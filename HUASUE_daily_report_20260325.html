@@ -162,7 +162,7 @@
   <div class="header-right">
     <div class="report-title">📊 每日库存分析报告</div>
     <div class="report-date">2026年03月25日 报告日期</div>
-    <div class="gen-time">生成时间: 2026-03-25 21:22:48</div>
+    <div class="gen-time">生成时间: 2026-03-25 21:37:18</div>
   </div>
 </div>
 
@@ -260,6 +260,35 @@
       <div class="chart-title">月度开票数量</div>
       <div class="chart-wrapper"><canvas id="invoiceCountChart" height="150"></canvas></div>
     </div>
+  </div>
+</div>
+
+<!-- Sales TOP20 by Period Section -->
+<div class="charts-section">
+  <div class="section-title">🏆 销售TOP20（区间排行）</div>
+  <div class="chart-card" style="padding:16px 20px;">
+    <!-- 区间切换按钮 -->
+    <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:14px;">
+      <span style="font-size:12px;color:#90a4ae;white-space:nowrap;">📅 时间区间：</span>
+      <button onclick="switchSalePeriod(7)" id="salePeriodBtn-7" style="padding:5px 14px;border-radius:6px;border:1px solid rgba(255,255,255,0.15);background:#1a1f35;color:#90a4ae;cursor:pointer;font-size:12px;white-space:nowrap;">近7天</button><button onclick="switchSalePeriod(15)" id="salePeriodBtn-15" style="padding:5px 14px;border-radius:6px;border:1px solid rgba(255,255,255,0.15);background:#1a1f35;color:#90a4ae;cursor:pointer;font-size:12px;white-space:nowrap;">近15天</button><button onclick="switchSalePeriod(30)" id="salePeriodBtn-30" style="padding:5px 14px;border-radius:6px;border:1px solid rgba(255,255,255,0.15);background:#1565c0;color:#fff;cursor:pointer;font-size:12px;white-space:nowrap;">近30天</button><button onclick="switchSalePeriod(60)" id="salePeriodBtn-60" style="padding:5px 14px;border-radius:6px;border:1px solid rgba(255,255,255,0.15);background:#1a1f35;color:#90a4ae;cursor:pointer;font-size:12px;white-space:nowrap;">近60天</button><button onclick="switchSalePeriod(90)" id="salePeriodBtn-90" style="padding:5px 14px;border-radius:6px;border:1px solid rgba(255,255,255,0.15);background:#1a1f35;color:#90a4ae;cursor:pointer;font-size:12px;white-space:nowrap;">近90天</button><button onclick="switchSalePeriod(180)" id="salePeriodBtn-180" style="padding:5px 14px;border-radius:6px;border:1px solid rgba(255,255,255,0.15);background:#1a1f35;color:#90a4ae;cursor:pointer;font-size:12px;white-space:nowrap;">近180天</button><button onclick="switchSalePeriod(360)" id="salePeriodBtn-360" style="padding:5px 14px;border-radius:6px;border:1px solid rgba(255,255,255,0.15);background:#1a1f35;color:#90a4ae;cursor:pointer;font-size:12px;white-space:nowrap;">近360天</button>
+      <span id="salePeriodHint" style="font-size:11px;color:#607d8b;margin-left:6px;"></span>
+    </div>
+    <!-- 图表模式切换：数量/金额 -->
+    <div style="display:flex;gap:8px;margin-bottom:12px;align-items:center;">
+      <span style="font-size:12px;color:#90a4ae;">排序依据：</span>
+      <button onclick="setSaleMode('qty')" id="saleModeQty"
+        style="padding:4px 14px;border-radius:6px;border:1px solid rgba(255,255,255,0.15);background:#00897b;color:#fff;cursor:pointer;font-size:12px;">
+        📦 销售数量
+      </button>
+      <button onclick="setSaleMode('amount')" id="saleModeAmt"
+        style="padding:4px 14px;border-radius:6px;border:1px solid rgba(255,255,255,0.15);background:#1a1f35;color:#90a4ae;cursor:pointer;font-size:12px;">
+        💰 销售金额
+      </button>
+    </div>
+    <div id="salePeriodNoData" style="display:none;padding:20px;text-align:center;color:#607d8b;font-size:13px;">
+      暂无该区间销售数据（账单数据不足）
+    </div>
+    <div class="chart-wrapper"><canvas id="saleTop20Chart" height="220"></canvas></div>
   </div>
 </div>
 
@@ -499,7 +528,7 @@
 
 <div class="footer">
   <p>HUASUE (华塑) | 华塑模具塑料有限公司</p>
-  <p>自动生成报告 | Generated: 2026-03-25 21:22:48 | Data Source: D:/codebuddy2/factory1kucun</p>
+  <p>自动生成报告 | Generated: 2026-03-25 21:37:18 | Data Source: D:/codebuddy2/factory1kucun</p>
 </div>
 
 <script>
@@ -1166,6 +1195,98 @@ new Chart(document.getElementById('invoiceCountChart'), {
     }
   }
 });
+
+// 7. Sales TOP20 by Period Chart
+const salesTop20Data = {"7": [], "15": [], "30": [], "60": [], "90": [], "180": [], "360": []};
+const SALE_PERIOD_LABELS = {"7": "\u8fd17\u5929", "15": "\u8fd115\u5929", "30": "\u8fd130\u5929", "60": "\u8fd160\u5929", "90": "\u8fd190\u5929", "180": "\u8fd1180\u5929", "360": "\u8fd1360\u5929"};
+let saleCurPeriod = 30;
+let saleCurMode = 'qty';  // 'qty' 或 'amount'
+
+const saleTop20Chart = new Chart(document.getElementById('saleTop20Chart'), {
+  type: 'bar',
+  data: { labels: [], datasets: [{ label: '销售数量', data: [], backgroundColor: [], borderColor: [], borderWidth: 1.5, borderRadius: 4 }] },
+  options: {
+    indexAxis: 'y',
+    responsive: true,
+    scales: {
+      x: { grid: { color: 'rgba(255,255,255,0.06)' }, ticks: { color: '#90a4ae' } },
+      y: { grid: { display: false }, ticks: { color: '#cfd8dc', font: { size: 11 } } }
+    },
+    plugins: {
+      legend: { display: false },
+      tooltip: {
+        callbacks: {
+          label: (ctx) => saleCurMode === 'qty'
+            ? ` 销售 ${ctx.raw.toLocaleString()} 件`
+            : ` ฿${ctx.raw.toLocaleString()} THB`
+        }
+      }
+    }
+  }
+});
+
+// 渐变颜色——销售图用橙→红暖色系
+function getSaleColor(idx, total) {
+  const hue = 30 - idx * (20 / Math.max(total, 1));
+  return `hsl(${Math.max(5, hue)}, 80%, 55%)`;
+}
+
+function updateSaleChart() {
+  const period = saleCurPeriod;
+  const arr = salesTop20Data[period] || [];
+  const noDataEl = document.getElementById('salePeriodNoData');
+  const hint = document.getElementById('salePeriodHint');
+  if (!arr || arr.length === 0) {
+    noDataEl.style.display = 'block';
+    saleTop20Chart.canvas.style.display = 'none';
+    if (hint) hint.textContent = '暂无数据';
+    return;
+  }
+  noDataEl.style.display = 'none';
+  saleTop20Chart.canvas.style.display = 'block';
+  // 按当前模式排序
+  const sorted = [...arr].sort((a, b) => b[saleCurMode] - a[saleCurMode]);
+  const labels = sorted.map(d => d.name || d.sku);
+  const vals   = sorted.map(d => d[saleCurMode]);
+  const total  = labels.length;
+  const colors = labels.map((_, i) => getSaleColor(i, total));
+  saleTop20Chart.data.labels = labels;
+  saleTop20Chart.data.datasets[0].data = vals;
+  saleTop20Chart.data.datasets[0].backgroundColor = colors.map(c => c.replace('55%', '45%') + '');
+  saleTop20Chart.data.datasets[0].borderColor = colors;
+  saleTop20Chart.data.datasets[0].label = saleCurMode === 'qty' ? '销售数量（件）' : '销售金额（THB）';
+  saleTop20Chart.update('active');
+  // 更新提示
+  const totalVal = vals.reduce((a, b) => a + b, 0);
+  if (hint) hint.textContent = saleCurMode === 'qty'
+    ? `合计 ${totalVal.toLocaleString()} 件 / ${total} 个SKU`
+    : `合计 ฿${totalVal.toLocaleString()}`;
+}
+
+function switchSalePeriod(period) {
+  saleCurPeriod = period;
+  // 更新按钮样式
+  [7,15,30,60,90,180,360].forEach(p => {
+    const btn = document.getElementById('salePeriodBtn-' + p);
+    if (!btn) return;
+    if (p === period) { btn.style.background = '#1565c0'; btn.style.color = '#fff'; }
+    else { btn.style.background = '#1a1f35'; btn.style.color = '#90a4ae'; }
+  });
+  updateSaleChart();
+}
+
+function setSaleMode(mode) {
+  saleCurMode = mode;
+  document.getElementById('saleModeQty').style.background = mode === 'qty' ? '#00897b' : '#1a1f35';
+  document.getElementById('saleModeQty').style.color = mode === 'qty' ? '#fff' : '#90a4ae';
+  document.getElementById('saleModeAmt').style.background = mode === 'amount' ? '#00897b' : '#1a1f35';
+  document.getElementById('saleModeAmt').style.color = mode === 'amount' ? '#fff' : '#90a4ae';
+  updateSaleChart();
+}
+
+// 初始渲染
+updateSaleChart();
+
 </script>
 </body>
 </html>
