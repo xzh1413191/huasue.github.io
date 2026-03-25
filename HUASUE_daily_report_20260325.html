@@ -162,7 +162,7 @@
   <div class="header-right">
     <div class="report-title">📊 每日库存分析报告</div>
     <div class="report-date">2026年03月25日 报告日期</div>
-    <div class="gen-time">生成时间: 2026-03-25 20:37:53</div>
+    <div class="gen-time">生成时间: 2026-03-25 20:58:07</div>
   </div>
 </div>
 
@@ -207,6 +207,19 @@
   <div class="charts-row charts-row-2">
     <div class="chart-card">
       <div class="chart-title">每日总库存数量趋势</div>
+      <!-- 说明栏 -->
+      <div style="display:flex;gap:16px;margin-bottom:8px;padding:8px 10px;background:rgba(255,255,255,0.04);border-radius:6px;flex-wrap:wrap;">
+        <div style="display:flex;align-items:center;gap:6px;">
+          <span style="display:inline-block;width:20px;height:3px;background:#2196f3;border-radius:2px;flex-shrink:0"></span>
+          <span style="font-size:12px;color:#90caf9;font-weight:600">蓝线：总库存件数</span>
+          <span style="font-size:11px;color:#607d8b">（左轴，所有产品库存数量之和）</span>
+        </div>
+        <div style="display:flex;align-items:center;gap:6px;">
+          <span style="display:inline-block;width:20px;height:3px;background:#4caf50;border-radius:2px;flex-shrink:0"></span>
+          <span style="font-size:12px;color:#a5d6a7;font-weight:600">绿线：活跃SKU种数</span>
+          <span style="font-size:11px;color:#607d8b">（右轴，有库存记录的产品种类数）</span>
+        </div>
+      </div>
       <div class="chart-wrapper"><canvas id="stockTrendChart" height="200"></canvas></div>
     </div>
     <div class="chart-card">
@@ -217,7 +230,19 @@
 
   <div class="charts-row charts-row-3">
     <div class="chart-card">
-      <div class="chart-title">库存TOP20产品（最新日期）</div>
+      <!-- TOP20 标题 + 日期切换 -->
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:8px;margin-bottom:10px;">
+        <div>
+          <div class="chart-title" style="margin-bottom:2px">库存TOP20产品</div>
+          <div id="top20DateLabel" style="font-size:12px;color:#78909c;">最新日期：2026-03-24</div>
+        </div>
+        <div style="display:flex;gap:6px;flex-wrap:wrap;">
+          <button onclick="switchTop20Date('2025-03-25')" id="top20Btn-2025-03-25" style="padding:4px 10px;border-radius:5px;border:1px solid rgba(255,255,255,0.15);background:#1a1f35;color:#90a4ae;cursor:pointer;font-size:11px;white-space:nowrap;">2025-03-25</button><button onclick="switchTop20Date('2026-03-17')" id="top20Btn-2026-03-17" style="padding:4px 10px;border-radius:5px;border:1px solid rgba(255,255,255,0.15);background:#1a1f35;color:#90a4ae;cursor:pointer;font-size:11px;white-space:nowrap;">2026-03-17</button><button onclick="switchTop20Date('2026-03-18')" id="top20Btn-2026-03-18" style="padding:4px 10px;border-radius:5px;border:1px solid rgba(255,255,255,0.15);background:#1a1f35;color:#90a4ae;cursor:pointer;font-size:11px;white-space:nowrap;">2026-03-18</button><button onclick="switchTop20Date('2026-03-19')" id="top20Btn-2026-03-19" style="padding:4px 10px;border-radius:5px;border:1px solid rgba(255,255,255,0.15);background:#1a1f35;color:#90a4ae;cursor:pointer;font-size:11px;white-space:nowrap;">2026-03-19</button><button onclick="switchTop20Date('2026-03-20')" id="top20Btn-2026-03-20" style="padding:4px 10px;border-radius:5px;border:1px solid rgba(255,255,255,0.15);background:#1a1f35;color:#90a4ae;cursor:pointer;font-size:11px;white-space:nowrap;">2026-03-20</button><button onclick="switchTop20Date('2026-03-21')" id="top20Btn-2026-03-21" style="padding:4px 10px;border-radius:5px;border:1px solid rgba(255,255,255,0.15);background:#1a1f35;color:#90a4ae;cursor:pointer;font-size:11px;white-space:nowrap;">2026-03-21</button><button onclick="switchTop20Date('2026-03-24')" id="top20Btn-2026-03-24" style="padding:4px 10px;border-radius:5px;border:1px solid rgba(255,255,255,0.15);background:#1565c0;color:#fff;cursor:pointer;font-size:11px;white-space:nowrap;">2026-03-24</button>
+        </div>
+      </div>
+      <!-- 分组颜色说明 -->
+      <div id="top20Legend" style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:10px;padding:8px;background:rgba(255,255,255,0.04);border-radius:6px;"></div>
+      <!-- 图表 -->
       <div class="chart-wrapper"><canvas id="top20Chart" height="300"></canvas></div>
     </div>
     <div class="chart-card">
@@ -474,7 +499,7 @@
 
 <div class="footer">
   <p>HUASUE (华塑) | 华塑模具塑料有限公司</p>
-  <p>自动生成报告 | Generated: 2026-03-25 20:37:53 | Data Source: D:/codebuddy2/factory1kucun</p>
+  <p>自动生成报告 | Generated: 2026-03-25 20:58:07 | Data Source: D:/codebuddy2/factory1kucun</p>
 </div>
 
 <script>
@@ -813,27 +838,32 @@ renderChgPagination();
 renderSSTable();
 renderSSPagination();
 
-// 1. Stock Trend Line Chart
+// 1. Stock Trend Line Chart — 蓝=总库存件数，绿=活跃SKU种数
 new Chart(document.getElementById('stockTrendChart'), {
   type: 'line',
   data: {
     labels: ["2025-03-25", "2026-03-17", "2026-03-18", "2026-03-19", "2026-03-20", "2026-03-21", "2026-03-24"],
     datasets: [{
-      label: '总库存数量',
+      label: '🔵 总库存件数（所有产品库存之和）',
       data: [31094.0, 36296.0, 34831.0, 34312.0, 32498.0, 32249.0, 31613.0],
       borderColor: '#2196f3',
       backgroundColor: 'rgba(33,150,243,0.1)',
       borderWidth: 2.5,
       pointBackgroundColor: '#2196f3',
+      pointBorderColor: '#fff',
+      pointBorderWidth: 2,
       pointRadius: 5,
       fill: true,
       tension: 0.3,
     }, {
-      label: 'SKU数量',
+      label: '🟢 活跃SKU种数（有记录的产品种类数）',
       data: [225, 230, 229, 228, 229, 229, 226],
       borderColor: '#4caf50',
       backgroundColor: 'rgba(76,175,80,0.05)',
       borderWidth: 2,
+      pointBackgroundColor: '#4caf50',
+      pointBorderColor: '#fff',
+      pointBorderWidth: 1.5,
       pointRadius: 4,
       fill: false,
       tension: 0.3,
@@ -844,11 +874,37 @@ new Chart(document.getElementById('stockTrendChart'), {
     responsive: true,
     interaction: { mode: 'index', intersect: false },
     scales: {
-      y: { grid: { color: 'rgba(255,255,255,0.06)' }, ticks: { color: '#90a4ae' } },
-      y2: { position: 'right', grid: { drawOnChartArea: false }, ticks: { color: '#4caf50' } },
+      y: {
+        grid: { color: 'rgba(255,255,255,0.06)' },
+        ticks: { color: '#90a4ae' },
+        title: { display: true, text: '库存总件数', color: '#90a4ae', font: { size: 11 } }
+      },
+      y2: {
+        position: 'right',
+        grid: { drawOnChartArea: false },
+        ticks: { color: '#4caf50' },
+        title: { display: true, text: 'SKU种数', color: '#4caf50', font: { size: 11 } }
+      },
       x: { grid: { color: 'rgba(255,255,255,0.06)' }, ticks: { color: '#90a4ae' } }
     },
-    plugins: { legend: { labels: { color: '#cfd8dc', boxWidth: 12 } } }
+    plugins: {
+      legend: {
+        labels: {
+          color: '#cfd8dc',
+          boxWidth: 16,
+          padding: 14,
+          font: { size: 11 }
+        }
+      },
+      tooltip: {
+        callbacks: {
+          label: (ctx) => {
+            if (ctx.datasetIndex === 0) return ` 总库存件数: ${ctx.raw.toLocaleString()} 件`;
+            return ` 活跃SKU: ${ctx.raw} 种`;
+          }
+        }
+      }
+    }
   }
 });
 
@@ -883,30 +939,111 @@ new Chart(document.getElementById('stockChangeChart'), {
   }
 });
 
-// 3. Top 20 Horizontal Bar
-new Chart(document.getElementById('top20Chart'), {
+// 3. Top 20 Horizontal Bar — 按分组着色 + 数据标签 + 日期切换
+const top20ByDate = {"2025-03-25": {"names": ["สินค้าตัวอย่าง", "HS-K008 中托 360ml 360 ML.", "HS-K007 圆碗 1300ml(1750) 1300 M", "HS - L008  ถาดรองแบ่งชั้น 360M", "HS-A015 长方形透明盒 ZS-350 ml", "HS-K009 方盒 400ml (500) 400 ML.", "HS-K001 圆碗 280ml(300) 280 ML.", "HS-A030 黑色美式高档盒 ZS-750 # Black", "HS-A029 黑色美式高档盒 ZS-650 # Black", "HS-K006 圆碗 1100ml(1500) 1100 M", "HS-K002 圆碗 400ml(450) 400 ML.", "HS-J 012 กล่องเหลี่ยม ฝาเซฟตี้", "HS-K005 圆碗 950ml(1250) 950 ML.", "HS - L001  กล่องข้าวกลม 280ML ", "HS-K010 方盒 500ml (650) 500 ML.", "HS-A031 黑色美式高档盒 ZS-1000 # Blac", "HS - L009  กล่องข้าวเหลี่ยม 40", "HS - L002  กล่องข้าวกลม 400ML ", "HS-A025 连体酱料杯 P1 2000", "HS-K004 圆碗 800ml(1000) 800 ML."], "vals": [1837.0, 694.0, 466.0, 451.0, 440.0, 430.0, 426.0, 402.0, 391.0, 387.0, 372.0, 368.0, 358.0, 352.0, 342.0, 332.0, 328.0, 312.0, 292.0, 291.0], "groups": ["", "001-K", "001-K", "008-L", "003-A", "001-K", "001-K", "003-A", "003-A", "001-K", "001-K", "002-J", "001-K", "008-L", "001-K", "003-A", "008-L", "008-L", "003-A", "001-K"]}, "2026-03-17": {"names": ["สินค้าตัวอย่าง", "HS-A015 长方形透明盒 ZS-350 ml", "HS-K008 中托 360ml 360 ML.", "HS-K009 方盒 400ml (500) 400 ML.", "HS-K001 圆碗 280ml(300) 280 ML.", "HS-K005 圆碗 950ml(1250) 950 ML.", "HS-K007 圆碗 1300ml(1750) 1300 M", "HS-K006 圆碗 1100ml(1500) 1100 M", "HS-K010 方盒 500ml (650) 500 ML.", "HS-K002 圆碗 400ml(450) 400 ML.", "HS-K003 圆碗 700ml(800) 700 ML.", "HS-K004 圆碗 800ml(1000) 800 ML.", "HS - L008  ถาดรองแบ่งชั้น 360M", "HS-K011 方盒 650ml (750) 650 ML.", "HS-A030 黑色美式高档盒 ZS-750 # Black", "HS-A029 黑色美式高档盒 ZS-650 # Black", "HS-K012 方盒 780ml (1000) 780 ML", "HS-J 012 กล่องเหลี่ยม ฝาเซฟตี้", "HS-K013 方盒 500ml 500 ML.", "HS - L001  กล่องข้าวกลม 280ML "], "vals": [1837.0, 940.0, 696.0, 492.0, 487.0, 487.0, 486.0, 483.0, 470.0, 465.0, 461.0, 461.0, 451.0, 435.0, 417.0, 391.0, 387.0, 368.0, 362.0, 358.0], "groups": ["", "003-A", "001-K", "001-K", "001-K", "001-K", "001-K", "001-K", "001-K", "001-K", "001-K", "001-K", "008-L", "001-K", "003-A", "003-A", "001-K", "002-J", "001-K", "008-L"]}, "2026-03-18": {"names": ["สินค้าตัวอย่าง", "HS-A015 长方形透明盒 ZS-350 ml", "HS-K008 中托 360ml 360 ML.", "HS-K009 方盒 400ml (500) 400 ML.", "HS-K007 圆碗 1300ml(1750) 1300 M", "HS-K001 圆碗 280ml(300) 280 ML.", "HS-K005 圆碗 950ml(1250) 950 ML.", "HS-K006 圆碗 1100ml(1500) 1100 M", "HS-K010 方盒 500ml (650) 500 ML.", "HS - L008  ถาดรองแบ่งชั้น 360M", "HS-K003 圆碗 700ml(800) 700 ML.", "HS-K002 圆碗 400ml(450) 400 ML.", "HS-K004 圆碗 800ml(1000) 800 ML.", "HS-K011 方盒 650ml (750) 650 ML.", "HS-A030 黑色美式高档盒 ZS-750 # Black", "HS-A029 黑色美式高档盒 ZS-650 # Black", "HS-J 012 กล่องเหลี่ยม ฝาเซฟตี้", "HS-K012 方盒 780ml (1000) 780 ML", "HS - L001  กล่องข้าวกลม 280ML ", "HS-A014 透明中托 ZS"], "vals": [1837.0, 790.0, 695.0, 486.0, 476.0, 470.0, 466.0, 465.0, 463.0, 451.0, 440.0, 439.0, 423.0, 410.0, 407.0, 391.0, 368.0, 365.0, 358.0, 342.0], "groups": ["", "003-A", "001-K", "001-K", "001-K", "001-K", "001-K", "001-K", "001-K", "008-L", "001-K", "001-K", "001-K", "001-K", "003-A", "003-A", "002-J", "001-K", "008-L", "003-A"]}, "2026-03-19": {"names": ["สินค้าตัวอย่าง", "HS-A015 长方形透明盒 ZS-350 ml", "HS-K008 中托 360ml 360 ML.", "HS-K009 方盒 400ml (500) 400 ML.", "HS-K007 圆碗 1300ml(1750) 1300 M", "HS-K001 圆碗 280ml(300) 280 ML.", "HS-K005 圆碗 950ml(1250) 950 ML.", "HS-K010 方盒 500ml (650) 500 ML.", "HS-K006 圆碗 1100ml(1500) 1100 M", "HS - L008  ถาดรองแบ่งชั้น 360M", "HS-K003 圆碗 700ml(800) 700 ML.", "HS-K002 圆碗 400ml(450) 400 ML.", "HS-K004 圆碗 800ml(1000) 800 ML.", "HS-A030 黑色美式高档盒 ZS-750 # Black", "HS-K011 方盒 650ml (750) 650 ML.", "HS-A029 黑色美式高档盒 ZS-650 # Black", "HS-J 012 กล่องเหลี่ยม ฝาเซฟตี้", "HS-K012 方盒 780ml (1000) 780 ML", "HS - L001  กล่องข้าวกลม 280ML ", "HS-A031 黑色美式高档盒 ZS-1000 # Blac"], "vals": [1837.0, 790.0, 695.0, 484.0, 475.0, 467.0, 464.0, 462.0, 457.0, 451.0, 438.0, 436.0, 416.0, 407.0, 405.0, 391.0, 368.0, 363.0, 358.0, 337.0], "groups": ["", "003-A", "001-K", "001-K", "001-K", "001-K", "001-K", "001-K", "001-K", "008-L", "001-K", "001-K", "001-K", "003-A", "001-K", "003-A", "002-J", "001-K", "008-L", "003-A"]}, "2026-03-20": {"names": ["สินค้าตัวอย่าง", "HS-A015 长方形透明盒 ZS-350 ml", "HS-K008 中托 360ml 360 ML.", "HS-K007 圆碗 1300ml(1750) 1300 M", "HS - L008  ถาดรองแบ่งชั้น 360M", "HS-K005 圆碗 950ml(1250) 950 ML.", "HS-K001 圆碗 280ml(300) 280 ML.", "HS-K009 方盒 400ml (500) 400 ML.", "HS-K010 方盒 500ml (650) 500 ML.", "HS-A030 黑色美式高档盒 ZS-750 # Black", "HS-K006 圆碗 1100ml(1500) 1100 M", "HS-A029 黑色美式高档盒 ZS-650 # Black", "HS-K002 圆碗 400ml(450) 400 ML.", "HS-J 012 กล่องเหลี่ยม ฝาเซฟตี้", "HS - L001  กล่องข้าวกลม 280ML ", "HS-A031 黑色美式高档盒 ZS-1000 # Blac", "HS - L009  กล่องข้าวเหลี่ยม 40", "HS - L002  กล่องข้าวกลม 400ML ", "HS-K004 圆碗 800ml(1000) 800 ML.", "HS-A014 透明中托 ZS"], "vals": [1837.0, 790.0, 695.0, 475.0, 451.0, 444.0, 436.0, 434.0, 412.0, 407.0, 407.0, 391.0, 384.0, 368.0, 358.0, 337.0, 329.0, 328.0, 303.0, 298.0], "groups": ["", "003-A", "001-K", "001-K", "008-L", "001-K", "001-K", "001-K", "001-K", "003-A", "001-K", "003-A", "001-K", "002-J", "008-L", "003-A", "008-L", "008-L", "001-K", "003-A"]}, "2026-03-21": {"names": ["สินค้าตัวอย่าง", "HS-A015 长方形透明盒 ZS-350 ml", "HS-K008 中托 360ml 360 ML.", "HS-K007 圆碗 1300ml(1750) 1300 M", "HS - L008  ถาดรองแบ่งชั้น 360M", "HS-K005 圆碗 950ml(1250) 950 ML.", "HS-K001 圆碗 280ml(300) 280 ML.", "HS-K009 方盒 400ml (500) 400 ML.", "HS-K010 方盒 500ml (650) 500 ML.", "HS-K006 圆碗 1100ml(1500) 1100 M", "HS-A030 黑色美式高档盒 ZS-750 # Black", "HS-A029 黑色美式高档盒 ZS-650 # Black", "HS-K002 圆碗 400ml(450) 400 ML.", "HS-J 012 กล่องเหลี่ยม ฝาเซฟตี้", "HS - L001  กล่องข้าวกลม 280ML ", "HS-A031 黑色美式高档盒 ZS-1000 # Blac", "HS - L009  กล่องข้าวเหลี่ยม 40", "HS - L002  กล่องข้าวกลม 400ML ", "HS-K004 圆碗 800ml(1000) 800 ML.", "HS-A025 连体酱料杯 P1 2000"], "vals": [1837.0, 790.0, 695.0, 473.0, 451.0, 438.0, 434.0, 434.0, 412.0, 405.0, 402.0, 391.0, 382.0, 368.0, 358.0, 332.0, 329.0, 328.0, 297.0, 293.0], "groups": ["", "003-A", "001-K", "001-K", "008-L", "001-K", "001-K", "001-K", "001-K", "001-K", "003-A", "003-A", "001-K", "002-J", "008-L", "003-A", "008-L", "008-L", "001-K", "003-A"]}, "2026-03-24": {"names": ["สินค้าตัวอย่าง", "HS-K008 中托 360ml 360 ML.", "HS-A015 长方形透明盒 ZS-350 ml", "HS-K007 圆碗 1300ml(1750) 1300 M", "HS - L008  ถาดรองแบ่งชั้น 360M", "HS-K009 方盒 400ml (500) 400 ML.", "HS-K001 圆碗 280ml(300) 280 ML.", "HS-K005 圆碗 950ml(1250) 950 ML.", "HS-K006 圆碗 1100ml(1500) 1100 M", "HS-A030 黑色美式高档盒 ZS-750 # Black", "HS-A029 黑色美式高档盒 ZS-650 # Black", "HS-K002 圆碗 400ml(450) 400 ML.", "HS-J 012 กล่องเหลี่ยม ฝาเซฟตี้", "HS - L001  กล่องข้าวกลม 280ML ", "HS-K010 方盒 500ml (650) 500 ML.", "HS-A031 黑色美式高档盒 ZS-1000 # Blac", "HS - L009  กล่องข้าวเหลี่ยม 40", "HS - L002  กล่องข้าวกลม 400ML ", "HS-A025 连体酱料杯 P1 2000", "HS-K004 圆碗 800ml(1000) 800 ML."], "vals": [1837.0, 695.0, 590.0, 466.0, 451.0, 433.0, 429.0, 409.0, 403.0, 402.0, 391.0, 373.0, 368.0, 352.0, 345.0, 332.0, 328.0, 325.0, 292.0, 291.0], "groups": ["", "001-K", "003-A", "001-K", "008-L", "001-K", "001-K", "001-K", "001-K", "003-A", "003-A", "001-K", "002-J", "008-L", "001-K", "003-A", "008-L", "008-L", "003-A", "001-K"]}};
+const top20Dates = ["2025-03-25", "2026-03-17", "2026-03-18", "2026-03-19", "2026-03-20", "2026-03-21", "2026-03-24"];
+let top20CurrentDate = top20Dates[top20Dates.length - 1];
+
+// 分组→颜色映射（固定色板，清晰区分）
+const GROUP_COLORS = {
+  '003-A': '#2196f3', '003-B': '#42a5f5', '003-C': '#90caf9',
+  '001-K': '#4caf50', '001-L': '#66bb6a', '001-J': '#a5d6a7',
+  '002-H': '#ff9800', '002-G': '#ffa726',
+  '004-F': '#9c27b0', '004-E': '#ba68c8',
+  '005-C': '#e91e63', '005-D': '#f06292',
+  'ถุง': '#ff5722', '': '#607d8b', 'default': '#607d8b'
+};
+
+function getGroupColor(group) {
+  return GROUP_COLORS[group] || GROUP_COLORS['default'];
+}
+
+function renderTop20Legend(groups) {
+  const seenGroups = [...new Set(groups)].filter(g => g);
+  const legend = document.getElementById('top20Legend');
+  if (!legend) return;
+  legend.innerHTML = seenGroups.map(g => {
+    const c = getGroupColor(g);
+    return `<div style="display:flex;align-items:center;gap:4px;font-size:11px;color:#cfd8dc;">
+      <span style="display:inline-block;width:12px;height:12px;border-radius:2px;background:${c};flex-shrink:0"></span>
+      <span>${g}</span>
+    </div>`;
+  }).join('');
+}
+
+const top20Chart = new Chart(document.getElementById('top20Chart'), {
   type: 'bar',
   data: {
-    labels: ["\u0e2a\u0e34\u0e19\u0e04\u0e49\u0e32\u0e15\u0e31\u0e27\u0e2d\u0e22\u0e48\u0e32\u0e07", "HS-K008 \u4e2d\u6258 360ml 360 ML.", "HS-A015 \u957f\u65b9\u5f62\u900f\u660e\u76d2 ZS-350 ml", "HS-K007 \u5706\u7897 1300ml(1750) 1300 M", "HS - L008  \u0e16\u0e32\u0e14\u0e23\u0e2d\u0e07\u0e41\u0e1a\u0e48\u0e07\u0e0a\u0e31\u0e49\u0e19 360M", "HS-K009 \u65b9\u76d2 400ml (500) 400 ML.", "HS-K001 \u5706\u7897 280ml(300) 280 ML.", "HS-K005 \u5706\u7897 950ml(1250) 950 ML.", "HS-K006 \u5706\u7897 1100ml(1500) 1100 M", "HS-A030 \u9ed1\u8272\u7f8e\u5f0f\u9ad8\u6863\u76d2 ZS-750 # Black", "HS-A029 \u9ed1\u8272\u7f8e\u5f0f\u9ad8\u6863\u76d2 ZS-650 # Black", "HS-K002 \u5706\u7897 400ml(450) 400 ML.", "HS-J 012 \u0e01\u0e25\u0e48\u0e2d\u0e07\u0e40\u0e2b\u0e25\u0e35\u0e48\u0e22\u0e21 \u0e1d\u0e32\u0e40\u0e0b\u0e1f\u0e15\u0e35\u0e49", "HS - L001  \u0e01\u0e25\u0e48\u0e2d\u0e07\u0e02\u0e49\u0e32\u0e27\u0e01\u0e25\u0e21 280ML ", "HS-K010 \u65b9\u76d2 500ml (650) 500 ML.", "HS-A031 \u9ed1\u8272\u7f8e\u5f0f\u9ad8\u6863\u76d2 ZS-1000 # Blac", "HS - L009  \u0e01\u0e25\u0e48\u0e2d\u0e07\u0e02\u0e49\u0e32\u0e27\u0e40\u0e2b\u0e25\u0e35\u0e48\u0e22\u0e21 40", "HS - L002  \u0e01\u0e25\u0e48\u0e2d\u0e07\u0e02\u0e49\u0e32\u0e27\u0e01\u0e25\u0e21 400ML ", "HS-A025 \u8fde\u4f53\u9171\u6599\u676f P1 2000", "HS-K004 \u5706\u7897 800ml(1000) 800 ML."],
+    labels: [],
     datasets: [{
-      label: '库存数量',
-      data: [1837.0, 695.0, 590.0, 466.0, 451.0, 433.0, 429.0, 409.0, 403.0, 402.0, 391.0, 373.0, 368.0, 352.0, 345.0, 332.0, 328.0, 325.0, 292.0, 291.0],
-      backgroundColor: palette.map((c, i) => c + 'cc'),
-      borderColor: palette,
-      borderWidth: 1,
-      borderRadius: 3,
+      label: '库存数量（箱）',
+      data: [],
+      backgroundColor: [],
+      borderColor: [],
+      borderWidth: 1.5,
+      borderRadius: 4,
     }]
   },
   options: {
     indexAxis: 'y',
     responsive: true,
     scales: {
-      x: { grid: { color: 'rgba(255,255,255,0.06)' }, ticks: { color: '#90a4ae' } },
-      y: { grid: { display: false }, ticks: { color: '#cfd8dc', font: { size: 11 } } }
+      x: {
+        grid: { color: 'rgba(255,255,255,0.06)' },
+        ticks: { color: '#90a4ae' }
+      },
+      y: {
+        grid: { display: false },
+        ticks: { color: '#cfd8dc', font: { size: 11 } }
+      }
     },
-    plugins: { legend: { display: false } }
+    plugins: {
+      legend: { display: false },
+      tooltip: {
+        callbacks: {
+          label: (ctx) => ` ${ctx.raw.toLocaleString()} 箱`,
+          afterLabel: (ctx) => {
+            const d = top20ByDate[top20CurrentDate];
+            if (d && d.groups) return `分组: ${d.groups[ctx.dataIndex] || '—'}`;
+            return '';
+          }
+        }
+      }
+    }
   }
 });
+
+function switchTop20Date(dateStr) {
+  top20CurrentDate = dateStr;
+  // 更新按钮样式
+  top20Dates.forEach(d => {
+    const btn = document.getElementById('top20Btn-' + d);
+    if (!btn) return;
+    if (d === dateStr) {
+      btn.style.background = '#1565c0';
+      btn.style.color = '#fff';
+    } else {
+      btn.style.background = '#1a1f35';
+      btn.style.color = '#90a4ae';
+    }
+  });
+  // 更新标签
+  const label = document.getElementById('top20DateLabel');
+  if (label) label.textContent = '日期：' + dateStr;
+  // 更新图表数据
+  const d = top20ByDate[dateStr];
+  if (!d) return;
+  const colors = d.groups.map(g => getGroupColor(g));
+  top20Chart.data.labels = d.names;
+  top20Chart.data.datasets[0].data = d.vals;
+  top20Chart.data.datasets[0].backgroundColor = colors.map(c => c + 'bb');
+  top20Chart.data.datasets[0].borderColor = colors;
+  top20Chart.update('active');
+  renderTop20Legend(d.groups);
+}
+
+// 初始渲染最新日期
+switchTop20Date(top20Dates[top20Dates.length - 1]);
 
 // 4. Group Chart (全部分组，用横向柱状图)
 new Chart(document.getElementById('groupPieChart'), {
@@ -933,18 +1070,24 @@ new Chart(document.getElementById('groupPieChart'), {
   }
 });
 
-// 5. Monthly Bill Bar Chart
+// 5. Monthly Sales LINE Chart（折线图）
 new Chart(document.getElementById('monthlyBillChart'), {
-  type: 'bar',
+  type: 'line',
   data: {
     labels: ["11.25", "12.25", "1.26", "2.26", "3.26"],
     datasets: [{
-      label: '销售额 (THB)',
+      label: '月度销售额 (฿THB)',
       data: [2455235.0, 4354410.0, 4872849.0, 3624498.0, 5650604.0],
-      backgroundColor: 'rgba(229,57,53,0.7)',
       borderColor: '#e53935',
-      borderWidth: 1.5,
-      borderRadius: 5,
+      backgroundColor: 'rgba(229,57,53,0.12)',
+      borderWidth: 2.5,
+      pointBackgroundColor: '#e53935',
+      pointBorderColor: '#fff',
+      pointBorderWidth: 2,
+      pointRadius: 7,
+      pointHoverRadius: 9,
+      fill: true,
+      tension: 0.3,
     }]
   },
   options: {
@@ -955,7 +1098,8 @@ new Chart(document.getElementById('monthlyBillChart'), {
         ticks: {
           color: '#90a4ae',
           callback: (v) => '฿' + (v/1000).toFixed(0) + 'K'
-        }
+        },
+        beginAtZero: true,
       },
       x: { grid: { display: false }, ticks: { color: '#90a4ae' } }
     },
@@ -963,8 +1107,11 @@ new Chart(document.getElementById('monthlyBillChart'), {
       legend: { labels: { color: '#cfd8dc' } },
       tooltip: {
         callbacks: {
-          label: (ctx) => ` ฿${ctx.raw.toLocaleString()}`
+          label: (ctx) => ` ฿${ctx.raw.toLocaleString()} THB`
         }
+      },
+      datalabels: {
+        display: false
       }
     }
   }
