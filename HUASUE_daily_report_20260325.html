@@ -163,7 +163,7 @@
   <div class="header-right">
     <div class="report-title">📊 每日库存分析报告</div>
     <div class="report-date">2026年03月25日 报告日期</div>
-    <div class="gen-time">生成时间: 2026-03-25 22:41:52</div>
+    <div class="gen-time">生成时间: 2026-03-25 23:00:50</div>
   </div>
 </div>
 
@@ -290,6 +290,61 @@
       暂无该区间销售数据（账单数据不足）
     </div>
     <div class="chart-wrapper"><canvas id="saleTop20Chart" style="width:100%;height:360px;"></canvas></div>
+  </div>
+</div>
+
+<!-- 客户销售TOP20 -->
+<div class="charts-section">
+  <div class="section-title">🏅 客户销售TOP20（累计排行）</div>
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;flex-wrap:wrap;">
+    <!-- 左：客户TOP20条形图 -->
+    <div class="chart-card" style="padding:16px 20px;">
+      <div style="font-size:13px;color:#90a4ae;margin-bottom:12px;">📊 按累计销售金额（THB）排名</div>
+      <div style="display:flex;gap:8px;margin-bottom:10px;">
+        <button onclick="setCustMode('total')" id="custModeTotal"
+          style="padding:4px 12px;border-radius:6px;border:1px solid rgba(255,255,255,0.15);background:#1565c0;color:#fff;cursor:pointer;font-size:12px;">
+          💰 总金额（含税）
+        </button>
+        <button onclick="setCustMode('goods')" id="custModeGoods"
+          style="padding:4px 12px;border-radius:6px;border:1px solid rgba(255,255,255,0.15);background:#1a1f35;color:#90a4ae;cursor:pointer;font-size:12px;">
+          📦 货款金额
+        </button>
+      </div>
+      <div class="chart-wrapper"><canvas id="custTop20Chart" style="width:100%;height:380px;"></canvas></div>
+    </div>
+    <!-- 右：业务员业绩 + 产品类别饼图 -->
+    <div style="display:flex;flex-direction:column;gap:16px;">
+      <div class="chart-card" style="padding:16px 20px;">
+        <div style="font-size:13px;color:#90a4ae;margin-bottom:10px;">👤 业务员业绩对比</div>
+        <canvas id="spBarChart" style="width:100%;height:160px;max-height:160px;"></canvas>
+        <div id="spSummary" style="margin-top:10px;display:flex;gap:12px;flex-wrap:wrap;font-size:12px;"></div>
+      </div>
+      <div class="chart-card" style="padding:16px 20px;">
+        <div style="font-size:13px;color:#90a4ae;margin-bottom:10px;">🗂️ 产品类别销售占比（Top10）</div>
+        <canvas id="catPieChart" style="width:100%;height:200px;max-height:200px;"></canvas>
+      </div>
+    </div>
+  </div>
+  <!-- 客户TOP20 详情表 -->
+  <div class="chart-card" style="margin-top:16px;padding:0;overflow:hidden;">
+    <div style="padding:14px 20px;font-size:13px;color:#90a4ae;border-bottom:1px solid rgba(255,255,255,0.07);">
+      📋 客户明细表（点击列头排序）
+    </div>
+    <div style="overflow-x:auto;">
+      <table id="custDetailTable" style="width:100%;border-collapse:collapse;font-size:12px;">
+        <thead>
+          <tr style="background:#1a1f35;color:#90a4ae;">
+            <th onclick="sortCustTable(0)" style="padding:10px 12px;text-align:center;cursor:pointer;white-space:nowrap;">排名 ↕</th>
+            <th onclick="sortCustTable(1)" style="padding:10px 12px;text-align:left;cursor:pointer;">客户ID ↕</th>
+            <th style="padding:10px 12px;text-align:left;">客户名称</th>
+            <th onclick="sortCustTable(3)" style="padding:10px 12px;text-align:right;cursor:pointer;white-space:nowrap;">货款金额 ↕</th>
+            <th onclick="sortCustTable(4)" style="padding:10px 12px;text-align:right;cursor:pointer;white-space:nowrap;">总金额（含税）↕</th>
+            <th style="padding:10px 12px;text-align:center;">业务员</th>
+          </tr>
+        </thead>
+        <tbody id="custDetailBody"></tbody>
+      </table>
+    </div>
   </div>
 </div>
 
@@ -529,7 +584,7 @@
 
 <div class="footer">
   <p>HUASUE (华塑) | 华塑模具塑料有限公司</p>
-  <p>自动生成报告 | Generated: 2026-03-25 22:41:52 | Data Source: D:/codebuddy2/factory1kucun</p>
+  <p>自动生成报告 | Generated: 2026-03-25 23:00:50 | Data Source: D:/codebuddy2/factory1kucun</p>
 </div>
 
 <script>
@@ -1227,6 +1282,16 @@ const SALE_PERIOD_LABELS = {"7": "\u8fd17\u5929", "15": "\u8fd115\u5929", "30": 
 let saleCurPeriod = 30;
 let saleCurMode = 'qty';  // 'qty' 或 'amount'
 
+// ── 客户TOP20 数据 ──
+const custTop20Data = [{"rank": 1, "id": "HS-151", "name": "99 เฮง เฮง เฮง จำกัด", "goods_amount": 613841.0, "total_amount": 656810.0, "salesperson": "Dow"}, {"rank": 2, "id": "HS-B041", "name": "บริษัท ไวซันไทย จำกัด", "goods_amount": 544845.0, "total_amount": 580746.0, "salesperson": "Elaine"}, {"rank": 3, "id": "HS-036", "name": "อาณาจักรเบเกอรี่ จำกัด", "goods_amount": 503827.0, "total_amount": 539095.0, "salesperson": "Dow"}, {"rank": 4, "id": "HS-B092", "name": "บริษัท วิน วิน แอนด์ โปร แพ็ค จำกัด", "goods_amount": 375738.0, "total_amount": 402040.0, "salesperson": "Elaine"}, {"rank": 5, "id": "HS-087", "name": "หอยจ๊อแม่วรรณา จำกัด", "goods_amount": 297567.0, "total_amount": 318397.0, "salesperson": "Dow"}, {"rank": 6, "id": "HS-019", "name": "ท็อปเวิลด์ (2014) จำกัด", "goods_amount": 229468.0, "total_amount": 245531.0, "salesperson": "Dow"}, {"rank": 7, "id": "HS-077", "name": "ศูนย์รวมแก้ว 2 (ร้านแป้งเค้ก)", "goods_amount": 218127.0, "total_amount": 233396.0, "salesperson": "Dow"}, {"rank": 8, "id": "HS-037", "name": "ลักขณาแพค จำกัด", "goods_amount": 206711.0, "total_amount": 221181.0, "salesperson": "Dow"}, {"rank": 9, "id": "HS-168", "name": "พรทิพย์ ศรีอัศวประเสริฐ (ร้านเจพีการค้า)", "goods_amount": 192514.0, "total_amount": 205990.0, "salesperson": "Dow"}, {"rank": 10, "id": "HS-161", "name": "พรทิพย์ ศรีอัศวประเสริฐ (เจพีการค้า)", "goods_amount": 182394.0, "total_amount": 195162.0, "salesperson": "Dow"}, {"rank": 11, "id": "HS-002", "name": "ซินไท่ อินดัสทรี แอนด์ เทรด จำกัด", "goods_amount": 176864.0, "total_amount": 189244.0, "salesperson": "Dow"}, {"rank": 12, "id": "HS-132", "name": "เจ๋ง 1688 จำกัด", "goods_amount": 150119.0, "total_amount": 160628.0, "salesperson": "Dow"}, {"rank": 13, "id": "HS-013", "name": "ขอนแก่น เบเกอรี่แลนด์ จำกัด (สนง.ใหญ่)", "goods_amount": 149899.0, "total_amount": 160392.0, "salesperson": "Dow"}, {"rank": 14, "id": "HS-067", "name": "เอ็มบีเอ โปร ฟู๊ด จำกัด", "goods_amount": 148014.0, "total_amount": 158375.0, "salesperson": "Dow"}, {"rank": 15, "id": "HS-040", "name": "เอฟดี เบเกอร์มาร์ท จำกัด", "goods_amount": 146847.0, "total_amount": 157126.0, "salesperson": "Dow"}, {"rank": 16, "id": "HS-B078", "name": "คุณ ธนันพัชร์ ใจดี (ร้านนับเงินบรรจุภัณฑ์)", "goods_amount": 121277.0, "total_amount": 129766.0, "salesperson": "Elaine"}, {"rank": 17, "id": "HS-B056", "name": "คุณ อนุกูล ประทุมทอง (ร้านเอ็มมาร์ท)", "goods_amount": 112743.0, "total_amount": 120635.0, "salesperson": "Elaine"}, {"rank": 18, "id": "HS-B015", "name": "บริษัท ต่างต่าง นานา จำกัด", "goods_amount": 112207.0, "total_amount": 120062.0, "salesperson": "Elaine"}, {"rank": 19, "id": "HS-029", "name": "โชติปทุมวรรณ เทรดดิ้ง เซ็นเตอร์ จำกัด", "goods_amount": 107631.0, "total_amount": 115166.0, "salesperson": "Dow"}, {"rank": 20, "id": "HS-023", "name": "ตั้งจิบเซ้ง ดิสทริบิวเตอร์ จำกัด (สนง.ใหญ่)", "goods_amount": 104738.0, "total_amount": 112070.0, "salesperson": "Dow"}];
+const spLabels = ["Dow", "Elaine"];
+const spAmounts = [6047554.0, 3355989.0];
+const spCounts = [102, 100];
+const skuCatData = [{"category": "高档外卖盒", "amount": 1256390.0}, {"category": "烘焙甜品盒", "amount": 1022614.0}, {"category": "通货方盒（standard）", "amount": 948023.0}, {"category": "耗材配料杯", "amount": 446496.0}, {"category": "通货方盒(底部花纹)", "amount": 443100.0}, {"category": "圆PET透明带盖高脚盘(Pedestal Cake Plate with Dom", "amount": 413100.0}, {"category": "便当套餐盒", "amount": 408956.0}, {"category": "通货圆碗(底部花纹)", "amount": 381986.0}, {"category": "长方形 PET 透明带盖托盘\nRectangular Clear PET Tra", "amount": 321950.0}, {"category": "餐饮打包碗", "amount": 286368.0}, {"category": "高端精品罐", "amount": 237394.0}, {"category": "密封包装罐", "amount": 211887.0}, {"category": "高透造型罐", "amount": 211826.0}, {"category": "防盗桶", "amount": 190681.0}, {"category": "正方防盗盒\ntamper-evident", "amount": 161354.0}];
+let custCurMode = 'total';  // 'total' 或 'goods'
+
+
+
 const saleTop20Chart = new Chart(document.getElementById('saleTop20Chart'), {
   type: 'bar',
   data: { labels: [], datasets: [{ label: '销售数量', data: [], backgroundColor: [], borderColor: [], borderWidth: 1.5, borderRadius: 4 }] },
@@ -1311,6 +1376,167 @@ function setSaleMode(mode) {
 
 // 初始渲染
 updateSaleChart();
+
+// ═══════════════════════════════════════════
+// 客户销售TOP20 图表
+// ═══════════════════════════════════════════
+
+// 客户TOP20 条形图
+const custTop20Chart = new Chart(document.getElementById('custTop20Chart'), {
+  type: 'bar',
+  data: { labels: [], datasets: [{ label: '总金额', data: [], backgroundColor: [], borderRadius: 4 }] },
+  options: {
+    indexAxis: 'y',
+    responsive: true,
+    maintainAspectRatio: false,
+    scales: {
+      x: { grid: { color: 'rgba(255,255,255,0.06)' }, ticks: { color: '#90a4ae', callback: v => '฿' + v.toLocaleString() } },
+      y: { grid: { display: false }, ticks: { color: '#cfd8dc', font: { size: 10 } } }
+    },
+    plugins: {
+      legend: { display: false },
+      tooltip: {
+        callbacks: {
+          label: (ctx) => ` ฿${ctx.raw.toLocaleString()} THB`,
+          afterLabel: (ctx) => {
+            const d = custTop20Data[ctx.dataIndex];
+            return d ? ` 业务员: ${d.salesperson}` : '';
+          }
+        }
+      }
+    }
+  }
+});
+
+function getCustColor(idx, total) {
+  const hue = 210 - idx * (120 / Math.max(total, 1));
+  return `hsl(${Math.max(90, hue)}, 70%, 52%)`;
+}
+
+function updateCustChart() {
+  const field = custCurMode === 'total' ? 'total_amount' : 'goods_amount';
+  const labels = custTop20Data.map(d => d.name.length > 22 ? d.name.slice(0,22)+'…' : d.name);
+  const vals = custTop20Data.map(d => d[field]);
+  const colors = custTop20Data.map((_, i) => getCustColor(i, custTop20Data.length));
+  custTop20Chart.data.labels = labels;
+  custTop20Chart.data.datasets[0].data = vals;
+  custTop20Chart.data.datasets[0].backgroundColor = colors;
+  custTop20Chart.data.datasets[0].label = custCurMode === 'total' ? '总金额（含税）' : '货款金额';
+  custTop20Chart.update();
+
+  // 更新明细表
+  const tbody = document.getElementById('custDetailBody');
+  if (tbody) {
+    tbody.innerHTML = custTop20Data.map((d,i) => `
+      <tr style="border-bottom:1px solid rgba(255,255,255,0.05);${i%2===0?'background:rgba(255,255,255,0.02)':''}">
+        <td style="padding:8px 12px;text-align:center;color:#ffd54f;font-weight:700;">${d.rank}</td>
+        <td style="padding:8px 12px;color:#80cbc4;font-size:11px;">${d.id}</td>
+        <td style="padding:8px 12px;color:#e0e0e0;max-width:240px;word-break:break-all;">${d.name}</td>
+        <td style="padding:8px 12px;text-align:right;color:#a5d6a7;">฿${d.goods_amount.toLocaleString()}</td>
+        <td style="padding:8px 12px;text-align:right;color:#fff176;font-weight:600;">฿${d.total_amount.toLocaleString()}</td>
+        <td style="padding:8px 12px;text-align:center;color:#ce93d8;">${d.salesperson}</td>
+      </tr>
+    `).join('');
+  }
+}
+
+function setCustMode(mode) {
+  custCurMode = mode;
+  document.getElementById('custModeTotal').style.background = mode === 'total' ? '#1565c0' : '#1a1f35';
+  document.getElementById('custModeTotal').style.color = mode === 'total' ? '#fff' : '#90a4ae';
+  document.getElementById('custModeGoods').style.background = mode === 'goods' ? '#1565c0' : '#1a1f35';
+  document.getElementById('custModeGoods').style.color = mode === 'goods' ? '#fff' : '#90a4ae';
+  updateCustChart();
+}
+
+// 业务员业绩柱图
+const spBarChart = new Chart(document.getElementById('spBarChart'), {
+  type: 'bar',
+  data: {
+    labels: spLabels,
+    datasets: [{
+      label: '销售总额',
+      data: spAmounts,
+      backgroundColor: ['#42a5f5','#ec407a','#66bb6a','#ffa726'],
+      borderRadius: 6,
+    }]
+  },
+  options: {
+    responsive: true,
+    maintainAspectRatio: false,
+    scales: {
+      y: { grid: { color: 'rgba(255,255,255,0.06)' }, ticks: { color: '#90a4ae', callback: v => '฿'+v.toLocaleString() } },
+      x: { grid: { display: false }, ticks: { color: '#cfd8dc' } }
+    },
+    plugins: {
+      legend: { display: false },
+      tooltip: {
+        callbacks: {
+          label: (ctx) => ` 销售 ฿${ctx.raw.toLocaleString()} | 客户 ${spCounts[ctx.dataIndex]} 个`
+        }
+      }
+    }
+  }
+});
+
+// 业务员汇总文字
+const spSummaryEl = document.getElementById('spSummary');
+if (spSummaryEl && spLabels.length) {
+  const spColors = ['#42a5f5','#ec407a','#66bb6a','#ffa726'];
+  spSummaryEl.innerHTML = spLabels.map((name, i) => `
+    <div style="background:rgba(255,255,255,0.05);padding:6px 12px;border-radius:6px;border-left:3px solid ${spColors[i%spColors.length]};">
+      <span style="color:${spColors[i%spColors.length]};font-weight:600;">${name}</span>
+      <span style="color:#90a4ae;margin-left:6px;">฿${spAmounts[i].toLocaleString()}</span>
+      <span style="color:#607d8b;margin-left:4px;font-size:11px;">(${spCounts[i]}客户)</span>
+    </div>
+  `).join('');
+}
+
+// 产品类别饼图
+if (skuCatData.length > 0) {
+  const catLabels = skuCatData.map(d => d.category.length > 18 ? d.category.slice(0,18)+'…' : d.category);
+  const catVals = skuCatData.map(d => d.amount);
+  const catColors = ['#42a5f5','#ec407a','#66bb6a','#ffa726','#ab47bc','#26c6da','#ef5350','#8d6e63','#78909c','#d4e157',
+                     '#ff8a65','#a1887f','#90a4ae','#80cbc4','#ffcc02'];
+  new Chart(document.getElementById('catPieChart'), {
+    type: 'doughnut',
+    data: { labels: catLabels, datasets: [{ data: catVals, backgroundColor: catColors.slice(0, catVals.length), borderWidth: 1, borderColor: '#0f0f1a' }] },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: {
+        legend: { position: 'right', labels: { color: '#90a4ae', font: { size: 10 }, boxWidth: 12 } },
+        tooltip: { callbacks: { label: (ctx) => ` ${ctx.label}: ฿${ctx.raw.toLocaleString()}` } }
+      }
+    }
+  });
+}
+
+// 客户表格排序
+let custSortAsc = [true,true,true,true,true,true];
+function sortCustTable(col) {
+  const arr = [...custTop20Data];
+  const asc = custSortAsc[col] = !custSortAsc[col];
+  const keys = ['rank','id','name','goods_amount','total_amount','salesperson'];
+  arr.sort((a,b) => {
+    const va = a[keys[col]], vb = b[keys[col]];
+    return asc ? (va > vb ? 1 : -1) : (va < vb ? 1 : -1);
+  });
+  const tbody = document.getElementById('custDetailBody');
+  tbody.innerHTML = arr.map((d,i) => `
+    <tr style="border-bottom:1px solid rgba(255,255,255,0.05);${i%2===0?'background:rgba(255,255,255,0.02)':''}">
+      <td style="padding:8px 12px;text-align:center;color:#ffd54f;font-weight:700;">${d.rank}</td>
+      <td style="padding:8px 12px;color:#80cbc4;font-size:11px;">${d.id}</td>
+      <td style="padding:8px 12px;color:#e0e0e0;max-width:240px;word-break:break-all;">${d.name}</td>
+      <td style="padding:8px 12px;text-align:right;color:#a5d6a7;">฿${d.goods_amount.toLocaleString()}</td>
+      <td style="padding:8px 12px;text-align:right;color:#fff176;font-weight:600;">฿${d.total_amount.toLocaleString()}</td>
+      <td style="padding:8px 12px;text-align:center;color:#ce93d8;">${d.salesperson}</td>
+    </tr>
+  `).join('');
+}
+
+// 初始渲染客户图表
+updateCustChart();
 
 </script>
 </body>
