@@ -162,7 +162,7 @@
   <div class="header-right">
     <div class="report-title">📊 每日库存分析报告</div>
     <div class="report-date">2026年03月25日 报告日期</div>
-    <div class="gen-time">生成时间: 2026-03-25 20:20:10</div>
+    <div class="gen-time">生成时间: 2026-03-25 20:37:53</div>
   </div>
 </div>
 
@@ -264,7 +264,7 @@
       💡 显示各SKU每日库存数量及环比变化。绿色=增加，红色=减少。数据量将随工厂运营积累而增加。
       <br>显示每个SKU每日库存变化，绿色=增加，红色=减少
     </div>
-    <!-- 搜索 -->
+    <!-- 搜索与日期筛选 -->
     <div style="display:flex;gap:12px;margin-bottom:12px;flex-wrap:wrap;align-items:center;">
       <input id="chgSearchInput" type="text" placeholder="🔍 搜索产品/条码/分组..." 
         style="flex:1;min-width:180px;padding:7px 12px;background:#0f1627;border:1px solid rgba(255,255,255,0.15);border-radius:8px;color:#e0e0e0;font-size:12px;outline:none;"
@@ -283,15 +283,40 @@
       </select>
       <span id="chgResultCount" style="font-size:12px;color:#607d8b;white-space:nowrap;">共 200 条</span>
     </div>
+    <!-- 日期筛选：快捷按钮 + 下拉 -->
+    <div style="display:flex;gap:8px;margin-bottom:14px;flex-wrap:wrap;align-items:center;">
+      <span style="font-size:12px;color:#90a4ae;white-space:nowrap;">📅 显示日期：</span>
+      <button onclick="setChgDateFilter('all')" id="chgDateAll"
+        style="padding:5px 14px;border-radius:6px;border:1px solid rgba(255,255,255,0.15);background:#2196f3;color:#fff;cursor:pointer;font-size:12px;">
+        全部日期
+      </button>
+      <button onclick="setChgDateFilter('latest')" id="chgDateLatest"
+        style="padding:5px 14px;border-radius:6px;border:1px solid rgba(255,255,255,0.15);background:#1a1f35;color:#90a4ae;cursor:pointer;font-size:12px;">
+        仅最新
+      </button>
+      <button onclick="setChgDateFilter('last3')" id="chgDateLast3"
+        style="padding:5px 14px;border-radius:6px;border:1px solid rgba(255,255,255,0.15);background:#1a1f35;color:#90a4ae;cursor:pointer;font-size:12px;">
+        近3天
+      </button>
+      <button onclick="setChgDateFilter('last7')" id="chgDateLast7"
+        style="padding:5px 14px;border-radius:6px;border:1px solid rgba(255,255,255,0.15);background:#1a1f35;color:#90a4ae;cursor:pointer;font-size:12px;">
+        近7天
+      </button>
+      <select id="chgDateSelect" onchange="setChgDateFilterSingle(this.value)"
+        style="padding:5px 10px;background:#0f1627;border:1px solid rgba(255,255,255,0.15);border-radius:6px;color:#e0e0e0;font-size:12px;outline:none;min-width:140px;">
+        <option value="">-- 选择单一日期 --</option>
+        <option value="2025-03-25">2025-03-25</option><option value="2026-03-17">2026-03-17</option><option value="2026-03-18">2026-03-18</option><option value="2026-03-19">2026-03-19</option><option value="2026-03-20">2026-03-20</option><option value="2026-03-21">2026-03-21</option><option value="2026-03-24">2026-03-24</option>
+      </select>
+    </div>
     <div style="overflow-x:auto;">
     <table class="data-table" id="chgTable">
       <thead>
-        <tr>
+        <tr id="chgTableHeaderRow">
           <th>#</th>
           <th>条码</th>
           <th>产品名称</th>
           <th>分组</th>
-          <th style="text-align:center;font-size:11px">2025-03-25</th><th style="text-align:center;font-size:11px">2026-03-17</th><th style="text-align:center;font-size:11px">2026-03-18</th><th style="text-align:center;font-size:11px">2026-03-19</th><th style="text-align:center;font-size:11px">2026-03-20</th><th style="text-align:center;font-size:11px">2026-03-21</th><th style="text-align:center;font-size:11px">2026-03-24</th>
+          <th class="chg-date-th" data-date="2025-03-25" style="text-align:center;font-size:11px;white-space:nowrap">2025-03-25</th><th class="chg-date-th" data-date="2026-03-17" style="text-align:center;font-size:11px;white-space:nowrap">2026-03-17</th><th class="chg-date-th" data-date="2026-03-18" style="text-align:center;font-size:11px;white-space:nowrap">2026-03-18</th><th class="chg-date-th" data-date="2026-03-19" style="text-align:center;font-size:11px;white-space:nowrap">2026-03-19</th><th class="chg-date-th" data-date="2026-03-20" style="text-align:center;font-size:11px;white-space:nowrap">2026-03-20</th><th class="chg-date-th" data-date="2026-03-21" style="text-align:center;font-size:11px;white-space:nowrap">2026-03-21</th><th class="chg-date-th" data-date="2026-03-24" style="text-align:center;font-size:11px;white-space:nowrap">2026-03-24</th>
           <th style="text-align:center">最新变化</th>
         </tr>
       </thead>
@@ -421,7 +446,6 @@
         <option value="zero">🔴 零库存</option>
         <option value="low">🟠 低库存(≤10)</option>
         <option value="medium">🟡 适中(11-50)</option>
-        <option value="good">🟢 充足(&gt;50)</option>
       </select>
       <span id="resultCount" style="font-size:12px;color:#607d8b;white-space:nowrap;">共 226 条</span>
     </div>
@@ -450,7 +474,7 @@
 
 <div class="footer">
   <p>HUASUE (华塑) | 华塑模具塑料有限公司</p>
-  <p>自动生成报告 | Generated: 2026-03-25 20:20:10 | Data Source: D:/codebuddy2/factory1kucun</p>
+  <p>自动生成报告 | Generated: 2026-03-25 20:37:53 | Data Source: D:/codebuddy2/factory1kucun</p>
 </div>
 
 <script>
@@ -472,7 +496,7 @@ function getStatusBadge(rem) {
   if (rem <= 0) return "<span class='badge badge-red'>🔴 零库存</span>";
   if (rem <= 10) return "<span class='badge badge-orange'>🟠 低库存</span>";
   if (rem <= 50) return "<span class='badge badge-orange' style='background:rgba(255,235,59,0.15);color:#fff176'>🟡 适中</span>";
-  return "<span class='badge badge-green'>🟢 充足</span>";
+  return "<span style='color:#546e7a;font-size:11px'>—</span>";
 }
 
 function filterTable() {
@@ -570,6 +594,60 @@ const CHG_PAGE_SIZE = 50;
 let filteredChg = [...productChanges];
 let chgPage = 1;
 
+// ── 日期筛选状态 ──
+let chgActiveDates = [...allDates]; // 当前显示的日期列表
+
+function updateDateColVisibility() {
+  // 更新表头列可见性
+  document.querySelectorAll('.chg-date-th').forEach(th => {
+    th.style.display = chgActiveDates.includes(th.dataset.date) ? '' : 'none';
+  });
+}
+
+function setChgDateFilter(mode) {
+  // 更新按钮高亮
+  ['chgDateAll','chgDateLatest','chgDateLast3','chgDateLast7'].forEach(id => {
+    const btn = document.getElementById(id);
+    if (btn) { btn.style.background = '#1a1f35'; btn.style.color = '#90a4ae'; }
+  });
+  const activeBtn = document.getElementById(
+    mode==='all'?'chgDateAll': mode==='latest'?'chgDateLatest': mode==='last3'?'chgDateLast3':'chgDateLast7'
+  );
+  if (activeBtn) { activeBtn.style.background = '#2196f3'; activeBtn.style.color = '#fff'; }
+  // 重置单选下拉
+  const sel = document.getElementById('chgDateSelect');
+  if (sel) sel.value = '';
+
+  const sorted = [...allDates].sort();
+  if (mode === 'all') {
+    chgActiveDates = [...allDates];
+  } else if (mode === 'latest') {
+    chgActiveDates = sorted.length > 0 ? [sorted[sorted.length-1]] : [];
+  } else if (mode === 'last3') {
+    chgActiveDates = sorted.slice(-3);
+  } else if (mode === 'last7') {
+    chgActiveDates = sorted.slice(-7);
+  }
+  updateDateColVisibility();
+  chgPage = 1;
+  renderChgTable();
+  renderChgPagination();
+}
+
+function setChgDateFilterSingle(date) {
+  if (!date) return;
+  // 清除按钮高亮
+  ['chgDateAll','chgDateLatest','chgDateLast3','chgDateLast7'].forEach(id => {
+    const btn = document.getElementById(id);
+    if (btn) { btn.style.background = '#1a1f35'; btn.style.color = '#90a4ae'; }
+  });
+  chgActiveDates = [date];
+  updateDateColVisibility();
+  chgPage = 1;
+  renderChgTable();
+  renderChgPagination();
+}
+
 function filterChgTable() {
   const search = document.getElementById('chgSearchInput').value.toLowerCase();
   const group = document.getElementById('chgGroupFilter').value;
@@ -594,21 +672,22 @@ function renderChgTable() {
   const pageData = filteredChg.slice(start, start + CHG_PAGE_SIZE);
   const tbody = document.getElementById('chgTableBody');
   if (pageData.length === 0) {
-    tbody.innerHTML = '<tr><td colspan="20" style="text-align:center;color:#607d8b;padding:24px">暂无数据</td></tr>';
+    tbody.innerHTML = `<tr><td colspan="${4 + chgActiveDates.length + 1}" style="text-align:center;color:#607d8b;padding:24px">暂无数据</td></tr>`;
     return;
   }
   tbody.innerHTML = pageData.map((p, i) => {
-    // 日期列
+    // 只渲染当前显示的日期列
     const dateCols = allDates.map(d => {
+      const hidden = !chgActiveDates.includes(d);
       const s = p.series.find(x => x.date === d);
-      if (!s || s.val === null) return `<td style="text-align:center;color:#37474f">—</td>`;
+      if (!s || s.val === null) return `<td data-date="${d}" style="text-align:center;color:#37474f;${hidden?'display:none':''}">—</td>`;
       let chgHtml = '';
       if (s.change === null) chgHtml = '';
       else if (s.change > 0) chgHtml = `<span class="chg-pos">▲${s.change.toLocaleString()}</span>`;
       else if (s.change < 0) chgHtml = `<span class="chg-neg">▼${Math.abs(s.change).toLocaleString()}</span>`;
       else chgHtml = `<span class="chg-zero">—</span>`;
       const bgStyle = s.change > 0 ? 'background:rgba(76,175,80,0.05)' : s.change < 0 ? 'background:rgba(244,67,54,0.05)' : '';
-      return `<td style="text-align:center;${bgStyle}"><span style="font-size:12px;color:#cfd8dc">${s.val.toLocaleString()}</span><br>${chgHtml}</td>`;
+      return `<td data-date="${d}" style="text-align:center;${bgStyle}${hidden?';display:none':''}"><span style="font-size:12px;color:#cfd8dc">${s.val.toLocaleString()}</span><br>${chgHtml}</td>`;
     }).join('');
     
     // 最新变化列
@@ -728,6 +807,7 @@ function goSSPage(p) {
 // 初始化渲染
 renderTable();
 renderPagination();
+updateDateColVisibility();
 renderChgTable();
 renderChgPagination();
 renderSSTable();
