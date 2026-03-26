@@ -714,7 +714,7 @@ footer .ft-red { color: var(--brand-red); }
     <div class="hd-right">
       <div class="rpt-badge">每日库存与销售分析报告</div>
       <div class="rpt-date">2026年03月26日</div>
-      <div class="rpt-gen">生成时间: 2026-03-26 14:41:20</div>
+      <div class="rpt-gen">生成时间: 2026-03-26 14:49:47</div>
     </div>
   </div>
   <nav class="nav-tabs">
@@ -906,7 +906,7 @@ footer .ft-red { color: var(--brand-red); }
 </div>
 </div>
 <footer>
-  <strong>HUASUE MOULD PLASTIC CO., LTD</strong> &nbsp;<span class="ft-red">&bull;</span>&nbsp; บริษัท ฮว้า เฟิง แพคเกจจิ้ง จำกัด &nbsp;&bull;&nbsp; 每日自动生成 &nbsp;&bull;&nbsp; 生成时间: 2026-03-26 14:41:20
+  <strong>HUASUE MOULD PLASTIC CO., LTD</strong> &nbsp;<span class="ft-red">&bull;</span>&nbsp; บริษัท ฮว้า เฟิง แพคเกจจิ้ง จำกัด &nbsp;&bull;&nbsp; 每日自动生成 &nbsp;&bull;&nbsp; 生成时间: 2026-03-26 14:49:47
 </footer>
 <script>
 
@@ -1459,19 +1459,15 @@ try {
   const allArr  = CAT_ALL  || [];
   const spKeys  = Object.keys(CAT_SP);
 
-  // 以"全部"的产品名顺序为主轴
-  const labels = allArr.map(x => {
-    const nm = (x.name || x.sku || '').trim();
-    return nm.length > 22 ? nm.slice(0, 22) + '…' : nm;
-  });
+  // 以"全部"的产品名顺序为主轴（不截断，完整显示）
+  const labels = allArr.map(x => (x.name || x.sku || '').trim());
 
   // 每个 SP 的数据集，按 labels 顺序对齐
   const buildDataset = (arr, label, color) => {
     const map = {};
     arr.forEach(x => {
       const nm = (x.name || x.sku || '').trim();
-      const shortNm = nm.length > 22 ? nm.slice(0, 22) + '…' : nm;
-      map[shortNm] = x.amount || 0;
+      map[nm] = x.amount || 0;
     });
     return {
       label,
@@ -1503,12 +1499,31 @@ try {
             position: 'top',
             labels: { boxWidth: 12, padding: 14, color: '#455a64', font: { size: 11 } }
           },
-          tooltip: { callbacks: { label: ctx => ctx.dataset.label + ': ' + fmtThb(ctx.raw) } }
+          tooltip: {
+            callbacks: {
+              label: ctx => ctx.dataset.label + ': ' + fmtThb(ctx.raw)
+            }
+          }
         },
         scales: {
-          x: { grid: { color: '#f0f2f8' }, ticks: { color: '#78909c' } },
-          y: { grid: { display: false }, ticks: { color: '#37474f', font: { size: 10 } } }
-        }
+          x: {
+            stacked: true,
+            grid: { color: '#f0f2f8' },
+            ticks: { color: '#78909c', callback: v => fmtThb(v) }
+          },
+          y: {
+            stacked: true,
+            grid: { display: false },
+            ticks: {
+              color: '#37474f',
+              font: { size: 11 },
+              autoSkip: false,
+              maxRotation: 0,
+              minRotation: 0
+            }
+          }
+        },
+        layout: { padding: { left: 10, right: 20, top: 10, bottom: 10 } }
       }
     });
   } catch(e) { console.error('catBarChart', e); }
