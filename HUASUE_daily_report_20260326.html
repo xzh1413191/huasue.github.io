@@ -163,7 +163,7 @@
   <div class="header-right">
     <div class="report-title">📊 每日库存分析报告</div>
     <div class="report-date">2026年03月26日 报告日期</div>
-    <div class="gen-time">生成时间: 2026-03-26 07:59:16</div>
+    <div class="gen-time">生成时间: 2026-03-26 08:04:59</div>
   </div>
 </div>
 
@@ -244,22 +244,22 @@
       <!-- 分组颜色说明 -->
       <div id="top20Legend" style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:10px;padding:8px;background:rgba(255,255,255,0.04);border-radius:6px;"></div>
       <!-- 图表 -->
-      <div class="chart-wrapper"><canvas id="top20Chart" style="width:100%;height:360px;"></canvas></div>
+      <div style="position:relative;height:360px;"><canvas id="top20Chart"></canvas></div>
     </div>
     <div class="chart-card">
       <div class="chart-title">产品分组库存分布（全部 9 个分组）</div>
-      <div class="chart-wrapper"><canvas id="groupPieChart" style="width:100%;height:360px;"></canvas></div>
+      <div style="position:relative;height:360px;"><canvas id="groupPieChart"></canvas></div>
     </div>
   </div>
 
   <div class="charts-row charts-row-2">
     <div class="chart-card">
       <div class="chart-title">月度销售金额（THB）</div>
-      <div class="chart-wrapper"><canvas id="monthlyBillChart" style="width:100%;height:260px;"></canvas></div>
+      <div style="position:relative;height:260px;"><canvas id="monthlyBillChart"></canvas></div>
     </div>
     <div class="chart-card">
       <div class="chart-title">月度开票数量</div>
-      <div class="chart-wrapper"><canvas id="invoiceCountChart" style="width:100%;height:260px;"></canvas></div>
+      <div style="position:relative;height:260px;"><canvas id="invoiceCountChart"></canvas></div>
     </div>
   </div>
 </div>
@@ -629,7 +629,7 @@
 
 <div class="footer">
   <p>HUASUE (华塑) | 华塑模具塑料有限公司</p>
-  <p>自动生成报告 | Generated: 2026-03-26 07:59:16 | Data Source: D:/codebuddy2/factory1kucun</p>
+  <p>自动生成报告 | Generated: 2026-03-26 08:04:59 | Data Source: D:/codebuddy2/factory1kucun</p>
 </div>
 
 <script>
@@ -969,33 +969,7 @@ renderSSTable();
 renderSSPagination();
 
 
-// ─── 固定所有图表 canvas 尺寸（防止动态缩放卡顿）───────────────────────────
-(function() {
-  var canvasSizes = {
-    'stockTrendChart':   {h: 240},
-    'stockChangeChart':  {h: 240},
-    'top20Chart':        {h: 360},
-    'groupPieChart':     {h: 360},
-    'monthlyBillChart':  {h: 260},
-    'invoiceCountChart': {h: 260},
-    'saleTop20Chart':    {h: 360},
-    'custTop20Chart':    {h: 360},
-    'spBarChart':        {h: 220},
-    'shopTypePieChart':  {h: 260},
-    'catPieChart':       {h: 300},
-    'catBarChart':       {h: 300},
-  };
-  Object.keys(canvasSizes).forEach(function(id) {
-    var el = document.getElementById(id);
-    if (!el) return;
-    var parentW = el.parentElement ? el.parentElement.clientWidth : 800;
-    el.style.width  = '100%';
-    el.style.height = canvasSizes[id].h + 'px';
-    el.width  = Math.max(parentW || 800, 300);
-    el.height = canvasSizes[id].h;
-  });
-})();
-// ─────────────────────────────────────────────────────────────────────────────
+
 
 // 1. Stock Trend Line Chart — 蓝=总库存件数，绿=活跃SKU种数
 new Chart(document.getElementById('stockTrendChart'), {
