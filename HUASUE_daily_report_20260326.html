@@ -163,7 +163,7 @@
   <div class="header-right">
     <div class="report-title">📊 每日库存分析报告</div>
     <div class="report-date">2026年03月26日 报告日期</div>
-    <div class="gen-time">生成时间: 2026-03-26 07:30:35</div>
+    <div class="gen-time">生成时间: 2026-03-26 07:34:25</div>
   </div>
 </div>
 
@@ -629,7 +629,7 @@
 
 <div class="footer">
   <p>HUASUE (华塑) | 华塑模具塑料有限公司</p>
-  <p>自动生成报告 | Generated: 2026-03-26 07:30:35 | Data Source: D:/codebuddy2/factory1kucun</p>
+  <p>自动生成报告 | Generated: 2026-03-26 07:34:25 | Data Source: D:/codebuddy2/factory1kucun</p>
 </div>
 
 <script>
@@ -1389,22 +1389,12 @@ function getSaleColor(idx, total) {
 }
 
 function updateSaleChart() {
-  const isSPMode = (saleCurSP !== '全部') && saleTop20BySP && saleTop20BySP[saleCurSP];
-  let arr;
-  if (isSPMode) {
-    arr = saleTop20BySP[saleCurSP] || [];
-  } else {
-    arr = salesTop20Data[saleCurPeriod] || [];
-  }
+  const arr = getSaleData();
   const noDataEl = document.getElementById('salePeriodNoData');
   const hint = document.getElementById('salePeriodHint');
-  // 隐藏/显示时间区间按钮（业务员模式不需要区间）
+  // 时间区间按钮：全部模式也有数据，保持显示
   const periodRow = document.querySelector('.sale-period-row');
-  if (isSPMode) {
-    if (periodRow) periodRow.style.opacity = '0.3';
-  } else {
-    if (periodRow) periodRow.style.opacity = '1';
-  }
+  if (periodRow) periodRow.style.opacity = '0.35';
   if (!arr || arr.length === 0) {
     noDataEl.style.display = 'block';
     saleTop20Chart.canvas.style.display = 'none';
@@ -1486,12 +1476,12 @@ function setSaleSP(sp) {
 
 // 销售TOP20 使用 saleTop20BySP 中的累计数据（包含类别）
 function getSaleData() {
-  if (saleCurSP !== '全部' && saleTop20BySP[saleCurSP]) {
+  // 优先用 saleTop20BySP（含全部/Dow/Elaine）
+  if (saleTop20BySP && saleTop20BySP[saleCurSP]) {
     return saleTop20BySP[saleCurSP];
   }
-  // 全部：使用原账单数据（按时间区间）
-  const period = saleCurPeriod;
-  return salesTop20Data[period] || [];
+  // 兜底：按时间区间（账单无SKU明细时为空）
+  return salesTop20Data[saleCurPeriod] || [];
 }
 
 // 初始渲染
