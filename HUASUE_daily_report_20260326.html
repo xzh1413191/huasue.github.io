@@ -163,7 +163,7 @@
   <div class="header-right">
     <div class="report-title">📊 每日库存分析报告</div>
     <div class="report-date">2026年03月26日 报告日期</div>
-    <div class="gen-time">生成时间: 2026-03-26 07:41:51</div>
+    <div class="gen-time">生成时间: 2026-03-26 07:48:17</div>
   </div>
 </div>
 
@@ -629,7 +629,7 @@
 
 <div class="footer">
   <p>HUASUE (华塑) | 华塑模具塑料有限公司</p>
-  <p>自动生成报告 | Generated: 2026-03-26 07:41:51 | Data Source: D:/codebuddy2/factory1kucun</p>
+  <p>自动生成报告 | Generated: 2026-03-26 07:48:17 | Data Source: D:/codebuddy2/factory1kucun</p>
 </div>
 
 <script>
@@ -1484,11 +1484,6 @@ function getSaleData() {
   return salesTop20Data[saleCurPeriod] || [];
 }
 
-// 初始渲染
-initCustTabs();    // 同时初始化 sale SP tabs
-updateSaleChart();
-
-
 // ═══════════════════════════════════════════
 // 客户销售TOP20 & 产品类别 图表 (v2)
 // ═══════════════════════════════════════════
@@ -1792,9 +1787,13 @@ function setCatTab(tab) {
 }
 
 // ── 初始化全部图表 ──
-initCustTabs();
-updateCustChart();
-updateCatCharts();
+initSaleSPTabs();    // 销售TOP20 业务员tab
+updateSaleChart();   // 销售TOP20 图表
+initCustTabs();      // 客户TOP20 业务员tab
+updateCustChart();   // 客户TOP20 图表
+updateCatCharts();   // 产品类别图表
+
+
 
 </script>
 </body>
