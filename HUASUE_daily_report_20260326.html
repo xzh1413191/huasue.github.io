@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="zh-TH">
+<html lang="zh-CN">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>HUASUE 每日库存分析报告 - 2026年03月26日</title>
+<title>HUASUE 每日库存销售分析报告 2026年03月26日</title>
 <script>/**
  * Skipped minification because the original files appears to be already minified.
  * Original file: /npm/chart.js@4.4.0/dist/chart.umd.js
@@ -27,304 +27,436 @@
 </script>
 <style>
 
+:root {
+  --brand-blue: #1a237e;
+  --brand-red:  #c62828;
+  --accent:     #283593;
+  --light-blue: #e8eaf6;
+  --light-red:  #ffebee;
+  --text:       #1a1a2e;
+  --text-2:     #455a64;
+  --text-3:     #90a4ae;
+  --bg:         #f4f6fb;
+  --card:       #ffffff;
+  --border:     #e0e4ef;
+  --green:      #2e7d32;
+  --orange:     #e65100;
+  --teal:       #00695c;
+  --purple:     #6a1b9a;
+}
 * { box-sizing: border-box; margin: 0; padding: 0; }
-body { font-family: 'Segoe UI', 'Microsoft YaHei', Arial, sans-serif;
-       background: #0d0d1a; color: #dde1ec; min-height: 100vh; }
+body {
+  font-family: 'Segoe UI', 'Microsoft YaHei', 'PingFang SC', Arial, sans-serif;
+  background: var(--bg); color: var(--text); min-height: 100vh;
+  font-size: 14px; line-height: 1.5;
+}
 
-/* ── Header ── */
+/* ─── Header ─── */
 .header {
-  background: linear-gradient(135deg, #12122a 0%, #1a1035 60%, #0f1f4a 100%);
-  padding: 20px 32px; display: flex; align-items: center; justify-content: space-between;
-  border-bottom: 2px solid #e53935;
-  box-shadow: 0 4px 24px rgba(229,57,53,.35);
+  background: linear-gradient(135deg, var(--brand-blue) 0%, #283593 60%, #1565c0 100%);
+  padding: 0; position: sticky; top: 0; z-index: 100;
+  box-shadow: 0 2px 16px rgba(26,35,126,.25);
+}
+.header-inner {
+  max-width: 1400px; margin: 0 auto;
+  padding: 18px 32px;
+  display: flex; align-items: center; justify-content: space-between;
   flex-wrap: wrap; gap: 12px;
 }
-.hd-left { display: flex; align-items: center; gap: 16px; }
+.hd-left { display: flex; align-items: center; gap: 14px; }
 .logo-box {
-  width: 54px; height: 54px;
-  background: linear-gradient(135deg, #e53935, #b71c1c);
+  width: 48px; height: 48px; flex-shrink: 0;
+  background: linear-gradient(135deg, var(--brand-red), #b71c1c);
   border-radius: 10px; display: flex; align-items: center; justify-content: center;
-  font-size: 20px; font-weight: 900; color: #fff; letter-spacing: -1px;
-  box-shadow: 0 4px 14px rgba(229,57,53,.5);
-  flex-shrink: 0;
+  font-size: 18px; font-weight: 900; color: #fff; letter-spacing: -1px;
+  box-shadow: 0 4px 14px rgba(198,40,40,.5);
 }
-.co-name h1 { font-size: 20px; font-weight: 700; color: #fff; letter-spacing: 2px; }
-.co-name p  { font-size: 11px; color: #90caf9; margin-top: 2px; }
+.co-name h1 { font-size: 18px; font-weight: 700; color: #fff; letter-spacing: 1px; }
+.co-name p  { font-size: 11px; color: rgba(255,255,255,.65); margin-top: 2px; }
 .hd-right { text-align: right; }
-.hd-right .rpt-title { font-size: 16px; font-weight: 600; color: #fff; }
-.hd-right .rpt-date  { font-size: 12px; color: #90caf9; margin-top: 3px; }
-.hd-right .rpt-gen   { font-size: 11px; color: #546e7a; margin-top: 2px; }
+.rpt-title { font-size: 15px; font-weight: 600; color: #fff; }
+.rpt-date  { font-size: 12px; color: rgba(255,255,255,.7); margin-top: 3px; }
+.rpt-gen   { font-size: 10px; color: rgba(255,255,255,.45); margin-top: 2px; }
 
-/* ── KPI Grid ── */
-.kpi-wrap { padding: 24px 32px 8px; display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 16px; }
+/* ─── Nav Tabs ─── */
+.nav-tabs {
+  background: var(--brand-blue);
+  border-top: 1px solid rgba(255,255,255,.1);
+}
+.nav-tabs-inner {
+  max-width: 1400px; margin: 0 auto; padding: 0 32px;
+  display: flex; gap: 0; overflow-x: auto;
+}
+.nav-tab {
+  padding: 10px 20px; color: rgba(255,255,255,.65); font-size: 12px; font-weight: 600;
+  cursor: pointer; border-bottom: 3px solid transparent;
+  transition: color .2s, border-color .2s; white-space: nowrap;
+  text-decoration: none; display: block;
+}
+.nav-tab:hover, .nav-tab.active { color: #fff; border-bottom-color: #ff5252; }
+
+/* ─── Page Wrap ─── */
+.page { max-width: 1400px; margin: 0 auto; padding: 24px 32px 48px; }
+
+/* ─── KPI Strip ─── */
+.kpi-strip {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+  gap: 14px; margin-bottom: 28px;
+}
 .kpi-card {
-  background: linear-gradient(135deg, #1b2343, #16203a);
-  border: 1px solid rgba(255,255,255,.08); border-radius: 14px; padding: 20px;
+  background: var(--card); border: 1px solid var(--border);
+  border-radius: 12px; padding: 18px 20px;
+  display: flex; flex-direction: column; gap: 6px;
+  box-shadow: 0 2px 8px rgba(0,0,0,.06);
   transition: transform .2s, box-shadow .2s;
+  border-left: 4px solid transparent;
 }
-.kpi-card:hover { transform: translateY(-3px); box-shadow: 0 8px 24px rgba(0,0,0,.4); }
-.kpi-label { font-size: 11px; color: #78909c; text-transform: uppercase; letter-spacing: 1px; }
-.kpi-value { font-size: 28px; font-weight: 700; margin: 6px 0 4px; }
-.kpi-sub   { font-size: 11px; color: #546e7a; }
-.kpi-blue   .kpi-value { color: #42a5f5; }
-.kpi-green  .kpi-value { color: #66bb6a; }
-.kpi-orange .kpi-value { color: #ffa726; }
-.kpi-red    .kpi-value { color: #ef5350; }
-.kpi-purple .kpi-value { color: #ab47bc; }
-.kpi-teal   .kpi-value { color: #26c6da; }
-.kpi-icon { font-size: 28px; float: right; opacity: .6; }
+.kpi-card:hover { transform: translateY(-2px); box-shadow: 0 6px 18px rgba(0,0,0,.1); }
+.kpi-card.blue   { border-left-color: #1565c0; }
+.kpi-card.green  { border-left-color: var(--green); }
+.kpi-card.red    { border-left-color: var(--brand-red); }
+.kpi-card.orange { border-left-color: var(--orange); }
+.kpi-card.teal   { border-left-color: var(--teal); }
+.kpi-card.purple { border-left-color: var(--purple); }
+.kpi-icon { font-size: 24px; }
+.kpi-label { font-size: 11px; color: var(--text-3); text-transform: uppercase; letter-spacing: .8px; font-weight: 600; }
+.kpi-value { font-size: 26px; font-weight: 700; }
+.kpi-card.blue   .kpi-value { color: #1565c0; }
+.kpi-card.green  .kpi-value { color: var(--green); }
+.kpi-card.red    .kpi-value { color: var(--brand-red); }
+.kpi-card.orange .kpi-value { color: var(--orange); }
+.kpi-card.teal   .kpi-value { color: var(--teal); }
+.kpi-card.purple .kpi-value { color: var(--purple); }
+.kpi-sub { font-size: 11px; color: var(--text-3); }
 
-/* ── Section ── */
-.section { padding: 8px 32px 24px; }
-.section-title {
-  font-size: 15px; font-weight: 700; color: #90caf9;
-  border-left: 4px solid #1565c0; padding-left: 12px;
-  margin-bottom: 16px; margin-top: 4px;
+/* ─── Section ─── */
+.section { margin-bottom: 32px; scroll-margin-top: 100px; }
+.section-header {
   display: flex; align-items: center; gap: 10px;
+  margin-bottom: 16px; padding-bottom: 10px;
+  border-bottom: 2px solid var(--border);
 }
-.section-title .badge {
-  font-size: 11px; background: rgba(21,101,192,.3); color: #42a5f5;
-  padding: 2px 8px; border-radius: 20px; font-weight: 500;
+.section-header .sec-icon {
+  width: 36px; height: 36px; border-radius: 8px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 18px; flex-shrink: 0;
+}
+.section-header .sec-icon.blue   { background: var(--light-blue); }
+.section-header .sec-icon.red    { background: var(--light-red); }
+.section-header .sec-icon.green  { background: #e8f5e9; }
+.section-header .sec-icon.orange { background: #fff3e0; }
+.section-header h2 { font-size: 16px; font-weight: 700; color: var(--brand-blue); }
+.section-header .badge {
+  font-size: 11px; padding: 3px 10px; border-radius: 20px; font-weight: 600;
+  background: var(--light-blue); color: var(--brand-blue);
 }
 
-/* ── Chart Cards ── */
-.chart-grid { display: grid; gap: 16px; }
-.chart-grid-2 { grid-template-columns: repeat(auto-fit, minmax(380px, 1fr)); }
-.chart-grid-3 { grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); }
-.chart-grid-1 { grid-template-columns: 1fr; }
-.chart-card {
-  background: linear-gradient(135deg, #161c30, #121929);
-  border: 1px solid rgba(255,255,255,.07); border-radius: 14px; padding: 20px;
+/* ─── Chart Grid ─── */
+.grid { display: grid; gap: 16px; }
+.grid-2  { grid-template-columns: repeat(auto-fit, minmax(380px, 1fr)); }
+.grid-3  { grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); }
+.grid-1  { grid-template-columns: 1fr; }
+.card {
+  background: var(--card); border: 1px solid var(--border);
+  border-radius: 12px; padding: 20px;
+  box-shadow: 0 2px 8px rgba(0,0,0,.05);
 }
-.chart-card-title { font-size: 13px; font-weight: 600; color: #cfd8dc;
-  margin-bottom: 14px; display: flex; align-items: center; justify-content: space-between; }
-.chart-wrap { position: relative; }
-.chart-wrap-360 { height: 360px; }
-.chart-wrap-300 { height: 300px; }
-.chart-wrap-240 { height: 240px; }
-.chart-wrap-200 { height: 200px; }
+.card-title {
+  font-size: 13px; font-weight: 700; color: var(--text);
+  margin-bottom: 14px; display: flex; align-items: center;
+  justify-content: space-between; flex-wrap: wrap; gap: 8px;
+}
+.card-title .ct-label { color: var(--text-2); }
+.chart-box { position: relative; }
+.h360 { height: 360px; }
+.h300 { height: 300px; }
+.h240 { height: 240px; }
+.h200 { height: 200px; }
 
-/* ── Tab Buttons ── */
-.tab-bar { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 12px; }
+/* ─── Tab Buttons ─── */
+.tabs { display: flex; gap: 6px; flex-wrap: wrap; }
 .tab-btn {
-  padding: 4px 12px; border-radius: 6px; border: 1px solid rgba(255,255,255,.12);
-  background: #1a1f35; color: #90a4ae; cursor: pointer; font-size: 11px;
-  transition: background .2s, color .2s; white-space: nowrap;
+  padding: 4px 12px; border-radius: 6px; border: 1px solid var(--border);
+  background: #fff; color: var(--text-2); cursor: pointer; font-size: 11px; font-weight: 600;
+  transition: all .15s; white-space: nowrap;
 }
-.tab-btn.active, .tab-btn:hover { background: #1565c0; color: #fff; }
-.tab-btn.sp-active { background: #6a1b9a; color: #fff; }
+.tab-btn:hover { border-color: var(--brand-blue); color: var(--brand-blue); }
+.tab-btn.active { background: var(--brand-blue); color: #fff; border-color: var(--brand-blue); }
 
-/* ── Date Btn strip ── */
-.date-strip { display: flex; gap: 5px; flex-wrap: wrap; margin-bottom: 12px; }
+/* ─── Date Buttons ─── */
+.date-strip { display: flex; gap: 5px; flex-wrap: wrap; }
 .date-btn {
-  padding: 3px 9px; border-radius: 5px; border: 1px solid rgba(255,255,255,.12);
-  background: #1a1f35; color: #90a4ae; cursor: pointer; font-size: 11px;
-  transition: background .15s;
+  padding: 3px 9px; border-radius: 5px; border: 1px solid var(--border);
+  background: #fff; color: var(--text-2); cursor: pointer; font-size: 11px;
+  transition: all .15s;
 }
-.date-btn.active { background: #1565c0; color: #fff; }
+.date-btn:hover { border-color: var(--brand-blue); }
+.date-btn.active { background: var(--brand-blue); color: #fff; border-color: var(--brand-blue); }
 
-/* ── Table ── */
-.tbl-wrap { overflow-x: auto; max-height: 450px; overflow-y: auto; border-radius: 10px; }
-table { width: 100%; border-collapse: collapse; font-size: 12px; }
-thead { background: #1a2540; position: sticky; top: 0; z-index: 2; }
-th { padding: 10px 12px; text-align: left; color: #90a4ae;
-     font-weight: 600; letter-spacing: .5px; font-size: 11px; white-space: nowrap; }
-td { padding: 8px 12px; border-bottom: 1px solid rgba(255,255,255,.05);
-     vertical-align: middle; white-space: nowrap; }
-tr:hover td { background: rgba(255,255,255,.03); }
-.badge-ok    { background: rgba(76,175,80,.2);  color: #81c784; padding: 2px 7px; border-radius: 4px; }
-.badge-low   { background: rgba(255,152,0,.2);  color: #ffb74d; padding: 2px 7px; border-radius: 4px; }
-.badge-zero  { background: rgba(244,67,54,.2);  color: #ef9a9a; padding: 2px 7px; border-radius: 4px; }
-.badge-alert { background: rgba(229,57,53,.25); color: #ef5350; padding: 2px 7px; border-radius: 4px; }
-
-/* ── Search box ── */
-.search-box {
-  width: 100%; padding: 8px 14px; border-radius: 8px;
-  border: 1px solid rgba(255,255,255,.12); background: #1a1f35;
-  color: #dde1ec; font-size: 13px; margin-bottom: 12px; outline: none;
-}
-.search-box::placeholder { color: #546e7a; }
-.search-box:focus { border-color: #1565c0; }
-
-/* ── Alert ── */
+/* ─── Alerts ─── */
+.alert-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 12px; }
 .alert-card {
-  background: rgba(229,57,53,.12); border: 1px solid rgba(229,57,53,.3);
-  border-radius: 10px; padding: 14px 18px; margin-bottom: 10px;
-  display: flex; align-items: center; gap: 16px; flex-wrap: wrap;
+  background: #fff; border: 1px solid #ffcdd2; border-radius: 10px;
+  padding: 14px 16px; border-left: 4px solid var(--brand-red);
+  display: flex; flex-direction: column; gap: 4px;
 }
-.alert-name { font-size: 13px; font-weight: 600; color: #ef9a9a; flex: 1 1 200px; }
-.alert-meta { font-size: 11px; color: #90a4ae; }
-.alert-gap  { font-size: 18px; font-weight: 700; color: #ef5350; white-space: nowrap; }
+.alert-card.warn { border-left-color: var(--orange); border-color: #ffe0b2; }
+.alert-sku  { font-size: 10px; color: var(--text-3); font-weight: 600; letter-spacing: .5px; }
+.alert-name { font-size: 13px; font-weight: 700; color: var(--text); }
+.alert-row  { display: flex; justify-content: space-between; align-items: center; margin-top: 4px; }
+.alert-num  { font-size: 20px; font-weight: 700; color: var(--brand-red); }
+.alert-card.warn .alert-num { color: var(--orange); }
+.alert-tag  { font-size: 10px; padding: 2px 8px; border-radius: 20px; font-weight: 600; }
+.alert-tag.zero { background: #ffebee; color: var(--brand-red); }
+.alert-tag.low  { background: #fff3e0; color: var(--orange); }
+.alert-sub  { font-size: 11px; color: var(--text-3); }
 
-/* ── Footer ── */
+/* ─── Table ─── */
+.tbl-wrap { overflow-x: auto; max-height: 480px; overflow-y: auto; border-radius: 8px; border: 1px solid var(--border); }
+table { width: 100%; border-collapse: collapse; font-size: 12px; }
+thead { background: #f8f9ff; position: sticky; top: 0; z-index: 2; }
+th {
+  padding: 10px 12px; text-align: left; color: var(--brand-blue);
+  font-weight: 700; letter-spacing: .4px; font-size: 11px; white-space: nowrap;
+  border-bottom: 2px solid var(--border);
+}
+td { padding: 8px 12px; border-bottom: 1px solid #f0f2f8; vertical-align: middle; }
+tr:last-child td { border-bottom: none; }
+tr:hover td { background: #f8f9ff; }
+.rank-badge {
+  width: 22px; height: 22px; border-radius: 50%;
+  display: inline-flex; align-items: center; justify-content: center;
+  font-size: 11px; font-weight: 700; color: #fff;
+  background: var(--text-3);
+}
+.rank-badge.r1 { background: #f9a825; }
+.rank-badge.r2 { background: #78909c; }
+.rank-badge.r3 { background: #a1887f; }
+.num-right { text-align: right; font-variant-numeric: tabular-nums; }
+
+/* ─── Search Box ─── */
+.search-box {
+  width: 100%; padding: 10px 16px; border: 1px solid var(--border);
+  border-radius: 8px; font-size: 13px; margin-bottom: 12px; outline: none;
+  transition: border-color .2s; background: #fff;
+}
+.search-box:focus { border-color: var(--brand-blue); box-shadow: 0 0 0 3px rgba(26,35,126,.1); }
+
+/* ─── SP Perf Cards ─── */
+.sp-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 12px; margin-bottom: 16px; }
+.sp-card {
+  background: var(--card); border: 1px solid var(--border); border-radius: 10px;
+  padding: 16px; display: flex; flex-direction: column; gap: 4px;
+  border-top: 3px solid var(--brand-blue);
+}
+.sp-card.sp1 { border-top-color: #1976d2; }
+.sp-card.sp2 { border-top-color: #6a1b9a; }
+.sp-name { font-size: 13px; font-weight: 700; color: var(--text); }
+.sp-amount { font-size: 22px; font-weight: 700; color: var(--brand-blue); }
+.sp-sub { font-size: 11px; color: var(--text-3); }
+
+/* ─── Footer ─── */
 footer {
-  text-align: center; padding: 24px; font-size: 11px; color: #37474f;
-  border-top: 1px solid rgba(255,255,255,.05); margin-top: 16px;
+  background: var(--brand-blue); color: rgba(255,255,255,.6);
+  text-align: center; padding: 18px 32px; font-size: 11px; letter-spacing: .5px;
 }
+footer strong { color: #fff; }
 
-/* ── 下钻面板 ── */
-.drilldown-panel {
-  display: none;
-  background: linear-gradient(135deg, #1a2540, #141e38);
-  border: 1px solid rgba(66,165,245,.3);
-  border-radius: 12px; padding: 18px; margin-top: 14px;
-}
-.drilldown-panel.show { display: block; }
-.drilldown-header {
-  display: flex; align-items: center; justify-content: space-between;
-  margin-bottom: 12px;
-}
-.drilldown-title {
-  font-size: 13px; font-weight: 600; color: #90caf9;
-}
-.drilldown-close {
-  cursor: pointer; background: none; border: none; color: #546e7a;
-  font-size: 18px; line-height: 1; padding: 2px 6px; border-radius: 4px;
-}
-.drilldown-close:hover { color: #ef5350; background: rgba(239,83,80,.15); }
-.drilldown-chart-wrap { height: 260px; position: relative; margin-bottom: 12px; }
-.drilldown-hint {
-  font-size: 11px; color: #546e7a; text-align: center; margin-top: 6px;
-}
-
-@media (max-width: 640px) {
-  .header   { padding: 14px 16px; }
-  .kpi-wrap { padding: 16px; gap: 10px; }
-  .section  { padding: 6px 16px 18px; }
-  .chart-grid-2, .chart-grid-3 { grid-template-columns: 1fr; }
+/* ─── Responsive ─── */
+@media (max-width: 768px) {
+  .page { padding: 16px; }
+  .header-inner { padding: 14px 16px; }
+  .nav-tabs-inner { padding: 0 8px; }
+  .grid-2, .grid-3 { grid-template-columns: 1fr; }
+  .kpi-strip { grid-template-columns: repeat(2, 1fr); }
 }
 
 </style>
 </head>
 <body>
 <header class="header">
-  <div class="hd-left">
-    <div class="logo-box">HH</div>
-    <div class="co-name">
-      <h1>HUASUE</h1>
-      <p>HUASUE MOULD PLASTIC CO., LTD &nbsp;|&nbsp; บริษัท ฮว้า เฟิง แพคเกจจิ้ง จำกัด</p>
+  <div class="header-inner">
+    <div class="hd-left">
+      <div class="logo-box">HH</div>
+      <div class="co-name">
+        <h1>HUASUE</h1>
+        <p>MOULD PLASTIC CO., LTD &nbsp;|&nbsp; บริษัท ฮว้า เฟิง แพคเกจจิ้ง จำกัด</p>
+      </div>
+    </div>
+    <div class="hd-right">
+      <div class="rpt-title">📊 每日库存与销售分析报告</div>
+      <div class="rpt-date">📅 2026年03月26日</div>
+      <div class="rpt-gen">⏱ 生成时间: 2026-03-26 13:35:22</div>
     </div>
   </div>
-  <div class="hd-right">
-    <div class="rpt-title">📊 每日库存与销售分析报告</div>
-    <div class="rpt-date">📅 2026年03月26日</div>
-    <div class="rpt-gen">⏱ 生成时间: 2026-03-26 13:20:31</div>
-  </div>
+  <nav class="nav-tabs">
+    <div class="nav-tabs-inner">
+      <a class="nav-tab active" href="#sec-kpi">概览</a>
+      <a class="nav-tab" href="#sec-stock">库存趋势</a>
+      <a class="nav-tab" href="#sec-inv">库存分布</a>
+      <a class="nav-tab" href="#sec-alert">安全预警</a>
+      <a class="nav-tab" href="#sec-sales">月度销售</a>
+      <a class="nav-tab" href="#sec-prod-top">产品TOP20</a>
+      <a class="nav-tab" href="#sec-cust">客户TOP20</a>
+      <a class="nav-tab" href="#sec-shop">客户类型</a>
+      <a class="nav-tab" href="#sec-detail">产品明细</a>
+    </div>
+  </nav>
 </header>
-<div class="kpi-wrap">
-  <div class="kpi-card kpi-blue"><span class="kpi-icon">📦</span><div class="kpi-label">总剩余库存</div><div class="kpi-value">31613</div><div class="kpi-sub">所有产品剩余数量合计</div></div>
-  <div class="kpi-card kpi-green"><span class="kpi-icon">🏷️</span><div class="kpi-label">产品种类</div><div class="kpi-value">226</div><div class="kpi-sub">最新库存文件品种数</div></div>
-  <div class="kpi-card kpi-red"><span class="kpi-icon">⚠️</span><div class="kpi-label">零库存产品</div><div class="kpi-value">1</div><div class="kpi-sub">需立即补货</div></div>
-  <div class="kpi-card kpi-orange"><span class="kpi-icon">📉</span><div class="kpi-label">低库存产品</div><div class="kpi-value">6</div><div class="kpi-sub">库存 ≤ 10 件</div></div>
-  <div class="kpi-card kpi-teal"><span class="kpi-icon">💰</span><div class="kpi-label">最新月销售额</div><div class="kpi-value">5,558,037</div><div class="kpi-sub">THB &nbsp;3.26</div></div>
-  <div class="kpi-card kpi-purple"><span class="kpi-icon">📋</span><div class="kpi-label">最新月开单数</div><div class="kpi-value">207</div><div class="kpi-sub">3.26 开单笔数</div></div>
+<div class="page" id="sec-kpi">
+<div class="kpi-strip">
+  <div class="kpi-card blue"><div class="kpi-icon">📦</div><div class="kpi-label">总剩余库存</div><div class="kpi-value">31613</div><div class="kpi-sub">所有产品剩余合计</div></div>
+  <div class="kpi-card green"><div class="kpi-icon">🏷️</div><div class="kpi-label">产品种类</div><div class="kpi-value">226</div><div class="kpi-sub">最新库存文件</div></div>
+  <div class="kpi-card red"><div class="kpi-icon">⚠️</div><div class="kpi-label">零库存产品</div><div class="kpi-value">1</div><div class="kpi-sub">需立即补货</div></div>
+  <div class="kpi-card orange"><div class="kpi-icon">📉</div><div class="kpi-label">低库存产品</div><div class="kpi-value">6</div><div class="kpi-sub">库存 ≤ 10 件</div></div>
+  <div class="kpi-card teal"><div class="kpi-icon">💰</div><div class="kpi-label">最新月销售额</div><div class="kpi-value">5,558,037</div><div class="kpi-sub">THB &nbsp;3.26</div></div>
+  <div class="kpi-card purple"><div class="kpi-icon">📋</div><div class="kpi-label">最新月开单数</div><div class="kpi-value">207</div><div class="kpi-sub">3.26 开单笔数</div></div>
 </div>
-<div class="section">
-  <div class="section-title">📈 库存历史趋势</div>
-  <div class="chart-grid chart-grid-2">
-    <div class="chart-card">
-      <div class="chart-card-title">库存总量 &amp; 产品数趋势</div>
-      <div class="chart-wrap chart-wrap-300"><canvas id="stockTrendChart"></canvas></div>
+<div class="section" id="sec-stock">
+  <div class="section-header">
+    <div class="sec-icon blue">📈</div>
+    <h2>库存历史趋势</h2>
+  </div>
+  <div class="grid grid-2">
+    <div class="card">
+      <div class="card-title">库存总量 &amp; 产品种类趋势</div>
+      <div class="chart-box h300"><canvas id="trendChart"></canvas></div>
     </div>
-    <div class="chart-card">
-      <div class="chart-card-title">相邻日库存变化量</div>
-      <div class="chart-wrap chart-wrap-300"><canvas id="stockChangeChart"></canvas></div>
+    <div class="card">
+      <div class="card-title">相邻日库存变化量</div>
+      <div class="chart-box h300"><canvas id="chgChart"></canvas></div>
     </div>
   </div>
 </div>
-<div class="section">
-  <div class="section-title">📦 库存分布</div>
-  <div class="chart-grid chart-grid-2">
-    <div class="chart-card">
-      <div class="chart-card-title">产品组库存占比</div>
-      <div class="chart-wrap chart-wrap-300"><canvas id="groupPieChart"></canvas></div>
+<div class="section" id="sec-inv">
+  <div class="section-header">
+    <div class="sec-icon blue">📦</div>
+    <h2>库存分布</h2>
+  </div>
+  <div class="grid grid-2">
+    <div class="card">
+      <div class="card-title">产品组库存占比</div>
+      <div class="chart-box h300"><canvas id="groupPieChart"></canvas></div>
     </div>
-    <div class="chart-card">
-      <div class="chart-card-title">库存TOP20产品
+    <div class="card">
+      <div class="card-title">
+        <span>库存TOP20产品</span>
         <div class="date-strip"><button class="date-btn" data-date="2025-03-25" onclick="switchTop20Date('2025-03-25')">2025-03-25</button><button class="date-btn" data-date="2026-03-17" onclick="switchTop20Date('2026-03-17')">2026-03-17</button><button class="date-btn" data-date="2026-03-18" onclick="switchTop20Date('2026-03-18')">2026-03-18</button><button class="date-btn" data-date="2026-03-19" onclick="switchTop20Date('2026-03-19')">2026-03-19</button><button class="date-btn" data-date="2026-03-20" onclick="switchTop20Date('2026-03-20')">2026-03-20</button><button class="date-btn" data-date="2026-03-21" onclick="switchTop20Date('2026-03-21')">2026-03-21</button><button class="date-btn active" data-date="2026-03-24" onclick="switchTop20Date('2026-03-24')">2026-03-24</button></div>
       </div>
-      <div class="chart-wrap chart-wrap-360"><canvas id="top20Chart"></canvas></div>
+      <div class="chart-box h360"><canvas id="top20Chart"></canvas></div>
     </div>
   </div>
 </div>
-<div class="section">
-  <div class="section-title">🚨 安全库存预警</div>
+<div class="section" id="sec-alert">
+  <div class="section-header">
+    <div class="sec-icon red">🚨</div>
+    <h2>安全库存预警</h2>
+  </div>
   <div id="alertsWrap"></div>
 </div>
-<div class="section">
-  <div class="section-title">💰 月度销售分析</div>
-  <div class="chart-grid chart-grid-2">
-    <div class="chart-card">
-      <div class="chart-card-title">月度销售额 &amp; 开单数</div>
-      <div class="chart-wrap chart-wrap-300"><canvas id="monthlyBillChart"></canvas></div>
+<div class="section" id="sec-sales">
+  <div class="section-header">
+    <div class="sec-icon green">💰</div>
+    <h2>月度销售分析</h2>
+  </div>
+  <div id="spCardWrap" class="sp-grid" style="margin-bottom:16px"></div>
+  <div class="grid grid-2">
+    <div class="card">
+      <div class="card-title">月度销售额 &amp; 开单数</div>
+      <div class="chart-box h300"><canvas id="monthlyChart"></canvas></div>
     </div>
-    <div class="chart-card">
-      <div class="chart-card-title">业务员业绩对比</div>
-      <div class="chart-wrap chart-wrap-300"><canvas id="spBarChart"></canvas></div>
+    <div class="card">
+      <div class="card-title">业务员业绩对比（累计）</div>
+      <div class="chart-box h300"><canvas id="spBarChart"></canvas></div>
     </div>
   </div>
 </div>
-<div class="section">
-  <div class="section-title">🏆 产品销售TOP20（累计）</div>
-  <div class="chart-card">
-    <div class="tab-bar" id="saleTabBar"></div>
-    <div class="chart-wrap chart-wrap-360"><canvas id="saleTop20Chart"></canvas></div>
+<div class="section" id="sec-prod-top">
+  <div class="section-header">
+    <div class="sec-icon orange">🏆</div>
+    <h2>产品销售TOP20（累计）</h2>
+  </div>
+  <div class="card">
+    <div class="card-title">
+      <span>按 <strong>product_name_cn</strong> 统计销售额排行</span>
+      <div class="tabs" id="saleTabBar"></div>
+    </div>
+    <div class="chart-box h400"><canvas id="saleTop20Chart"></canvas></div>
   </div>
 </div>
-<div class="section">
-  <div class="section-title">👥 客户销售TOP20（累计）</div>
-  <div class="chart-grid chart-grid-2">
-    <div class="chart-card">
-      <div class="tab-bar" id="custTabBar"></div>
-      <div class="chart-wrap chart-wrap-360"><canvas id="custTop20Chart"></canvas></div>
+<div class="section" id="sec-cust">
+  <div class="section-header">
+    <div class="sec-icon blue">👥</div>
+    <h2>客户销售TOP20（累计）</h2>
+  </div>
+  <div class="grid grid-2">
+    <div class="card">
+      <div class="card-title">
+        <span>TOP15 客户销售额</span>
+        <div class="tabs" id="custTabBar"></div>
+      </div>
+      <div class="chart-box h400"><canvas id="custTop20Chart"></canvas></div>
     </div>
-    <div class="chart-card">
-      <div class="chart-card-title">客户列表</div>
+    <div class="card">
+      <div class="card-title">客户详情表</div>
       <div class="tbl-wrap"><table>
-        <thead><tr><th>#</th><th>客户名称</th><th>业务员</th><th>类型</th><th>销售额(THB)</th></tr></thead>
+        <thead><tr><th>#</th><th>客户名称</th><th>业务员</th><th>类型</th><th style="text-align:right">销售额(THB)</th></tr></thead>
         <tbody id="custTableBody"></tbody>
       </table></div>
     </div>
   </div>
 </div>
-<div class="section">
-  <div class="section-title">🛍️ 客户类型 &amp; 产品销售TOP20</div>
-  <div class="chart-grid chart-grid-2">
-    <div class="chart-card">
-      <div class="chart-card-title">客户店铺类型分布</div>
-      <div class="chart-wrap chart-wrap-300"><canvas id="shopTypePieChart"></canvas></div>
+<div class="section" id="sec-shop">
+  <div class="section-header">
+    <div class="sec-icon orange">🛍️</div>
+    <h2>客户类型分布 &amp; 产品销售TOP20</h2>
+  </div>
+  <div class="grid grid-2">
+    <div class="card">
+      <div class="card-title">客户店铺类型分布</div>
+      <div class="chart-box h300"><canvas id="shopTypePieChart"></canvas></div>
     </div>
-    <div class="chart-card">
-      <div class="chart-card-title">产品销售额 TOP20（累计）
-        <div class="tab-bar" id="catTabBar" style="margin-top:6px"></div>
+    <div class="card">
+      <div class="card-title">
+        <span>产品销售额 TOP20（来自 Customer_SKU_Profile）</span>
+        <div class="tabs" id="catTabBar"></div>
       </div>
-      <div class="chart-wrap chart-wrap-360"><canvas id="catBarChart"></canvas></div>
+      <div class="chart-box h360"><canvas id="catBarChart"></canvas></div>
     </div>
   </div>
 </div>
-<div class="section">
-  <div class="section-title">📋 完整产品库存明细</div>
-  <input class="search-box" id="prodSearch" type="text" placeholder="🔍 搜索产品名称、条码、组别...">
-  <div class="tbl-wrap">
-    <table id="prodTable">
-      <thead><tr>
-        <th>序</th>
-        <th data-key="barcode">条码</th>
-        <th data-key="name">产品名称</th>
-        <th data-key="group">组别</th>
-        <th data-key="stock_qty" style="text-align:right">库存量</th>
-        <th data-key="reserved" style="text-align:right">占用</th>
-        <th data-key="remaining" style="text-align:right">剩余 ▼</th>
-        <th>单位</th>
-        <th>状态</th>
-      </tr></thead>
-      <tbody id="prodTableBody"></tbody>
-    </table>
+<div class="section" id="sec-detail">
+  <div class="section-header">
+    <div class="sec-icon blue">📋</div>
+    <h2>完整产品库存明细</h2>
+  </div>
+  <div class="card">
+    <input class="search-box" id="prodSearch" type="text" placeholder="🔍 搜索产品名称、条码、组别...">
+    <div class="tbl-wrap">
+      <table id="prodTable">
+        <thead><tr>
+          <th>#</th>
+          <th>条码</th>
+          <th>产品名称</th>
+          <th>组别</th>
+          <th style="text-align:right">库存量</th>
+          <th style="text-align:right">占用</th>
+          <th style="text-align:right">剩余 ▼</th>
+          <th>单位</th>
+          <th>状态</th>
+        </tr></thead>
+        <tbody id="prodTableBody"></tbody>
+      </table>
+    </div>
   </div>
 </div>
-<footer>HUASUE MOULD PLASTIC CO., LTD &nbsp;|&nbsp; 每日自动生成 &nbsp;|&nbsp; 生成时间: 2026-03-26 13:20:31</footer>
+</div>
+<footer>
+  <strong>HUASUE MOULD PLASTIC CO., LTD</strong> &nbsp;|&nbsp; บริษัท ฮว้า เฟิง แพคเกจจิ้ง จำกัด &nbsp;|&nbsp; 每日自动生成 &nbsp;|&nbsp; 生成时间: 2026-03-26 13:35:22
+</footer>
 <script>
+
 const DATES       = ["2025-03-25", "2026-03-17", "2026-03-18", "2026-03-19", "2026-03-20", "2026-03-21", "2026-03-24"];
 const TREND_TOT   = [31094.0, 36296.0, 34831.0, 34312.0, 32498.0, 32249.0, 31613.0];
 const TREND_PRODS = [225, 230, 229, 228, 229, 229, 226];
@@ -346,274 +478,421 @@ const SP_COUNTS   = [102, 100];
 const SHOP_TYPE   = [{"type": "企业/公司", "amount": 4143835.0}, {"type": "烘焙/蛋糕店", "amount": 2149520.0}, {"type": "其他", "amount": 1572410.0}, {"type": "包装批发商", "amount": 832673.0}, {"type": "贸易/批发商", "amount": 538054.0}, {"type": "超市/便利店", "amount": 159049.0}, {"type": "咖啡店", "amount": 8002.0}];
 const CAT_ALL     = [{"sku": "HS-A028", "name": "黑色美式高档盒", "amount": 623716.0}, {"sku": "HS-E025", "name": "经典长圆角盒", "amount": 330104.0}, {"sku": "HS-K016", "name": "方盒 1000ml", "amount": 268105.0}, {"sku": "HS-K015", "name": "方盒 750ml", "amount": 245000.0}, {"sku": "HS-L022", "name": "HS-L022", "amount": 243323.0}, {"sku": "HS-L012", "name": "HS-L012", "amount": 235686.0}, {"sku": "HS-K014", "name": "方盒 650ml", "amount": 233381.0}, {"sku": "HS-L023", "name": "HS-L023", "amount": 220358.0}, {"sku": "HS-A030", "name": "黑色美式高档盒", "amount": 218108.0}, {"sku": "HS-K012", "name": "方盒 780ml (1000)", "amount": 215600.0}, {"sku": "HS-K013", "name": "方盒 500ml", "amount": 201537.0}, {"sku": "HS-A026", "name": "连体酱料杯", "amount": 200664.0}, {"sku": "HS-A029", "name": "黑色美式高档盒", "amount": 198338.0}, {"sku": "HS-L003", "name": "HS-L003", "amount": 193344.0}, {"sku": "HS-A007", "name": "透明圆形深碗", "amount": 186293.0}, {"sku": "HS-K011", "name": "方盒 650ml (750)", "amount": 166840.0}, {"sku": "HS-L011", "name": "HS-L011", "amount": 164878.0}, {"sku": "HS-L021", "name": "HS-L021", "amount": 163966.0}, {"sku": "HS-C007", "name": "长方PET蛋糕托盘", "amount": 157592.0}, {"sku": "HS-L004", "name": "HS-L004", "amount": 150762.0}];
 const CAT_SP      = {"Dow": [{"sku": "HS-A028", "name": "黑色美式高档盒", "amount": 620098.0}, {"sku": "HS-E025", "name": "经典长圆角盒", "amount": 327018.0}, {"sku": "HS-A030", "name": "黑色美式高档盒", "amount": 200695.0}, {"sku": "HS-A029", "name": "黑色美式高档盒", "amount": 192731.0}, {"sku": "HS-A026", "name": "连体酱料杯", "amount": 189183.0}, {"sku": "HS-A007", "name": "透明圆形深碗", "amount": 186293.0}, {"sku": "HS-C007", "name": "长方PET蛋糕托盘", "amount": 155942.0}, {"sku": "HS-L023", "name": "HS-L023", "amount": 141069.0}, {"sku": "HS-L022", "name": "HS-L022", "amount": 130866.0}, {"sku": "HS-A031", "name": "黑色美式高档盒", "amount": 123926.0}, {"sku": "HS-A027", "name": "连体酱料杯", "amount": 123029.0}, {"sku": "HS-A015", "name": "长方形透明盒", "amount": 120290.0}, {"sku": "HS-L021", "name": "HS-L021", "amount": 117324.0}, {"sku": "HS-C006", "name": "长方PET蛋糕托盘", "amount": 112567.0}, {"sku": "HS-C003", "name": "圆PET蛋糕高脚托盘", "amount": 109620.0}, {"sku": "HS-A025", "name": "连体酱料杯", "amount": 109045.0}, {"sku": "HS-E030", "name": "HS-E030", "amount": 90912.0}, {"sku": "HS-E018", "name": "中号方底透盒", "amount": 86330.0}, {"sku": "HS-E003", "name": "水晶正方盒", "amount": 84380.0}, {"sku": "HS-E024", "name": "圆角高深透盒", "amount": 81202.0}], "Elaine": [{"sku": "HS-K016", "name": "方盒 1000ml", "amount": 268105.0}, {"sku": "HS-K014", "name": "方盒 650ml", "amount": 231081.0}, {"sku": "HS-K015", "name": "方盒 750ml", "amount": 226500.0}, {"sku": "HS-K012", "name": "方盒 780ml (1000)", "amount": 214280.0}, {"sku": "HS-K013", "name": "方盒 500ml", "amount": 199857.0}, {"sku": "HS-L012", "name": "HS-L012", "amount": 174816.0}, {"sku": "HS-K011", "name": "方盒 650ml (750)", "amount": 165550.0}, {"sku": "HS-L003", "name": "HS-L003", "amount": 141928.0}, {"sku": "HS-L011", "name": "HS-L011", "amount": 137645.0}, {"sku": "HS-K003", "name": "圆碗 700ml(800)", "amount": 122309.0}, {"sku": "HS-L022", "name": "HS-L022", "amount": 112457.0}, {"sku": "HS-L004", "name": "HS-L004", "amount": 106482.0}, {"sku": "HS-K004", "name": "圆碗 800ml(1000)", "amount": 94987.0}, {"sku": "HS-L010", "name": "HS-L010", "amount": 91823.0}, {"sku": "HS-L002", "name": "HS-L002", "amount": 81135.0}, {"sku": "HS-L023", "name": "HS-L023", "amount": 79289.0}, {"sku": "HS-L005", "name": "HS-L005", "amount": 77765.0}, {"sku": "HS-L009", "name": "HS-L009", "amount": 67245.0}, {"sku": "HS-L006", "name": "HS-L006", "amount": 66254.0}, {"sku": "HS-L007", "name": "HS-L007", "amount": 60857.0}]};
-const CAT_DET_ALL = {};
-const CAT_DET_SP  = {};
 const ALL_PRODS   = [{"no": 226, "barcode": "สินค้าตัวอย่าง", "name": "สินค้าตัวอย่าง", "group": "", "lot": "", "stock_qty": 1837.0, "reserved": 0.0, "remaining": 1837.0, "unit": "ลัง", "location": "N/A-不适用"}, {"no": 214, "barcode": "18859624002773", "name": "HS-K008 中托 360ml 360 ML.", "group": "001-K", "lot": "156X30 (16แพค /25ชิ้น /400ลัง)", "stock_qty": 695.0, "reserved": 0.0, "remaining": 695.0, "unit": "ลัง", "location": "N/A-不适用"}, {"no": 14, "barcode": "18859624000786", "name": "HS-A015 长方形透明盒 ZS-350 ml", "group": "003-A", "lot": "162*111*35 (12แพค /25ชิ้น /300ลัง)", "stock_qty": 590.0, "reserved": 0.0, "remaining": 590.0, "unit": "ลัง", "location": "N/A-不适用"}, {"no": 213, "barcode": "18859624002766", "name": "HS-K007 圆碗 1300ml(1750) 1300 ML.", "group": "001-K", "lot": "171X101 (8แพค /25ชิ้น /200ลัง)", "stock_qty": 473.0, "reserved": 7.0, "remaining": 466.0, "unit": "ลัง", "location": "N/A-不适用"}, {"no": 182, "barcode": "18859624002520", "name": "HS - L008  ถาดรองแบ่งชั้น 360ML", "group": "008-L", "lot": "155x100 (30ชิ้น x 16แพค / 480ชิ้น)", "stock_qty": 451.0, "reserved": 0.0, "remaining": 451.0, "unit": "ลัง", "location": "N/A-不适用"}, {"no": 215, "barcode": "18859624002780", "name": "HS-K009 方盒 400ml (500) 400 ML.", "group": "001-K", "lot": "165X111X35(12แพค /25ชิ้น /300ลัง)", "stock_qty": 483.0, "reserved": 50.0, "remaining": 433.0, "unit": "ลัง", "location": "N/A-不适用"}, {"no": 207, "barcode": "18859624002704", "name": "HS-K001 圆碗 280ml(300) 280 ML.", "group": "001-K", "lot": "120X46 (18แพค /25ชิ้น /450ลัง)", "stock_qty": 460.0, "reserved": 31.0, "remaining": 429.0, "unit": "ลัง", "location": "N/A-不适用"}, {"no": 211, "barcode": "18859624002742", "name": "HS-K005 圆碗 950ml(1250) 950 ML.", "group": "001-K", "lot": "171X77 (8แพค /25ชิ้น /200ลัง)", "stock_qty": 443.0, "reserved": 34.0, "remaining": 409.0, "unit": "ลัง", "location": "N/A-不适用"}, {"no": 212, "barcode": "18859624002759", "name": "HS-K006 圆碗 1100ml(1500) 1100 ML.", "group": "001-K", "lot": "171X87 (8แพค /25ชิ้น /200ลัง)", "stock_qty": 455.0, "reserved": 52.0, "remaining": 403.0, "unit": "ลัง", "location": "N/A-不适用"}, {"no": 31, "barcode": "18859624000939", "name": "HS-A030 黑色美式高档盒 ZS-750 # Black (B)", "group": "003-A", "lot": "156*156*59 (9แพค / 25ชิ้น /300ลัง)", "stock_qty": 402.0, "reserved": 0.0, "remaining": 402.0, "unit": "ลัง", "location": "N/A-不适用"}, {"no": 29, "barcode": "18859624000922", "name": "HS-A029 黑色美式高档盒 ZS-650 # Black (B)", "group": "003-A", "lot": "156*156*54 (12แพค / 25ชิ้น /300ลัง)", "stock_qty": 391.0, "reserved": 0.0, "remaining": 391.0, "unit": "ลัง", "location": "N/A-不适用"}, {"no": 208, "barcode": "18859624002711", "name": "HS-K002 圆碗 400ml(450) 400 ML.", "group": "001-K", "lot": "120X67 (18แพค /25ชิ้น /450ลัง)", "stock_qty": 429.0, "reserved": 56.0, "remaining": 373.0, "unit": "ลัง", "location": "N/A-不适用"}, {"no": 166, "barcode": "18859624002438", "name": "HS-J 012 กล่องเหลี่ยม ฝาเซฟตี้ล็อค  ZS-3000 ml", "group": "002-J", "lot": "300x209x299 (20ชิ้น x 4แพค / 80ชิ้น)", "stock_qty": 368.0, "reserved": 0.0, "remaining": 368.0, "unit": "ลัง", "location": "N/A-不适用"}, {"no": 168, "barcode": "18859624002452", "name": "HS - L001  กล่องข้าวกลม 280ML   สีใส #Clear (C)", "group": "008-L", "lot": "122X235 (30ชิ้น x 18แพค / 540ชิ้น)", "stock_qty": 356.0, "reserved": 4.0, "remaining": 352.0, "unit": "ลัง", "location": "N/A-不适用"}, {"no": 216, "barcode": "18859624002797", "name": "HS-K010 方盒 500ml (650) 500 ML.", "group": "001-K", "lot": "165X111X35(12แพค /25ชิ้น /300ลัง)", "stock_qty": 395.0, "reserved": 50.0, "remaining": 345.0, "unit": "ลัง", "location": "N/A-不适用"}, {"no": 33, "barcode": "18859624000946", "name": "HS-A031 黑色美式高档盒 ZS-1000 # Black (B)", "group": "003-A", "lot": "156*156*71 (12แพค/ 25ชิ้น/300ลัง)", "stock_qty": 332.0, "reserved": 0.0, "remaining": 332.0, "unit": "ลัง", "location": "N/A-不适用"}, {"no": 183, "barcode": "18859624002537", "name": "HS - L009  กล่องข้าวเหลี่ยม 400ML  สีใส  #Clear  (C)", "group": "008-L", "lot": "166x112x183 (30ชิ้น x 12แพค / 360ชิ้น)", "stock_qty": 328.0, "reserved": 0.0, "remaining": 328.0, "unit": "ลัง", "location": "N/A-不适用"}, {"no": 170, "barcode": "18859624002469", "name": "HS - L002  กล่องข้าวกลม 400ML   สีใส #Clear (C)", "group": "008-L", "lot": "122X252 (30ชิ้น x 18แพค / 540ชิ้น)", "stock_qty": 328.0, "reserved": 3.0, "remaining": 325.0, "unit": "ลัง", "location": "N/A-不适用"}, {"no": 24, "barcode": "18859624000885", "name": "HS-A025 连体酱料杯 P1 2000", "group": "003-A", "lot": "3.9*3*3.3 (40แพค /50ชิ้น /2000ลัง)", "stock_qty": 298.0, "reserved": 6.0, "remaining": 292.0, "unit": "ลัง", "location": "N/A-不适用"}, {"no": 210, "barcode": "18859624002735", "name": "HS-K004 圆碗 800ml(1000) 800 ML.", "group": "001-K", "lot": "150X85 (12แพค /25ชิ้น /300ลัง)", "stock_qty": 391.0, "reserved": 100.0, "remaining": 291.0, "unit": "ลัง", "location": "N/A-不适用"}, {"no": 13, "barcode": "18859624000779", "name": "HS-A014 透明中托 ZS", "group": "003-A", "lot": "162*140*30 (16แพค /25ชิ้น /400ลัง)", "stock_qty": 288.0, "reserved": 0.0, "remaining": 288.0, "unit": "ลัง", "location": "N/A-不适用"}, {"no": 157, "barcode": "18859624002346", "name": "HS-J 03 กล่องกลม ฝาเซฟตี้ล็อค ZS-1000 ml", "group": "002-J", "lot": "207x43 (20ชิ้น x 6แพค / 120ชิ้น)", "stock_qty": 279.0, "reserved": 0.0, "remaining": 279.0, "unit": "ลัง", "location": "N/A-不适用"}, {"no": 176, "barcode": "18859624002490", "name": "HS - L005  กล่องข้าวกลม 950ML  สีใส  #Clear (C)", "group": "008-L", "lot": "172x304 (30ชิ้น x 8แพค / 240ชิ้น)", "stock_qty": 271.0, "reserved": 0.0, "remaining": 271.0, "unit": "ลัง", "location": "N/A-不适用"}, {"no": 174, "barcode": "18859624002483", "name": "HS - L004  กล่องข้าวกลม 800ML   สีใส #Clear  (C)", "group": "008-L", "lot": "152X260 (30ชิ้น x 12แพค / 360ชิ้น)", "stock_qty": 271.0, "reserved": 0.0, "remaining": 271.0, "unit": "ลัง", "location": "N/A-不适用"}, {"no": 161, "barcode": "18859624002384", "name": "HS-J 07 กล่องเหลี่ยม ฝาเซฟตี้ล็อค  ZS-750 ml", "group": "002-J", "lot": "221x156x36 (20ชิ้น x 9แพค / 180ชิ้น)", "stock_qty": 261.0, "reserved": 0.0, "remaining": 261.0, "unit": "ลัง", "location": "N/A-不适用"}, {"no": 167, "barcode": "18859624002445", "name": "HS-J 013 กล่องเหลี่ยม ฝาเซฟตี้ล็อค  ZS-3200 ml", "group": "002-J", "lot": "252x252x301 (20ชิ้นx 4แพค / 80ชิ้น)", "stock_qty": 259.0, "reserved": 0.0, "remaining": 259.0, "unit": "ลัง", "location": "N/A-不适用"}, {"no": 27, "barcode": "18859624000915", "name": "HS-A028 黑色美式高档盒 ZS-500 # Black (B)", "group": "003-A", "lot": "156*156*47 (12แพค /25ชิ้น /300ลัง)", "stock_qty": 258.0, "reserved": 0.0, "remaining": 258.0, "unit": "ลัง", "location": "N/A-不适用"}, {"no": 158, "barcode": "18859624002353", "name": "HS-J 04 กล่องกลม ฝาเซฟตี้ล็อค ZS-1250 ml", "group": "002-J", "lot": "207x58 (20ชิ้น x 6แพค / 120ชิ้น)", "stock_qty": 255.0, "reserved": 0.0, "remaining": 255.0, "unit": "ลัง", "location": "N/A-不适用"}, {"no": 165, "barcode": "18859624002421", "name": "HS-J 011 กล่องเหลี่ยม ฝาเซฟตี้ล็อค  ZS-1800 ml", "group": "002-J", "lot": "240x175x62 (20ชิ้น x 6แพค / 120ชิ้น)", "stock_qty": 253.0, "reserved": 0.0, "remaining": 253.0, "unit": "ลัง", "location": "N/A-不适用"}, {"no": 162, "barcode": "18859624002391", "name": "HS-J 08 กล่องเหลี่ยม ฝาเซฟตี้ล็อค  ZS-800 ml", "group": "002-J", "lot": "192x129x40 (20ชิ้น x 9แพค / 180ชิ้น)", "stock_qty": 251.0, "reserved": 0.0, "remaining": 251.0, "unit": "ลัง", "location": "N/A-不适用"}, {"no": 156, "barcode": "18859624002339", "name": "HS-J 02 กล่องกลม ฝาเซฟตี้ล็อค ZS-650 ml", "group": "002-J", "lot": "156x54 (20ชิ้น x 12แพค / 240ชิ้น)", "stock_qty": 251.0, "reserved": 0.0, "remaining": 251.0, "unit": "ลัง", "location": "N/A-不适用"}, {"no": 164, "barcode": "18859624002414", "name": "HS-J 010 กล่องเหลี่ยม ฝาเซฟตี้ล็อค  ZS-1500 ml", "group": "002-J", "lot": "186x186x67 (20ชิ้น x 6แพค / 120ชิ้น)", "stock_qty": 249.0, "reserved": 0.0, "remaining": 249.0, "unit": "ลัง", "location": "N/A-不适用"}, {"no": 155, "barcode": "18859624002322", "name": "HS-J 01 กล่องกลม ฝาเซฟตี้ล็อค ZS-500 ml", "group": "002-J", "lot": "156x44  (20ชิ้น x 12แพค / 240ชิ้น)", "stock_qty": 247.0, "reserved": 0.0, "remaining": 247.0, "unit": "ลัง", "location": "N/A-不适用"}, {"no": 15, "barcode": "18859624000793", "name": "HS-A016 长方形透明盒 ZS-500 ml", "group": "003-A", "lot": "162*111*46 (12แพค /25ชิ้น /300ลัง)", "stock_qty": 245.0, "reserved": 0.0, "remaining": 245.0, "unit": "ลัง", "location": "N/A-不适用"}, {"no": 57, "barcode": "18859624001172", "name": "HS-C007 长方PET蛋糕托盘", "group": "005-C", "lot": "49.5*24 (6)", "stock_qty": 246.0, "reserved": 1.0, "remaining": 245.0, "unit": "ลัง", "location": "N/A-不适用"}, {"no": 159, "barcode": "18859624002360", "name": "HS-J 05 กล่องเหลี่ยมจตุรัส ฝาเซฟตี้ล็อค  ZS-500 ml", "group": "002-J", "lot": "141x141x46 (20ชิ้น x 12แพค / 240ชิ้น)", "stock_qty": 245.0, "reserved": 0.0, "remaining": 245.0, "unit": "ลัง", "location": "N/A-不适用"}, {"no": 35, "barcode": "18859624000953", "name": "HS-B001 白色高档盒 320", "group": "004-B", "lot": "128*104*43 (12แพค /25ชิ้น /300ลัง)", "stock_qty": 245.0, "reserved": 0.0, "remaining": 245.0, "unit": "ลัง", "location": "N/A-不适用"}, {"no": 163, "barcode": "18859624002407", "name": "HS-J 09 กล่องเหลี่ยม ฝาเซฟตี้ล็อค  ZS-1250 ml", "group": "002-J", "lot": "186x186x58 (20ชิ้น x 6แพค / 120ชิ้น)", "stock_qty": 237.0, "reserved": 0.0, "remaining": 237.0, "unit": "ลัง", "location": "N/A-不适用"}, {"no": 172, "barcode": "18859624002476", "name": "HS - L003  กล่องข้าวกลม 700ML   สีใส #Clear (C)", "group": "008-L", "lot": "152X245 (30ชิ้น x 12แพค / 360ชิ้น)", "stock_qty": 227.0, "reserved": 0.0, "remaining": 227.0, "unit": "ลัง", "location": "N/A-不适用"}, {"no": 209, "barcode": "18859624002728", "name": "HS-K003 圆碗 700ml(800) 700 ML.", "group": "001-K", "lot": "150X70 (12แพค /25ชิ้น /300ลัง)", "stock_qty": 326.0, "reserved": 104.0, "remaining": 222.0, "unit": "ลัง", "location": "N/A-不适用"}, {"no": 160, "barcode": "18859624002377", "name": "HS-J 06 กล่องเหลี่ยมจตุรัส ฝาเซฟตี้ล็อค  ZS-650 ml", "group": "002-J", "lot": "141x141x57 (20ชิ้น x 12แพค / 240ชิ้น)", "stock_qty": 209.0, "reserved": 0.0, "remaining": 209.0, "unit": "ลัง", "location": "N/A-不适用"}, {"no": 191, "barcode": "18859624002575", "name": "HS - L013  ถ้วยกลม 280ML", "group": "008-L", "lot": "120x214 (60ชิ้น x 9แพค / 540ชิ้น)", "stock_qty": 207.0, "reserved": 0.0, "remaining": 207.0, "unit": "ลัง", "location": "N/A-不适用"}, {"no": 56, "barcode": "18859624001165", "name": "HS-C006 长方PET蛋糕托盘", "group": "005-C", "lot": "37*19.5(18)", "stock_qty": 204.0, "reserved": 1.0, "remaining": 203.0, "unit": "ลัง", "location": "N/A-不适用"}, {"no": 185, "barcode": "18859624002544", "name": "HS - L010  กล่องข้าวเหลี่ยม 500ML   สีใส #Clear  (C)", "group": "008-L", "lot": "166x112x210 (30ชิ้น x 12แพค / 360ชิ้น)", "stock_qty": 206.0, "reserved": 3.0, "remaining": 203.0, "unit": "ลัง", "location": "N/A-不适用"}, {"no": 193, "barcode": "18859624002599", "name": "HS - L015  ถ้วยกลม 700ML", "group": "008-L", "lot": "150x228 (60ชิ้น x 6แพค / 360ชิ้น)", "stock_qty": 197.0, "reserved": 0.0, "remaining": 197.0, "unit": "ลัง", "location": "N/A-不适用"}, {"no": 39, "barcode": "18859624000991", "name": "HS-B005 白色高档盒 820", "group": "004-B", "lot": "137*106*80 (12แพค/ 25ชิ้น /300ลัง)", "stock_qty": 193.0, "reserved": 0.0, "remaining": 193.0, "unit": "ลัง", "location": "N/A-不适用"}, {"no": 44, "barcode": "18859624001042", "name": "HS-B010 纯白广口圆碗 958", "group": "004-B", "lot": "164*116*85 (8แพค/ 25ชิ้น /200ลัง)", "stock_qty": 190.0, "reserved": 0.0, "remaining": 190.0, "unit": "ลัง", "location": "N/A-不适用"}, {"no": 41, "barcode": "18859624001011", "name": "HS-B007 白色高档盒 1230", "group": "004-B", "lot": "156*114*92 (12แพค/ 25ชิ้น /300ลัง)", "stock_qty": 188.0, "reserved": 0.0, "remaining": 188.0, "unit": "ลัง", "location": "N/A-不适用"}, {"no": 42, "barcode": "18859624001028", "name": "HS-B008 纯白广口圆碗 608", "group": "004-B", "lot": "164*116*57 (8แพค /25ชิ้น /200ลัง)", "stock_qty": 187.0, "reserved": 0.0, "remaining": 187.0, "unit": "ลัง", "location": "N/A-不适用"}, {"no": 16, "barcode": "18859624000809", "name": "HS-A017 长方形透明盒 ZS-650 ml", "group": "003-A", "lot": "190*130*36 (12แพค /25ชิ้น /300ลัง)", "stock_qty": 185.0, "reserved": 0.0, "remaining": 185.0, "unit": "ลัง", "location": "N/A-不适用"}, {"no": 195, "barcode": "18859624002612", "name": "HS - L017  ถ้วยกลม 950ML", "group": "008-L", "lot": "171x312 (60ชิ้น x 4แพค / 240ชิ้น)", "stock_qty": 182.0, "reserved": 0.0, "remaining": 182.0, "unit": "ลัง", "location": "N/A-不适用"}, {"no": 192, "barcode": "18859624002582", "name": "HS - L014  ถ้วยกลม 400ML", "group": "008-L", "lot": "120x235 (60ชิ้น x 9ชิ้น / 540ชิ้น)", "stock_qty": 182.0, "reserved": 0.0, "remaining": 182.0, "unit": "ลัง", "location": "N/A-不适用"}, {"no": 45, "barcode": "18859624001059", "name": "HS-B011 纯白广口圆碗 1080", "group": "004-B", "lot": "179*128*69 (8แพค/ 25ชิ้น /200ลัง)", "stock_qty": 177.0, "reserved": 0.0, "remaining": 177.0, "unit": "ลัง", "location": "N/A-不适用"}, {"no": 8, "barcode": "18859624000717", "name": "HS-A008 透明圆形深碗 ZS-1500 ml", "group": "003-A", "lot": "177*112*95 (8แพค /25ชิ้น /200ลัง)", "stock_qty": 177.0, "reserved": 0.0, "remaining": 177.0, "unit": "ลัง", "location": "N/A-不适用"}, {"no": 48, "barcode": "18859624001080", "name": "HS-B014 纯白广口大盆 2500", "group": "004-B", "lot": "246*188*83 (4แพค/ 15ชิ้น /60ลัง)", "stock_qty": 177.0, "reserved": 0.0, "remaining": 177.0, "unit": "ลัง", "location": "N/A-不适用"}, {"no": 28, "barcode": "18859624000915-CLR", "name": "HS-A028 黑色美式高档盒 ZS-500 #Clear (C)", "group": "003-A", "lot": "156*156*47 (12แพค /25ชิ้น /300ลัง)", "stock_qty": 175.0, "reserved": 0.0, "remaining": 175.0, "unit": "ลัง", "location": "N/A-不适用"}, {"no": 38, "barcode": "18859624000984", "name": "HS-B004 白色高档盒 720", "group": "004-B", "lot": "137*107*72 (12แพค/ 25ชิ้น /300ลัง)", "stock_qty": 175.0, "reserved": 0.0, "remaining": 175.0, "unit": "ลัง", "location": "N/A-不适用"}, {"no": 197, "barcode": "18859624002636", "name": "HS - L019  ถ้วยกลม 1300ML", "group": "008-L", "lot": "171x335 (60ชิ้น x 4แพค / 240ชิ้น)", "stock_qty": 175.0, "reserved": 0.0, "remaining": 175.0, "unit": "ลัง", "location": "N/A-不适用"}, {"no": 37, "barcode": "18859624000977", "name": "HS-B003 白色高档盒 520", "group": "004-B", "lot": "128*97*63 (12แพค /25ชิ้น /300ลัง)", "stock_qty": 174.0, "reserved": 0.0, "remaining": 174.0, "unit": "ลัง", "location": "N/A-不适用"}, {"no": 187, "barcode": "18859624002551", "name": "HS - L011  กล่องข้าวเหลี่ยม 650ML   สีใส #Clear  (C)", "group": "008-L", "lot": "166x112x250 (30ชิ้น x 12แพค / 360ชิ้น)", "stock_qty": 174.0, "reserved": 0.0, "remaining": 174.0, "unit": "ลัง", "location": "N/A-不适用"}, {"no": 131, "barcode": "18859624001998", "name": "HS-E026 扁平小圆盒 1060 390 ml", "group": "006-E", "lot": "10.0*6.0 (224)", "stock_qty": 174.0, "reserved": 0.0, "remaining": 174.0, "unit": "ลัง", "location": "N/A-不适用"}, {"no": 3, "barcode": "18859624000663", "name": "HS-A003 透明圆形餐盒 ZS-500 ml", "group": "003-A", "lot": "128*90*64 (18แพค /25ชิ้น /450ลัง)", "stock_qty": 174.0, "reserved": 0.0, "remaining": 174.0, "unit": "ลัง", "location": "N/A-不适用"}, {"no": 21, "barcode": "18859624000854", "name": "HS-A022 长方形单格盒 ZS", "group": "003-A", "lot": "225*117*41 (12แพค /25ชิ้น /300ลัง)", "stock_qty": 173.0, "reserved": 0.0, "remaining": 173.0, "unit": "ลัง", "location": "N/A-不适用"}, {"no": 47, "barcode": "18859624001073", "name": "HS-B013 纯白广口大盆 1500", "group": "004-B", "lot": "246*188*56 (4แพค/15 ชิ้น /60ลัง)", "stock_qty": 171.0, "reserved": 0.0, "remaining": 171.0, "unit": "ลัง", "location": "N/A-不适用"}, {"no": 194, "barcode": "18859624002605", "name": "HS - L016  ถ้วยกลม 800ML", "group": "008-L", "lot": "150x243 (60ชิ้น x 6แพค / 360ชิ้น)", "stock_qty": 170.0, "reserved": 0.0, "remaining": 170.0, "unit": "ลัง", "location": "N/A-不适用"}, {"no": 196, "barcode": "18859624002629", "name": "HS - L018  ถ้วยกลม 1100ML", "group": "008-L", "lot": "171x321 (60ชิ้น x 4แพค / 240ชิ้น)", "stock_qty": 169.0, "reserved": 0.0, "remaining": 169.0, "unit": "ลัง", "location": "N/A-不适用"}, {"no": 30, "barcode": "18859624000922-CLR", "name": "HS-A029 黑色美式高档盒 ZS-650 #Clear (C)", "group": "003-A", "lot": "156*156*54 (12แพค / 25ชิ้น /300ลัง)", "stock_qty": 167.0, "reserved": 0.0, "remaining": 167.0, "unit": "ลัง", "location": "N/A-不适用"}, {"no": 22, "barcode": "18859624000861", "name": "HS-A023 长方形双格盒 2 ZS", "group": "003-A", "lot": "225*117*41 (12แพค /25ชิ้น /300ลัง)", "stock_qty": 167.0, "reserved": 0.0, "remaining": 167.0, "unit": "ลัง", "location": "N/A-不适用"}, {"no": 43, "barcode": "18859624001035", "name": "HS-B009 纯白广口圆碗 728", "group": "004-B", "lot": "164*116*67 (8แพค/ 25ชิ้น /200ลัง)", "stock_qty": 167.0, "reserved": 0.0, "remaining": 167.0, "unit": "ลัง", "location": "N/A-不适用"}, {"no": 17, "barcode": "18859624000816", "name": "HS-A018 长方形透明盒 ZS-750 ml", "group": "003-A", "lot": "190*130*50 (12แพค /25ชิ้น /300ลัง)", "stock_qty": 170.0, "reserved": 5.0, "remaining": 165.0, "unit": "ลัง", "location": "N/A-不适用"}, {"no": 180, "barcode": "18859624002513", "name": "HS - L007  กล่องข้าวกลม 1300ML  สีใส  #Clear  (C)", "group": "008-L", "lot": "172x304 (30ชิ้น x 8แพค / 240ชิ้น)", "stock_qty": 160.0, "reserved": 0.0, "remaining": 160.0, "unit": "ลัง", "location": "N/A-不适用"}, {"no": 122, "barcode": "18859624001905", "name": "HS-E017 小号方底透盒 85 340 ml", "group": "006-E", "lot": "8.5*8.5*6.3 (168)", "stock_qty": 155.0, "reserved": 0.0, "remaining": 155.0, "unit": "ลัง", "location": "N/A-不适用"}, {"no": 199, "barcode": "18859624002643-BLK", "name": "HS - L020  กล่องข้าวเหลี่ยม 500MLสีดำ# Black (B)", "group": "008-L", "lot": "171x119x234 (30ชิ้น x 12แพค / 360ชิ้น)", "stock_qty": 148.0, "reserved": 0.0, "remaining": 148.0, "unit": "ลัง", "location": "N/A-不适用"}, {"no": 169, "barcode": "18859624002452-BLK", "name": "HS - L001  กล่องข้าวกลม 280ML สีดำ  # Black (B)", "group": "008-L", "lot": "122X235 (30ชิ้น x 18แพค / 540ชิ้น)", "stock_qty": 152.0, "reserved": 10.0, "remaining": 142.0, "unit": "ลัง", "location": "N/A-不适用"}, {"no": 26, "barcode": "18859624000908", "name": "HS-A027 连体酱料杯 P4 1000", "group": "003-A", "lot": "6.9*5.1*4.5 (20แพค /50ชิ้น /1000ลัง)", "stock_qty": 144.0, "reserved": 2.0, "remaining": 142.0, "unit": "ลัง", "location": "N/A-不适用"}, {"no": 76, "barcode": "18859624001462", "name": "HS-E007 水晶长方盒 PET 440 ml", "group": "006-E", "lot": "147*84*55 (180)", "stock_qty": 142.0, "reserved": 0.0, "remaining": 142.0, "unit": "ลัง", "location": "N/A-不适用"}, {"no": 46, "barcode": "18859624001066", "name": "HS-B012 纯白广口圆碗 1280", "group": "004-B", "lot": "179*129*85 (8แพค/ 25ชิ้น /200ลัง)", "stock_qty": 142.0, "reserved": 0.0, "remaining": 142.0, "unit": "ลัง", "location": "N/A-不适用"}, {"no": 12, "barcode": "18859624000762", "name": "HS-A013 透明圆形巨盆 ZS-3500 ml", "group": "003-A", "lot": "236*162*111 (4แพค/25ชิ้น/100ลัง)", "stock_qty": 139.0, "reserved": 0.0, "remaining": 139.0, "unit": "ลัง", "location": "N/A-不适用"}, {"no": 4, "barcode": "18859624000670", "name": "HS-A004 透明圆形餐盒 ZS-650 ml", "group": "003-A", "lot": "158*102*60 (12แพค /25ชิ้น /300ลัง)", "stock_qty": 139.0, "reserved": 0.0, "remaining": 139.0, "unit": "ลัง", "location": "N/A-不适用"}, {"no": 123, "barcode": "18859624001912", "name": "HS-E018 中号方底透盒 95 450 ml", "group": "006-E", "lot": "9.5*9.5*6.5 (168)", "stock_qty": 139.0, "reserved": 1.0, "remaining": 138.0, "unit": "ลัง", "location": "N/A-不适用"}, {"no": 184, "barcode": "18859624002537-BLK", "name": "HS - L009  กล่องข้าวเหลี่ยม 400ML สีดำ # Black (B)", "group": "008-L", "lot": "166x112x183 (30ชิ้น x 12แพค / 360ชิ้น)", "stock_qty": 166.0, "reserved": 30.0, "remaining": 136.0, "unit": "ลัง", "location": "N/A-不适用"}, {"no": 40, "barcode": "18859624001004", "name": "HS-B006 白色高档盒 1030", "group": "004-B", "lot": "156*120*73 (12แพค/ 25ชิ้น /300ลัง)", "stock_qty": 134.0, "reserved": 0.0, "remaining": 134.0, "unit": "ลัง", "location": "N/A-不适用"}, {"no": 186, "barcode": "18859624002544-BLK", "name": "HS - L010  กล่องข้าวเหลี่ยม 500ML สีดำ # Black (B)", "group": "008-L", "lot": "166x112x210 (30ชิ้น x 12แพค / 360ชิ้น)", "stock_qty": 167.0, "reserved": 33.0, "remaining": 134.0, "unit": "ลัง", "location": "N/A-不适用"}, {"no": 18, "barcode": "18859624000823", "name": "HS-A019 长方形透明盒 ZS-1000 ml", "group": "003-A", "lot": "190*130*60 (12แพค /25ชิ้น /300ลัง)", "stock_qty": 135.0, "reserved": 5.0, "remaining": 130.0, "unit": "ลัง", "location": "N/A-不适用"}, {"no": 87, "barcode": "18859624001578", "name": "HS-F002 黄盖方形罐 PET 330 ml +", "group": "007--F", "lot": "57*100(210)", "stock_qty": 124.0, "reserved": 0.0, "remaining": 124.0, "unit": "ลัง", "location": "N/A-不适用"}, {"no": 77, "barcode": "18859624001479", "name": "HS-E008 水晶长方盒 PET 550 ml", "group": "006-E", "lot": "148*78*81 (140)", "stock_qty": 119.0, "reserved": 0.0, "remaining": 119.0, "unit": "ลัง", "location": "N/A-不适用"}, {"no": 201, "barcode": "18859624002650-BLK", "name": "HS - L021  กล่องข้าวเหลี่ยม 650ML สีดำ# Black (B)", "group": "008-L", "lot": "171x119x258 (30ชิ้น x 12แพค / 360ชิ้น)", "stock_qty": 116.0, "reserved": 0.0, "remaining": 116.0, "unit": "ลัง", "location": "N/A-不适用"}, {"no": 5, "barcode": "18859624000687", "name": "HS-A005 透明圆形餐盒 ZS-800 ml", "group": "003-A", "lot": "158*102*68 (12แพค /25ชิ้น /300ลัง)", "stock_qty": 114.0, "reserved": 0.0, "remaining": 114.0, "unit": "ลัง", "location": "N/A-不适用"}, {"no": 25, "barcode": "18859624000892", "name": "HS-A026 连体酱料杯 P2 1000", "group": "003-A", "lot": "6.1*5.1*3 (20แพค/ 50ชิ้น /1000ลัง)", "stock_qty": 117.0, "reserved": 3.0, "remaining": 114.0, "unit": "ลัง", "location": "N/A-不适用"}, {"no": 9, "barcode": "18859624000724", "name": "HS-A009 透明圆形深碗 ZS-1750 ml", "group": "003-A", "lot": "177*113*112 (8แพค /25ชิ้น /200ลัง)", "stock_qty": 113.0, "reserved": 0.0, "remaining": 113.0, "unit": "ลัง", "location": "N/A-不适用"}, {"no": 67, "barcode": "18859624001271", "name": "HS-B018 美式透明圆桶 160Z 300", "group": "004-B", "lot": "113*98*65 (12แพค/ 25ชิ้น /300ลัง)", "stock_qty": 111.0, "reserved": 0.0, "remaining": 111.0, "unit": "ลัง", "location": "N/A-不适用"}, {"no": 32, "barcode": "18859624000939-CLR", "name": "HS-A030 黑色美式高档盒 ZS-750 #Clear (C)", "group": "003-A", "lot": "156*156*59 (9แพค / 25ชิ้น /300ลัง)", "stock_qty": 107.0, "reserved": 0.0, "remaining": 107.0, "unit": "ลัง", "location": "N/A-不适用"}, {"no": 171, "barcode": "18859624002469-BLK", "name": "HS - L002  กล่องข้าวกลม 400ML สีดำ # Black (B)", "group": "008-L", "lot": "122X252 (30ชิ้น x 18แพค / 540ชิ้น)", "stock_qty": 126.0, "reserved": 20.0, "remaining": 106.0, "unit": "ลัง", "location": "N/A-不适用"}, {"no": 81, "barcode": "18859624001516", "name": "HS-E012 水晶大圆盒 PET 660 ml", "group": "006-E", "lot": "140*53 (96)", "stock_qty": 106.0, "reserved": 0.0, "remaining": 106.0, "unit": "ลัง", "location": "N/A-不适用"}, {"no": 181, "barcode": "18859624002513-BLK", "name": "HS - L007  กล่องข้าวกลม 1300ML สีดำ # Black (B)", "group": "008-L", "lot": "172x304 (30ชิ้น x 8แพค / 240ชิ้น)", "stock_qty": 114.0, "reserved": 10.0, "remaining": 104.0, "unit": "ลัง", "location": "N/A-不适用"}, {"no": 69, "barcode": "18859624001295", "name": "HS-B020 美式透明圆桶 320Z 300", "group": "004-B", "lot": "113*92*124 (12แพค 25ชิ้น /300ลัง)", "stock_qty": 102.0, "reserved": 0.0, "remaining": 102.0, "unit": "ลัง", "location": "N/A-不适用"}, {"no": 66, "barcode": "18859624001264", "name": "HS-B017 美式透明圆桶 120Z 300", "group": "004-B", "lot": "113*100*47 (12แพค/25ชิ้น /300ลัง)", "stock_qty": 102.0, "reserved": 0.0, "remaining": 102.0, "unit": "ลัง", "location": "N/A-不适用"}, {"no": 217, "barcode": "18859624002803", "name": "HS-K011 方盒 650ml (750) 650 ML.", "group": "001-K", "lot": "165X111X57(12แพค /25ชิ้น /300ลัง)", "stock_qty": 405.0, "reserved": 304.0, "remaining": 101.0, "unit": "ลัง", "location": "N/A-不适用"}, {"no": 222, "barcode": "8859624002134", "name": "HS-H002 ถุงลายดอกไม้ดับเบิ้ลคัพ", "group": "ถุง", "lot": "20*11*27(85g.)", "stock_qty": 100.0, "reserved": 0.0, "remaining": 100.0, "unit": "ลัง", "location": "N/A-不适用"}, {"no": 1, "barcode": "18859624000649", "name": "HS-A001 透明圆形餐盒 ZS-300 ml", "group": "003-A", "lot": "128*91*45 (18แพค /25ชิ้น /450ลัง)", "stock_qty": 99.0, "reserved": 0.0, "remaining": 99.0, "unit": "ลัง", "location": "N/A-不适用"}, {"no": 23, "barcode": "18859624000878", "name": "HS-A024 长方形三格盒 3 ZS", "group": "003-A", "lot": "225*117*41 (12แพค /25ชิ้น /300ลัง)", "stock_qty": 98.0, "reserved": 0.0, "remaining": 98.0, "unit": "ลัง", "location": "N/A-不适用"}, {"no": 224, "barcode": "8859624002158", "name": "HS-H004 ถุงดอกลิลลี่ ถ้วยคู่", "group": "ถุง", "lot": "20*11*27(85g.)", "stock_qty": 97.0, "reserved": 0.0, "remaining": 97.0, "unit": "ลัง", "location": "N/A-不适用"}, {"no": 143, "barcode": "18859624002117", "name": "HS-C023 长方 PET牛油果绿 (Avocado Green)托盘 220g", "group": "005-C", "lot": "39*28*3 (40)", "stock_qty": 97.0, "reserved": 0.0, "remaining": 97.0, "unit": "ลัง", "location": "N/A-不适用"}, {"no": 97, "barcode": "18859624001691-BLK", "name": "HS-F014 蓝盖易扣罐 PET - 245 ml + # Black (B)", "group": "007--F", "lot": "85*50(240)", "stock_qty": 96.0, "reserved": 0.0, "remaining": 96.0, "unit": "ลัง", "location": "N/A-不适用"}, {"no": 223, "barcode": "8859624002141", "name": "HS-H003 ถุง HELLO ถ้วยคู่", "group": "ถุง", "lot": "20*11*27(85g.)", "stock_qty": 96.0, "reserved": 0.0, "remaining": 96.0, "unit": "ลัง", "location": "N/A-不适用"}, {"no": 96, "barcode": "18859624001691", "name": "HS-F014 蓝盖易扣罐 PET - 245 ml + #Clear (C)", "group": "007--F", "lot": "85*50(240)", "stock_qty": 95.0, "reserved": 0.0, "remaining": 95.0, "unit": "ลัง", "location": "N/A-不适用"}, {"no": 100, "barcode": "18859624001707-BLK", "name": "HS-F015 蓝盖易扣罐 PET - 350 ml + # Black (B)", "group": "007--F", "lot": "85*70(240)", "stock_qty": 95.0, "reserved": 0.0, "remaining": 95.0, "unit": "ลัง", "location": "N/A-不适用"}, {"no": 103, "barcode": "18859624001714-BLK", "name": "HS-F016 蓝盖易扣罐 PET - 410 ml + # Black (B)", "group": "007--F", "lot": "85*85(200)", "stock_qty": 95.0, "reserved": 0.0, "remaining": 95.0, "unit": "ลัง", "location": "N/A-不适用"}, {"no": 225, "barcode": "8859624002165", "name": "HS-H005 ถุงดอกพีช ถ้วยคู่", "group": "ถุง", "lot": "20*11*27(85g.)", "stock_qty": 95.0, "reserved": 0.0, "remaining": 95.0, "unit": "ลัง", "location": "N/A-不适用"}, {"no": 7, "barcode": "18859624000700", "name": "HS-A007 透明圆形深碗 ZS-1250 ml", "group": "003-A", "lot": "177*112*82 (8แพค /25ชิ้น /200ลัง)", "stock_qty": 94.0, "reserved": 0.0, "remaining": 94.0, "unit": "ลัง", "location": "N/A-不适用"}, {"no": 106, "barcode": "18859624001721-BLK", "name": "HS-F017 蓝盖易扣罐 PET - 670 ml + # Black (B)", "group": "007--F", "lot": "85*130(120)", "stock_qty": 93.0, "reserved": 0.0, "remaining": 93.0, "unit": "ลัง", "location": "N/A-不适用"}, {"no": 105, "barcode": "18859624001721", "name": "HS-F017 蓝盖易扣罐 PET - 670 ml + #Clear (C)", "group": "007--F", "lot": "85*130(120)", "stock_qty": 92.0, "reserved": 0.0, "remaining": 92.0, "unit": "ลัง", "location": "N/A-不适用"}, {"no": 68, "barcode": "18859624001288", "name": "HS-B019 美式透明圆桶 240Z 300", "group": "004-B", "lot": "113*95*91 (12แพค/ 25ชิ้น /300ลัง)", "stock_qty": 92.0, "reserved": 0.0, "remaining": 92.0, "unit": "ลัง", "location": "N/A-不适用"}, {"no": 142, "barcode": "18859624002100", "name": "HS-C022 长方 PET牛油果绿 (Avocado Green)托盘 315g", "group": "005-C", "lot": "44.5*30.5*3.5 (40)", "stock_qty": 92.0, "reserved": 0.0, "remaining": 92.0, "unit": "ลัง", "location": "N/A-不适用"}, {"no": 99, "barcode": "18859624001707", "name": "HS-F015 蓝盖易扣罐 PET - 350 ml + #Clear (C)", "group": "007--F", "lot": "85*70(240)", "stock_qty": 92.0, "reserved": 0.0, "remaining": 92.0, "unit": "ลัง", "location": "N/A-不适用"}, {"no": 20, "barcode": "18859624000847", "name": "HS-A021 大号长方餐盒 ZS-1500 ml", "group": "003-A", "lot": "220*152*70 (12แพค/ 25ชิ้น /300ลัง)", "stock_qty": 91.0, "reserved": 0.0, "remaining": 91.0, "unit": "ลัง", "location": "N/A-不适用"}, {"no": 125, "barcode": "18859624001936", "name": "HS-E020 浅盘阔面盒 216 760 ml", "group": "006-E", "lot": "21.5*15.0*3.2 (90)", "stock_qty": 90.0, "reserved": 0.0, "remaining": 90.0, "unit": "ลัง", "location": "N/A-不适用"}, {"no": 121, "barcode": "18859624001868", "name": "HS-F031 卡通小熊瓶 PET 495 ml +", "group": "007--F", "lot": "75*109(120)", "stock_qty": 90.0, "reserved": 0.0, "remaining": 90.0, "unit": "ลัง", "location": "N/A-不适用"}, {"no": 79, "barcode": "18859624001493", "name": "HS-E010 水晶圆盒 PET 400 ml", "group": "006-E", "lot": "120*54 (160)", "stock_qty": 90.0, "reserved": 0.0, "remaining": 90.0, "unit": "ลัง", "location": "N/A-不适用"}, {"no": 58, "barcode": "18859624001189", "name": "HS-C008 圆PET蛋糕高脚托盘", "group": "005-C", "lot": "D32(18)", "stock_qty": 90.0, "reserved": 1.0, "remaining": 89.0, "unit": "ลัง", "location": "N/A-不适用"}, {"no": 19, "barcode": "18859624000830", "name": "HS-A020 大号长方餐盒 ZS-1250 ml", "group": "003-A", "lot": "220*152*58 (12แพค /25ชิ้น /300ลัง)", "stock_qty": 89.0, "reserved": 0.0, "remaining": 89.0, "unit": "ลัง", "location": "N/A-不适用"}, {"no": 82, "barcode": "18859624001523", "name": "HS-E013 金盖高深盒 PET 1080 ml", "group": "006-E", "lot": "105*94*140 (108)", "stock_qty": 89.0, "reserved": 0.0, "remaining": 89.0, "unit": "ลัง", "location": "N/A-不适用"}, {"no": 86, "barcode": "18859624001561", "name": "HS-F001 黄盖方形罐 PET 300 ml +", "group": "007--F", "lot": "57*90(210)", "stock_qty": 89.0, "reserved": 0.0, "remaining": 89.0, "unit": "ลัง", "location": "N/A-不适用"}, {"no": 128, "barcode": "18859624001967", "name": "HS-E023 钻石八角盒 BJ01 510 ml", "group": "006-E", "lot": "13.6*14.6*5.4 (150)", "stock_qty": 88.0, "reserved": 0.0, "remaining": 88.0, "unit": "ลัง", "location": "N/A-不适用"}, {"no": 102, "barcode": "18859624001714", "name": "HS-F016 蓝盖易扣罐 PET - 410 ml + #Clear (C)", "group": "007--F", "lot": "85*85(200)", "stock_qty": 88.0, "reserved": 0.0, "remaining": 88.0, "unit": "ลัง", "location": "N/A-不适用"}, {"no": 50, "barcode": "18859624001103", "name": "HS-B016 纯白巨型深盆 4000", "group": "004-B", "lot": "290*226*92 (4แพค/ 15ชิ้น /60ลัง)", "stock_qty": 88.0, "reserved": 0.0, "remaining": 88.0, "unit": "ลัง", "location": "N/A-不适用"}, {"no": 178, "barcode": "18859624002506", "name": "HS - L006  กล่องข้าวกลม 1100ML   สีใส #Clear  (C)", "group": "008-L", "lot": "172x314 (30ชิ้น x 8แพค / 240 ชิ้น)", "stock_qty": 87.0, "reserved": 0.0, "remaining": 87.0, "unit": "ลัง", "location": "N/A-不适用"}, {"no": 221, "barcode": "8859624002127", "name": "HS-H001 ถุงลายชาเย็นถ้วยคู่ หน้ากว้าง20 ข้าง11 สูง27cm", "group": "ถุง", "lot": "20*11*27(85g.)", "stock_qty": 85.0, "reserved": 0.0, "remaining": 85.0, "unit": "ลัง", "location": "N/A-不适用"}, {"no": 34, "barcode": "18859624000946-CLR", "name": "HS-A031 黑色美式高档盒 ZS-1000 #Clear (C)", "group": "003-A", "lot": "156*156*71 (12แพค/ 25ชิ้น/300ลัง)", "stock_qty": 85.0, "reserved": 0.0, "remaining": 85.0, "unit": "ลัง", "location": "N/A-不适用"}, {"no": 75, "barcode": "18859624001455", "name": "HS-E006 水晶正方盒 PET 390 ml", "group": "006-E", "lot": "106*106*57 (180)", "stock_qty": 85.0, "reserved": 0.0, "remaining": 85.0, "unit": "ลัง", "location": "N/A-不适用"}, {"no": 49, "barcode": "18859624001097", "name": "HS-B015 纯白巨型深盆 3500", "group": "004-B", "lot": "290*226*84 (4แพค/ 15ชิ้น /60ลัง)", "stock_qty": 84.0, "reserved": 0.0, "remaining": 84.0, "unit": "ลัง", "location": "N/A-不适用"}, {"no": 133, "barcode": "18859624002018", "name": "HS-E028 กล่องแปดเหลี่ยม หยัก SJH 620 ml", "group": "006-E", "lot": "15.6*12.4*5.3 (108)", "stock_qty": 84.0, "reserved": 0.0, "remaining": 84.0, "unit": "ลัง", "location": "N/A-不适用"}, {"no": 127, "barcode": "18859624001950", "name": "HS-E022 标准长方透盒 103 590 ml", "group": "006-E", "lot": "14.7*9.0*5.0 (189)", "stock_qty": 84.0, "reserved": 0.0, "remaining": 84.0, "unit": "ลัง", "location": "N/A-不适用"}, {"no": 89, "barcode": "18859624001592", "name": "HS-F004 黄盖方形罐 PET 490 ml +", "group": "007--F", "lot": "57*140(210)", "stock_qty": 84.0, "reserved": 0.0, "remaining": 84.0, "unit": "ลัง", "location": "N/A-不适用"}, {"no": 138, "barcode": "18859624002063", "name": "HS-C018 长方 PET黑色托盘（金边无盖） 285g", "group": "005-C", "lot": "35*23*3 (40)", "stock_qty": 83.0, "reserved": 1.0, "remaining": 82.0, "unit": "ลัง", "location": "N/A-不适用"}, {"no": 124, "barcode": "18859624001929", "name": "HS-E019 扁平宽盒 215 1050 ml", "group": "006-E", "lot": "21.5*15.0*6.5 (168)", "stock_qty": 81.0, "reserved": 0.0, "remaining": 81.0, "unit": "ลัง", "location": "N/A-不适用"}, {"no": 119, "barcode": "18859624001844", "name": "HS-F029 金盖收口罐 PET 450 ml +", "group": "007--F", "lot": "65*130(210)", "stock_qty": 81.0, "reserved": 0.0, "remaining": 81.0, "unit": "ลัง", "location": "N/A-不适用"}, {"no": 132, "barcode": "18859624002001", "name": "HS-E027 กล่องเหลี่ยม  183 1000 ml", "group": "006-E", "lot": "18.3*18.3*3.5 (78)", "stock_qty": 80.0, "reserved": 0.0, "remaining": 80.0, "unit": "ลัง", "location": "N/A-不适用"}, {"no": 188, "barcode": "18859624002551-BLK", "name": "HS - L011  กล่องข้าวเหลี่ยม 650ML สีดำ # Black (B)", "group": "008-L", "lot": "166x112x250 (30ชิ้น x 12แพค / 360ชิ้น)", "stock_qty": 133.0, "reserved": 53.0, "remaining": 80.0, "unit": "ลัง", "location": "N/A-不适用"}, {"no": 126, "barcode": "18859624001943", "name": "HS-E021 弧面长方盒 195 630 ml", "group": "006-E", "lot": "19.5*13.0*4.0 (100)", "stock_qty": 80.0, "reserved": 0.0, "remaining": 80.0, "unit": "ลัง", "location": "N/A-不适用"}, {"no": 78, "barcode": "18859624001486", "name": "HS-E009 水晶长方盒 PET 430 ml", "group": "006-E", "lot": "155*77*65 (140)", "stock_qty": 79.0, "reserved": 0.0, "remaining": 79.0, "unit": "ลัง", "location": "N/A-不适用"}, {"no": 88, "barcode": "18859624001585", "name": "HS-F003 黄盖方形罐 PET 430 ml +", "group": "007--F", "lot": "57*130(210)", "stock_qty": 78.0, "reserved": 0.0, "remaining": 78.0, "unit": "ลัง", "location": "N/A-不适用"}, {"no": 90, "barcode": "18859624001608", "name": "HS-F005 黄盖方形罐 PET 560 ml +", "group": "007--F", "lot": "57*160(210)", "stock_qty": 77.0, "reserved": 0.0, "remaining": 77.0, "unit": "ลัง", "location": "N/A-不适用"}, {"no": 141, "barcode": "18859624002094", "name": "HS-C021 长方 PET透明托盘（金边无盖） 400g", "group": "005-C", "lot": "40.5*29.5*2 (40)", "stock_qty": 78.0, "reserved": 1.0, "remaining": 77.0, "unit": "ลัง", "location": "N/A-不适用"}, {"no": 139, "barcode": "18859624002070", "name": "HS-C019 长方 PET黑色托盘（金边无盖） 430g", "group": "005-C", "lot": "40.5*27.5*3 (40)", "stock_qty": 78.0, "reserved": 1.0, "remaining": 77.0, "unit": "ลัง", "location": "N/A-不适用"}, {"no": 140, "barcode": "18859624002087", "name": "HS-C020 长方 PET透明托盘（金边无盖） 240g", "group": "005-C", "lot": "34.5*23.2* (40)", "stock_qty": 78.0, "reserved": 1.0, "remaining": 77.0, "unit": "ลัง", "location": "N/A-不适用"}, {"no": 85, "barcode": "18859624001554", "name": "HS-E016 金盖巨无霸 PET 1970 ml", "group": "006-E", "lot": "129.5*100*185 (48)", "stock_qty": 76.0, "reserved": 0.0, "remaining": 76.0, "unit": "ลัง", "location": "N/A-不适用"}, {"no": 129, "barcode": "18859624001974", "name": "HS-E024 圆角高深透盒 1270 395 ml", "group": "006-E", "lot": "12.0*6.3*7.0 (252)", "stock_qty": 76.0, "reserved": 1.0, "remaining": 75.0, "unit": "ลัง", "location": "N/A-不适用"}, {"no": 73, "barcode": "18859624001431", "name": "HS-E004 水晶长方盒 PET 570 ml", "group": "006-E", "lot": "132*108*58 (150)", "stock_qty": 74.0, "reserved": 0.0, "remaining": 74.0, "unit": "ลัง", "location": "N/A-不适用"}, {"no": 107, "barcode": "18859624001721-Blue", "name": "HS-F017 蓝盖易扣罐 PET - 670 ml + #Blue (BL)", "group": "007--F", "lot": "85*130(120)", "stock_qty": 73.0, "reserved": 0.0, "remaining": 73.0, "unit": "ลัง", "location": "N/A-不适用"}, {"no": 93, "barcode": "18859624001639", "name": "HS-F008 红盖圆形罐 PET 850 ml +", "group": "007--F", "lot": "75*180(108)", "stock_qty": 73.0, "reserved": 0.0, "remaining": 73.0, "unit": "ลัง", "location": "N/A-不适用"}, {"no": 80, "barcode": "18859624001509", "name": "HS-E011 水晶椭圆盒 PET 440 ml", "group": "006-E", "lot": "149*94*56 (144)", "stock_qty": 73.0, "reserved": 0.0, "remaining": 73.0, "unit": "ลัง", "location": "N/A-不适用"}, {"no": 190, "barcode": "18859624002568-BLK", "name": "HS - L012  กล่องข้าวเหลี่ยม 780ML สีดำ # Black (B)", "group": "008-L", "lot": "166x112x272 (30ชิ้น x 12แพค / 360ชิ้น)", "stock_qty": 125.0, "reserved": 53.0, "remaining": 72.0, "unit": "ลัง", "location": "N/A-不适用"}, {"no": 70, "barcode": "18859624001400", "name": "HS-E001 水晶正方盒 PET 370 ml", "group": "006-E", "lot": "106*106*58 (180)", "stock_qty": 72.0, "reserved": 0.0, "remaining": 72.0, "unit": "ลัง", "location": "N/A-不适用"}, {"no": 94, "barcode": "18859624001646", "name": "HS-F009 红盖圆形罐 PET 1000 ml +", "group": "007--F", "lot": "75*200(72)", "stock_qty": 72.0, "reserved": 0.0, "remaining": 72.0, "unit": "ลัง", "location": "N/A-不适用"}, {"no": 11, "barcode": "18859624000755", "name": "HS-A012 透明圆形大盆 ZS-3000 ml", "group": "003-A", "lot": "236*166*97 (4แพค /25ชิ้น /100ลัง)", "stock_qty": 72.0, "reserved": 0.0, "remaining": 72.0, "unit": "ลัง", "location": "N/A-不适用"}, {"no": 84, "barcode": "18859624001547", "name": "HS-E015 金盖超高盒 PET 1110 ml", "group": "006-E", "lot": "98.5*77.5*182 (84)", "stock_qty": 71.0, "reserved": 0.0, "remaining": 71.0, "unit": "ลัง", "location": "N/A-不适用"}, {"no": 175, "barcode": "18859624002483-BLK", "name": "HS - L004  กล่องข้าวกลม 800ML สีดำ # Black (B)", "group": "008-L", "lot": "152X260 (30ชิ้น x 12แพค / 360ชิ้น)", "stock_qty": 101.0, "reserved": 30.0, "remaining": 71.0, "unit": "ลัง", "location": "N/A-不适用"}, {"no": 95, "barcode": "18859624001653", "name": "HS-F010 红盖圆形罐 PET 1100 ml +", "group": "007--F", "lot": "75*220(72)", "stock_qty": 71.0, "reserved": 0.0, "remaining": 71.0, "unit": "ลัง", "location": "N/A-不适用"}, {"no": 92, "barcode": "18859624001622", "name": "HS-F007 红盖圆形罐 PET 750 ml +", "group": "007--F", "lot": "75*160(108)", "stock_qty": 69.0, "reserved": 0.0, "remaining": 69.0, "unit": "ลัง", "location": "N/A-不适用"}, {"no": 118, "barcode": "18859624001837", "name": "HS-F028 金盖收口罐 PET 410 ml +", "group": "007--F", "lot": "65*115(210)", "stock_qty": 68.0, "reserved": 0.0, "remaining": 68.0, "unit": "ลัง", "location": "N/A-不适用"}, {"no": 83, "barcode": "18859624001530", "name": "HS-E014 金盖高深盒 PET 830 ml", "group": "006-E", "lot": "98.5*77.5*140 (126)", "stock_qty": 67.0, "reserved": 0.0, "remaining": 67.0, "unit": "ลัง", "location": "N/A-不适用"}, {"no": 204, "barcode": "18859624002674-BLK", "name": "HS - L023  กล่องข้าวเหลี่ยม 1000ML สีดำ # Black (B)", "group": "008-L", "lot": "171x119x290 (30ชิ้น x 12แพค / 360ชิ้น)", "stock_qty": 67.0, "reserved": 0.0, "remaining": 67.0, "unit": "ลัง", "location": "N/A-不适用"}, {"no": 120, "barcode": "18859624001851", "name": "HS-F030 金盖收口罐 PET 725 ml +", "group": "007--F", "lot": "65*156(120)", "stock_qty": 67.0, "reserved": 0.0, "remaining": 67.0, "unit": "ลัง", "location": "N/A-不适用"}, {"no": 137, "barcode": "18859624002056", "name": "HS-C017 长方 PET透明托盘（金边无盖） 430g", "group": "005-C", "lot": "40.5*27.5*3 (40)", "stock_qty": 67.0, "reserved": 1.0, "remaining": 66.0, "unit": "ลัง", "location": "N/A-不适用"}, {"no": 51, "barcode": "18859624001110", "name": "HS-C001 圆PET蛋糕高脚托盘", "group": "005-C", "lot": "D21*21 (24 )", "stock_qty": 67.0, "reserved": 1.0, "remaining": 66.0, "unit": "ลัง", "location": "N/A-不适用"}, {"no": 2, "barcode": "18859624000656", "name": "HS-A002 透明圆形餐盒 ZS-450 ml", "group": "003-A", "lot": "128*88*58 (18แพค /25ชิ้น /450ลัง)", "stock_qty": 66.0, "reserved": 0.0, "remaining": 66.0, "unit": "ลัง", "location": "N/A-不适用"}, {"no": 136, "barcode": "18859624002049", "name": "HS-C016 长方 PET透明托盘（金边无盖） 285g", "group": "005-C", "lot": "35*23*3 (40)", "stock_qty": 67.0, "reserved": 1.0, "remaining": 66.0, "unit": "ลัง", "location": "N/A-不适用"}, {"no": 91, "barcode": "18859624001615", "name": "HS-F006 红盖圆形罐 PET 650 ml +", "group": "007--F", "lot": "75*140(108)", "stock_qty": 66.0, "reserved": 0.0, "remaining": 66.0, "unit": "ลัง", "location": "N/A-不适用"}, {"no": 54, "barcode": "18859624001141", "name": "HS-C004 圆PET蛋糕高脚托盘", "group": "005-C", "lot": "D36 (12 )", "stock_qty": 65.0, "reserved": 1.0, "remaining": 64.0, "unit": "ลัง", "location": "N/A-不适用"}, {"no": 104, "barcode": "18859624001714-Blue", "name": "HS-F016 蓝盖易扣罐 PET - 410 ml + #Blue (BL)", "group": "007--F", "lot": "85*85(200)", "stock_qty": 62.0, "reserved": 0.0, "remaining": 62.0, "unit": "ลัง", "location": "N/A-不适用"}, {"no": 101, "barcode": "18859624001707-Blue", "name": "HS-F015 蓝盖易扣罐 PET - 350 ml + #Blue (BL)", "group": "007--F", "lot": "85*70(240)", "stock_qty": 62.0, "reserved": 0.0, "remaining": 62.0, "unit": "ลัง", "location": "N/A-不适用"}, {"no": 203, "barcode": "18859624002674", "name": "HS - L023  กล่องข้าวเหลี่ยม 1000ML  สีใส  #Clear (C)", "group": "008-L", "lot": "171x119x290 (30ชิ้น x 12แพค / 360ชิ้น)", "stock_qty": 60.0, "reserved": 0.0, "remaining": 60.0, "unit": "ลัง", "location": "N/A-不适用"}, {"no": 6, "barcode": "18859624000694", "name": "HS-A006 透明圆形餐盒 ZS-1000 ml", "group": "003-A", "lot": "158*102*82 (12แพค /25ชิ้น /300ลัง)", "stock_qty": 58.0, "reserved": 0.0, "remaining": 58.0, "unit": "ลัง", "location": "N/A-不适用"}, {"no": 52, "barcode": "18859624001127", "name": "HS-C002 圆PET蛋糕高脚托盘", "group": "005-C", "lot": "D25.5*23 (18)", "stock_qty": 59.0, "reserved": 1.0, "remaining": 58.0, "unit": "ลัง", "location": "N/A-不适用"}, {"no": 113, "barcode": "18859624001783", "name": "HS-F023 矮胖南瓜罐 780 ml PET +", "group": "007--F", "lot": "85*104(120)", "stock_qty": 56.0, "reserved": 0.0, "remaining": 56.0, "unit": "ลัง", "location": "N/A-不适用"}, {"no": 130, "barcode": "18859624001981", "name": "HS-E025 经典长圆角盒 1250 260 ml", "group": "006-E", "lot": "12.0*6.3*5.0 (264)", "stock_qty": 60.0, "reserved": 6.0, "remaining": 54.0, "unit": "ลัง", "location": "N/A-不适用"}, {"no": 173, "barcode": "18859624002476-BLK", "name": "HS - L003  กล่องข้าวกลม 700ML สีดำ # Black (B)", "group": "008-L", "lot": "152X245 (30ชิ้น x 12แพค / 360ชิ้น)", "stock_qty": 83.0, "reserved": 30.0, "remaining": 53.0, "unit": "ลัง", "location": "N/A-不适用"}, {"no": 150, "barcode": "18859624002278", "name": "HS-C030 珠边斜条纹圆型碗 (小) (Beaded Ribbed Round Bowl - Small) PET JCA745", "group": "005-C", "lot": "ชามกลม", "stock_qty": 53.0, "reserved": 0.0, "remaining": 53.0, "unit": "ลัง", "location": "N/A-不适用"}, {"no": 146, "barcode": "18859624002230", "name": "HS-C026 带盖条纹圆型干果碗 PET JCA8660", "group": "005-C", "lot": "ชามกลม", "stock_qty": 52.0, "reserved": 0.0, "remaining": 52.0, "unit": "ลัง", "location": "N/A-不适用"}, {"no": 151, "barcode": "18859624002285", "name": "HS-C031 珠边斜条纹圆型碗 (大) (Beaded Ribbed Round Bowl - Large) PET JCA746", "group": "005-C", "lot": "ชามกลม", "stock_qty": 52.0, "reserved": 0.0, "remaining": 52.0, "unit": "ลัง", "location": "N/A-不适用"}, {"no": 147, "barcode": "18859624002247", "name": "HS-C027 圆型纹理水果/沙拉碗 PET JCA732", "group": "005-C", "lot": "ชามกลม", "stock_qty": 52.0, "reserved": 0.0, "remaining": 52.0, "unit": "ลัง", "location": "N/A-不适用"}, {"no": 148, "barcode": "18859624002254", "name": "HS-C028 带盖双耳条纹圆型碗 (Round Ribbed Bowl with Lid and Handles) PET JCA8625", "group": "005-C", "lot": "ชามกลม", "stock_qty": 52.0, "reserved": 0.0, "remaining": 52.0, "unit": "ลัง", "location": "N/A-不适用"}, {"no": 134, "barcode": "18859624002025", "name": "HS-E029 กล่องเหลี่ยม 185 1300 ml", "group": "006-E", "lot": "18.5*13.5*6.4 (96)", "stock_qty": 52.0, "reserved": 0.0, "remaining": 52.0, "unit": "ลัง", "location": "N/A-不适用"}, {"no": 149, "barcode": "18859624002261", "name": "HS-C029 带盖双耳条纹圆型碗 (Round Ribbed Bowl with Lid and Handles) PET JCA8626-2", "group": "005-C", "lot": "ชามกลม", "stock_qty": 51.0, "reserved": 0.0, "remaining": 51.0, "unit": "ลัง", "location": "N/A-不适用"}, {"no": 144, "barcode": "18859624002216", "name": "HS-C024 长方形 PET 透明带盖托盘 PET JCA891", "group": "005-C", "lot": "ถาดสี่เหลี่ยม", "stock_qty": 50.0, "reserved": 1.0, "remaining": 49.0, "unit": "ลัง", "location": "N/A-不适用"}, {"no": 59, "barcode": "18859624001196", "name": "HS-C009 圆PET蛋糕高脚托盘", "group": "005-C", "lot": "D39(12)", "stock_qty": 50.0, "reserved": 1.0, "remaining": 49.0, "unit": "ลัง", "location": "N/A-不适用"}, {"no": 198, "barcode": "18859624002643", "name": "HS - L020  กล่องข้าวเหลี่ยม 500ML  สีใส #Clear  (C)", "group": "008-L", "lot": "171x119x234 (30ชิ้น x 12แพค / 360ชิ้น)", "stock_qty": 99.0, "reserved": 50.0, "remaining": 49.0, "unit": "ลัง", "location": "N/A-不适用"}, {"no": 154, "barcode": "18859624002315", "name": "HS-C034 描金边带盖展示盘 (大) (Gold-Rimmed Display Tray with Lid - Large) JCA898+L", "group": "005-C", "lot": "ถาดใส่เค้ก", "stock_qty": 48.0, "reserved": 0.0, "remaining": 48.0, "unit": "ลัง", "location": "N/A-不适用"}, {"no": 62, "barcode": "18859624001226", "name": "HS-C012 长方 PET蛋糕托盘", "group": "005-C", "lot": "D30.5 (24)", "stock_qty": 49.0, "reserved": 1.0, "remaining": 48.0, "unit": "ลัง", "location": "N/A-不适用"}, {"no": 63, "barcode": "18859624001233", "name": "HS-C013 长方 PET蛋糕托盘", "group": "005-C", "lot": "40*27.5 (18)", "stock_qty": 48.0, "reserved": 1.0, "remaining": 47.0, "unit": "ลัง", "location": "N/A-不适用"}, {"no": 152, "barcode": "18859624002292", "name": "HS-C032 带盖四格展示盒 (Four-Compartment Display Box with Lid) 4 JCA8682-L", "group": "005-C", "lot": "ถาดแบ่งเหลี่ยม", "stock_qty": 48.0, "reserved": 1.0, "remaining": 47.0, "unit": "ลัง", "location": "N/A-不适用"}, {"no": 205, "barcode": "18859624002681", "name": "HS-C035 描金边带盖展示盘 (小) (Gold-Rimmed Display Tray with Lid - Small) JCA867+L-J-BJ", "group": "005-C", "lot": "ถาดใส่เค้ก", "stock_qty": 47.0, "reserved": 0.0, "remaining": 47.0, "unit": "ลัง", "location": "N/A-不适用"}, {"no": 145, "barcode": "18859624002223", "name": "HS-C025 长方形 PET 透明带盖托盘 PET JCA892", "group": "005-C", "lot": "ถาดสี่เหลี่ยม", "stock_qty": 48.0, "reserved": 1.0, "remaining": 47.0, "unit": "ลัง", "location": "N/A-不适用"}, {"no": 117, "barcode": "18859624001820", "name": "HS-F027 金盖直筒罐 PET 700 ml +", "group": "007--F", "lot": "75*154(120)", "stock_qty": 46.0, "reserved": 0.0, "remaining": 46.0, "unit": "ลัง", "location": "N/A-不适用"}, {"no": 206, "barcode": "18859624002698", "name": "HS-C036 三头柄带盖长方形托盘 (Rectangular Tray with Lid & Three Handles) JCA8668+BL", "group": "005-C", "lot": "ถาดใส่เค้ก", "stock_qty": 47.0, "reserved": 1.0, "remaining": 46.0, "unit": "ลัง", "location": "N/A-不适用"}, {"no": 74, "barcode": "18859624001448", "name": "HS-E005 水晶扁平盒 PET 280 ml", "group": "006-E", "lot": "185*120*22 (192)", "stock_qty": 46.0, "reserved": 0.0, "remaining": 46.0, "unit": "ลัง", "location": "N/A-不适用"}, {"no": 55, "barcode": "18859624001158", "name": "HS-C005 长方PET蛋糕托盘", "group": "005-C", "lot": "44*33.5(12)", "stock_qty": 46.0, "reserved": 0.0, "remaining": 46.0, "unit": "ลัง", "location": "N/A-不适用"}, {"no": 108, "barcode": "18859624001738", "name": "HS-F018 透明锥形罐 360 ml PET +", "group": "007--F", "lot": "65*100(210)", "stock_qty": 44.0, "reserved": 0.0, "remaining": 44.0, "unit": "ลัง", "location": "N/A-不适用"}, {"no": 153, "barcode": "18859624002308", "name": "HS-C033 珠边带盖长方形展示盘 (Rectangular Beaded Display Tray with Lid) JCA868-L+L", "group": "005-C", "lot": "ถาดใส่เค้ก", "stock_qty": 45.0, "reserved": 1.0, "remaining": 44.0, "unit": "ลัง", "location": "N/A-不适用"}, {"no": 179, "barcode": "18859624002506-BLK", "name": "HS - L006  กล่องข้าวกลม 1100ML สีดำ # Black (B)", "group": "008-L", "lot": "172x304 (30ชิ้น x 8แพค / 240ชิ้น)", "stock_qty": 73.0, "reserved": 30.0, "remaining": 43.0, "unit": "ลัง", "location": "N/A-不适用"}, {"no": 65, "barcode": "18859624001257", "name": "HS-C015 正方 PET蛋糕托盘", "group": "005-C", "lot": "27.5*27.5(18)", "stock_qty": 44.0, "reserved": 1.0, "remaining": 43.0, "unit": "ลัง", "location": "N/A-不适用"}, {"no": 71, "barcode": "18859624001417", "name": "HS-E002 水晶正方盒 PET 440 ml", "group": "006-E", "lot": "106*106*50 (210)", "stock_qty": 42.0, "reserved": 0.0, "remaining": 42.0, "unit": "ลัง", "location": "N/A-不适用"}, {"no": 109, "barcode": "18859624001745", "name": "HS-F019 透明锥形罐 975 ml PET +", "group": "007--F", "lot": "65*203(80)", "stock_qty": 42.0, "reserved": 0.0, "remaining": 42.0, "unit": "ลัง", "location": "N/A-不适用"}, {"no": 64, "barcode": "18859624001240", "name": "HS-C014 正方 PET蛋糕托盘", "group": "005-C", "lot": "22*22(24)", "stock_qty": 42.0, "reserved": 1.0, "remaining": 41.0, "unit": "ลัง", "location": "N/A-不适用"}, {"no": 112, "barcode": "18859624001776", "name": "HS-F022 透明广口罐 730 ml PET +", "group": "007--F", "lot": "100*93(150)", "stock_qty": 39.0, "reserved": 0.0, "remaining": 39.0, "unit": "ลัง", "location": "N/A-不适用"}, {"no": 98, "barcode": "18859624001691-Blue", "name": "HS-F014 蓝盖易扣罐 PET - 245 ml + #Blue (BL)", "group": "007--F", "lot": "85*50(240)", "stock_qty": 36.0, "reserved": 0.0, "remaining": 36.0, "unit": "ลัง", "location": "N/A-不适用"}, {"no": 116, "barcode": "18859624001813", "name": "HS-F026 金盖南瓜罐 PET 400 ml +", "group": "007--F", "lot": "75*90(200)", "stock_qty": 36.0, "reserved": 0.0, "remaining": 36.0, "unit": "ลัง", "location": "N/A-不适用"}, {"no": 110, "barcode": "18859624001752", "name": "HS-F020 透明锥形罐 490 ml PET +", "group": "007--F", "lot": "57*160(240)", "stock_qty": 35.0, "reserved": 0.0, "remaining": 35.0, "unit": "ลัง", "location": "N/A-不适用"}, {"no": 53, "barcode": "18859624001134", "name": "HS-C003 圆PET蛋糕高脚托盘", "group": "005-C", "lot": "D30*25 (18 )", "stock_qty": 35.0, "reserved": 1.0, "remaining": 34.0, "unit": "ลัง", "location": "N/A-不适用"}, {"no": 10, "barcode": "18859624000731", "name": "HS-A010 透明圆形大盆 ZS-2000 ml", "group": "003-A", "lot": "236*178*65 (4แพค /25ชิ้น /100ลัง)", "stock_qty": 33.0, "reserved": 0.0, "remaining": 33.0, "unit": "ลัง", "location": "N/A-不适用"}, {"no": 61, "barcode": "18859624001219", "name": "HS-C011 圆 PET蛋糕托盘", "group": "005-C", "lot": "D30.5(18)", "stock_qty": 33.0, "reserved": 0.0, "remaining": 33.0, "unit": "ลัง", "location": "N/A-不适用"}, {"no": 60, "barcode": "18859624001202", "name": "HS-C010 圆 PET蛋糕托盘", "group": "005-C", "lot": "D25(24)", "stock_qty": 33.0, "reserved": 0.0, "remaining": 33.0, "unit": "ลัง", "location": "N/A-不适用"}, {"no": 177, "barcode": "18859624002490-BLK", "name": "HS - L005  กล่องข้าวกลม 950ML สีดำ # Black (B)", "group": "008-L", "lot": "172x304 (30ชิ้น x 8แพค / 240ชิ้น)", "stock_qty": 40.0, "reserved": 10.0, "remaining": 30.0, "unit": "ลัง", "location": "N/A-不适用"}, {"no": 114, "barcode": "18859624001790", "name": "HS-F024 金盖矮胖罐 PET 370 ml +", "group": "007--F", "lot": "75*80(240)", "stock_qty": 29.0, "reserved": 0.0, "remaining": 29.0, "unit": "ลัง", "location": "N/A-不适用"}, {"no": 115, "barcode": "18859624001806", "name": "HS-F025 金盖矮胖罐 PET 385 ml +", "group": "007--F", "lot": "75*85(200)", "stock_qty": 24.0, "reserved": 0.0, "remaining": 24.0, "unit": "ลัง", "location": "N/A-不适用"}, {"no": 36, "barcode": "18859624000960", "name": "HS-B002 白色高档盒 420", "group": "004-B", "lot": "128*101*54 (1แพค /25ชิ้น /300ลัง)", "stock_qty": 23.0, "reserved": 0.0, "remaining": 23.0, "unit": "ลัง", "location": "N/A-不适用"}, {"no": 111, "barcode": "18859624001769", "name": "HS-F021 透明广口罐 625 ml PET +", "group": "007--F", "lot": "100*80(150)", "stock_qty": 20.0, "reserved": 0.0, "remaining": 20.0, "unit": "ลัง", "location": "N/A-不适用"}, {"no": 72, "barcode": "18859624001424", "name": "HS-E003 水晶正方盒 PET 450 ml", "group": "006-E", "lot": "106*106*57 (180)", "stock_qty": 16.0, "reserved": 0.0, "remaining": 16.0, "unit": "ลัง", "location": "N/A-不适用"}, {"no": 189, "barcode": "18859624002568", "name": "HS - L012  กล่องข้าวเหลี่ยม 780ML   สีใส #Clear (C)", "group": "008-L", "lot": "166x112x272 (30ชิ้น x 12แพค / 360ชิ้น)", "stock_qty": 8.0, "reserved": 0.0, "remaining": 8.0, "unit": "ลัง", "location": "N/A-不适用"}, {"no": 200, "barcode": "18859624002650", "name": "HS - L021  กล่องข้าวเหลี่ยม 650ML   สีใส #Clear  (C)", "group": "008-L", "lot": "171x119x258 (30ชิ้น x 12แพค / 360ชิ้น)", "stock_qty": 8.0, "reserved": 0.0, "remaining": 8.0, "unit": "ลัง", "location": "N/A-不适用"}, {"no": 219, "barcode": "18859624002827", "name": "HS-K013 方盒 500ml 500 ML.", "group": "001-K", "lot": "171X117X39(12แพค /25ชิ้น /300ลัง)", "stock_qty": 57.0, "reserved": 50.0, "remaining": 7.0, "unit": "ลัง", "location": "N/A-不适用"}, {"no": 218, "barcode": "18859624002810", "name": "HS-K012 方盒 780ml (1000) 780 ML.", "group": "001-K", "lot": "165X111X67(12แพค /25ชิ้น /300ลัง)", "stock_qty": 312.0, "reserved": 308.0, "remaining": 4.0, "unit": "ลัง", "location": "N/A-不适用"}, {"no": 202, "barcode": "18859624002667", "name": "HS - L022  กล่องข้าวเหลี่ยม 750ML  สีใส  #Clear  (C)", "group": "008-L", "lot": "171x119x270 (30ชิ้น x 12แพค / 360ชิ้น)", "stock_qty": 2.0, "reserved": 0.0, "remaining": 2.0, "unit": "ลัง", "location": "003-成品仓"}, {"no": 135, "barcode": "18859624002032", "name": "HS-E030 กล่องเหลี่ยม 108 600 ml", "group": "007--F", "lot": "10.8*10.8*5.9 (140)", "stock_qty": 1.0, "reserved": 0.0, "remaining": 1.0, "unit": "ลัง", "location": "N/A-不适用"}, {"no": 220, "barcode": "18859624002834", "name": "HS-K014 方盒 650ml 650 ML.", "group": "001-K", "lot": "171X117X50(12แพค /25ชิ้น /300ลัง)", "stock_qty": 91.0, "reserved": 91.0, "remaining": 0.0, "unit": "ลัง", "location": "N/A-不适用"}];
 const ALERTS      = [{"name": "HS-K012 方盒 780ml (1000) 780 ML.", "barcode": "18859624002810", "group": "001-K", "unit": "ลัง", "current": 4.0, "safety_stock": 739.0, "gap": 735.0, "method": "calculated"}, {"name": "HS-K011 方盒 650ml (750) 650 ML.", "barcode": "18859624002803", "group": "001-K", "unit": "ลัง", "current": 101.0, "safety_stock": 644.0, "gap": 543.0, "method": "calculated"}, {"name": "HS-K013 方盒 500ml 500 ML.", "barcode": "18859624002827", "group": "001-K", "unit": "ลัง", "current": 7.0, "safety_stock": 505.0, "gap": 498.0, "method": "calculated"}, {"name": "HS-K014 方盒 650ml 650 ML.", "barcode": "18859624002834", "group": "001-K", "unit": "ลัง", "current": 0.0, "safety_stock": 496.0, "gap": 496.0, "method": "calculated"}, {"name": "HS-A015 长方形透明盒 ZS-350 ml", "barcode": "18859624000786", "group": "003-A", "unit": "ลัง", "current": 590.0, "safety_stock": 899.0, "gap": 309.0, "method": "calculated"}, {"name": "HS-K003 圆碗 700ml(800) 700 ML.", "barcode": "18859624002728", "group": "001-K", "unit": "ลัง", "current": 222.0, "safety_stock": 357.0, "gap": 135.0, "method": "calculated"}, {"name": "HS - L020  กล่องข้าวเหลี่ยม 500ML  สีใส #Clear  (C)", "barcode": "18859624002643", "group": "008-L", "unit": "ลัง", "current": 49.0, "safety_stock": 178.0, "gap": 129.0, "method": "calculated"}, {"name": "HS-A024 长方形三格盒 3 ZS", "barcode": "18859624000878", "group": "003-A", "unit": "ลัง", "current": 98.0, "safety_stock": 198.0, "gap": 100.0, "method": "calculated"}, {"name": "HS-A007 透明圆形深碗 ZS-1250 ml", "barcode": "18859624000700", "group": "003-A", "unit": "ลัง", "current": 94.0, "safety_stock": 184.0, "gap": 90.0, "method": "calculated"}, {"name": "HS - L021  กล่องข้าวเหลี่ยม 650ML   สีใส #Clear  (C)", "barcode": "18859624002650", "group": "008-L", "unit": "ลัง", "current": 8.0, "safety_stock": 84.0, "gap": 76.0, "method": "calculated"}, {"name": "HS-A026 连体酱料杯 P2 1000", "barcode": "18859624000892", "group": "003-A", "unit": "ลัง", "current": 114.0, "safety_stock": 188.0, "gap": 74.0, "method": "calculated"}, {"name": "HS - L012  กล่องข้าวเหลี่ยม 780ML สีดำ # Black (B)", "barcode": "18859624002568-BLK", "group": "008-L", "unit": "ลัง", "current": 72.0, "safety_stock": 129.0, "gap": 57.0, "method": "calculated"}, {"name": "HS - L012  กล่องข้าวเหลี่ยม 780ML   สีใส #Clear (C)", "barcode": "18859624002568", "group": "008-L", "unit": "ลัง", "current": 8.0, "safety_stock": 63.0, "gap": 55.0, "method": "calculated"}, {"name": "HS - L006  กล่องข้าวกลม 1100ML สีดำ # Black (B)", "barcode": "18859624002506-BLK", "group": "008-L", "unit": "ลัง", "current": 43.0, "safety_stock": 95.0, "gap": 52.0, "method": "calculated"}, {"name": "HS - L023  กล่องข้าวเหลี่ยม 1000ML  สีใส  #Clear (C)", "barcode": "18859624002674", "group": "008-L", "unit": "ลัง", "current": 60.0, "safety_stock": 92.0, "gap": 32.0, "method": "calculated"}, {"name": "HS - L003  กล่องข้าวกลม 700ML สีดำ # Black (B)", "barcode": "18859624002476-BLK", "group": "008-L", "unit": "ลัง", "current": 53.0, "safety_stock": 85.0, "gap": 32.0, "method": "calculated"}, {"name": "HS - L005  กล่องข้าวกลม 950ML สีดำ # Black (B)", "barcode": "18859624002490-BLK", "group": "008-L", "unit": "ลัง", "current": 30.0, "safety_stock": 55.0, "gap": 25.0, "method": "calculated"}, {"name": "HS - L023  กล่องข้าวเหลี่ยม 1000ML สีดำ # Black (B)", "barcode": "18859624002674-BLK", "group": "008-L", "unit": "ลัง", "current": 67.0, "safety_stock": 91.0, "gap": 24.0, "method": "calculated"}, {"name": "HS-E003 水晶正方盒 PET 450 ml", "barcode": "18859624001424", "group": "006-E", "unit": "ลัง", "current": 16.0, "safety_stock": 40.0, "gap": 24.0, "method": "calculated"}, {"name": "HS - L011  กล่องข้าวเหลี่ยม 650ML สีดำ # Black (B)", "barcode": "18859624002551-BLK", "group": "008-L", "unit": "ลัง", "current": 80.0, "safety_stock": 100.0, "gap": 20.0, "method": "calculated"}, {"name": "HS-E030 กล่องเหลี่ยม 108 600 ml", "barcode": "18859624002032", "group": "007--F", "unit": "ลัง", "current": 1.0, "safety_stock": 20.0, "gap": 19.0, "method": "calculated"}, {"name": "HS - L004  กล่องข้าวกลม 800ML สีดำ # Black (B)", "barcode": "18859624002483-BLK", "group": "008-L", "unit": "ลัง", "current": 71.0, "safety_stock": 83.0, "gap": 12.0, "method": "calculated"}, {"name": "HS - L022  กล่องข้าวเหลี่ยม 750ML  สีใส  #Clear  (C)", "barcode": "18859624002667", "group": "008-L", "unit": "ลัง", "current": 2.0, "safety_stock": 8.0, "gap": 6.0, "method": "calculated"}, {"name": "HS-B018 美式透明圆桶 160Z 300", "barcode": "18859624001271", "group": "004-B", "unit": "ลัง", "current": 111.0, "safety_stock": 113.0, "gap": 2.0, "method": "calculated"}];
-let   CUR_DATE    = "2026-03-24";
+const LATEST_DATE = "2026-03-24";
+
 </script>
 <script>
 
-/* ── Chart defaults ── */
-Chart.defaults.color         = '#78909c';
-Chart.defaults.font.family   = "'Segoe UI','Microsoft YaHei',Arial,sans-serif";
-Chart.defaults.font.size     = 11;
-Chart.defaults.plugins.legend.display = false;
+/* ─────────────────────────────────────────────────────
+   工具函数
+───────────────────────────────────────────────────── */
+function C(id) { return document.getElementById(id); }
+function fmtNum(n) { return Number(n).toLocaleString(); }
+function fmtThb(n) { return 'THB ' + Number(n).toLocaleString(); }
 
-const PALETTE = ['#42a5f5','#66bb6a','#ffa726','#ef5350','#ab47bc',
-                 '#26c6da','#d4e157','#ff7043','#26a69a','#ec407a',
-                 '#5c6bc0','#8d6e63','#78909c','#29b6f6','#9ccc65'];
+// 调色板：品牌系列
+const P_BLUE   = ['#1a237e','#283593','#3949ab','#3f51b5','#5c6bc0','#7986cb','#9fa8da','#c5cae9'];
+const P_RED    = ['#b71c1c','#c62828','#d32f2f','#e53935','#ef5350','#e57373','#ef9a9a','#ffcdd2'];
+const P_MIX    = ['#1a237e','#c62828','#283593','#d32f2f','#3949ab','#e53935','#3f51b5','#ef5350',
+                  '#5c6bc0','#e57373','#7986cb','#ef9a9a','#1565c0','#b71c1c','#0d47a1','#c62828'];
+const PALETTE  = P_MIX;
 
-function C(id){ return document.getElementById(id).getContext('2d'); }
-const OPT_BAR_H = { // 横向柱状图通用选项
+Chart.defaults.font.family = "'Segoe UI', 'Microsoft YaHei', Arial, sans-serif";
+Chart.defaults.font.size   = 11;
+
+const OPT_BASE = { responsive: true, maintainAspectRatio: false };
+
+const OPT_LINE = {
+  ...OPT_BASE,
+  interaction: { mode: 'index', intersect: false },
+  plugins: { legend: { position: 'top', labels: { boxWidth: 12, padding: 14, color: '#455a64' } } },
+  scales: {
+    x: { grid: { color: '#f0f2f8' }, ticks: { color: '#78909c', maxRotation: 30 } },
+    y: { grid: { color: '#f0f2f8' }, ticks: { color: '#78909c' } }
+  }
+};
+
+const OPT_BAR_H = {
+  ...OPT_BASE,
   indexAxis: 'y',
-  responsive: true, maintainAspectRatio: false,
+  plugins: { legend: { display: false } },
   scales: {
-    x: { grid:{ color:'rgba(255,255,255,0.05)' }, ticks:{ color:'#78909c' } },
-    y: { grid:{ display:false }, ticks:{ color:'#cfd8dc', font:{ size:10 } } }
-  },
-  plugins:{ legend:{ display:false } }
-};
-const OPT_BAR_V = { // 纵向柱状图通用选项
-  responsive: true, maintainAspectRatio: false,
-  scales: {
-    x: { grid:{ display:false }, ticks:{ color:'#78909c', maxRotation:45 } },
-    y: { grid:{ color:'rgba(255,255,255,0.05)' }, ticks:{ color:'#78909c' } }
-  },
-  plugins:{ legend:{ display:false } }
-};
-const OPT_LINE = { // 折线图通用选项
-  responsive: true, maintainAspectRatio: false,
-  scales: {
-    x: { grid:{ color:'rgba(255,255,255,0.05)' }, ticks:{ color:'#78909c' } },
-    y: { grid:{ color:'rgba(255,255,255,0.05)' }, ticks:{ color:'#78909c' } }
-  },
-  plugins:{ legend:{ display:true, labels:{ color:'#90a4ae', boxWidth:12 } } }
+    x: { grid: { color: '#f0f2f8' }, ticks: { color: '#78909c' } },
+    y: { grid: { display: false }, ticks: { color: '#37474f', font: { size: 11 } } }
+  }
 };
 
-/* ── 1. 库存趋势折线图 ── */
+const OPT_BAR_V = {
+  ...OPT_BASE,
+  plugins: { legend: { display: false } },
+  scales: {
+    x: { grid: { display: false }, ticks: { color: '#78909c' } },
+    y: { grid: { color: '#f0f2f8' }, ticks: { color: '#78909c' } }
+  }
+};
+
+const OPT_PIE = {
+  ...OPT_BASE,
+  plugins: {
+    legend: { position: 'right', labels: { boxWidth: 12, padding: 14, color: '#455a64', font: { size: 11 } } }
+  }
+};
+
+/* ─────────────────────────────────────────────────────
+   Nav smooth scroll
+───────────────────────────────────────────────────── */
+document.querySelectorAll('.nav-tab').forEach(t => {
+  t.addEventListener('click', e => {
+    e.preventDefault();
+    const target = document.querySelector(t.getAttribute('href'));
+    if (target) target.scrollIntoView({ behavior: 'smooth' });
+  });
+});
+
+/* ─────────────────────────────────────────────────────
+   1. 库存趋势
+───────────────────────────────────────────────────── */
 try {
-  new Chart(C('stockTrendChart'), {
+  new Chart(C('trendChart'), {
     type: 'line',
     data: {
       labels: DATES,
       datasets: [
-        { label:'总库存', data: TREND_TOT,
-          borderColor:'#42a5f5', backgroundColor:'rgba(66,165,245,.12)',
-          tension:.35, fill:true, pointRadius:4 },
-        { label:'产品数', data: TREND_PRODS,
-          borderColor:'#66bb6a', backgroundColor:'rgba(102,187,106,.08)',
-          tension:.35, fill:true, pointRadius:3, yAxisID:'y2' },
+        {
+          label: '总库存量',
+          data: TREND_TOT,
+          borderColor: '#1a237e', backgroundColor: 'rgba(26,35,126,.08)',
+          fill: true, tension: .35, borderWidth: 2, pointRadius: 4,
+          pointBackgroundColor: '#fff', pointBorderColor: '#1a237e', pointBorderWidth: 2,
+        },
+        {
+          label: '产品种类数',
+          data: TREND_PRODS,
+          borderColor: '#c62828', backgroundColor: 'transparent',
+          tension: .35, borderWidth: 2, borderDash: [5,3],
+          pointRadius: 3, pointBackgroundColor: '#c62828',
+          yAxisID: 'y2'
+        },
       ]
     },
     options: {
-      responsive: true, maintainAspectRatio: false,
+      ...OPT_LINE,
       scales: {
-        x: { grid:{ color:'rgba(255,255,255,0.05)' }, ticks:{ color:'#78909c' } },
-        y:  { position:'left',  grid:{ color:'rgba(255,255,255,0.05)' }, ticks:{ color:'#42a5f5' } },
-        y2: { position:'right', grid:{ display:false }, ticks:{ color:'#66bb6a' } }
-      },
-      plugins:{ legend:{ display:true, labels:{ color:'#90a4ae', boxWidth:12 } } }
-    }
-  });
-} catch(e){ console.error('stockTrendChart', e); }
-
-/* ── 2. 库存变化柱状图 ── */
-try {
-  const chgColors = CHG_VALS.map(v => v >= 0 ? 'rgba(102,187,106,.8)' : 'rgba(239,83,80,.8)');
-  new Chart(C('stockChangeChart'), {
-    type: 'bar',
-    data: { labels: CHG_LABELS, datasets: [{ data: CHG_VALS, backgroundColor: chgColors, borderRadius: 4 }] },
-    options: {
-      ...OPT_BAR_V,
-      plugins: { legend:{ display:false }, tooltip:{ callbacks:{ label: ctx => (ctx.raw >= 0 ? '+' : '') + ctx.raw } } }
-    }
-  });
-} catch(e){ console.error('stockChangeChart', e); }
-
-/* ── 3. 产品组饼图 ── */
-try {
-  new Chart(C('groupPieChart'), {
-    type: 'doughnut',
-    data: { labels: GRP_LABELS, datasets: [{ data: GRP_VALS, backgroundColor: PALETTE, borderWidth: 1, borderColor:'#12122a' }] },
-    options: {
-      responsive: true, maintainAspectRatio: false,
-      plugins: {
-        legend: { display: true, position:'right', labels:{ color:'#90a4ae', boxWidth:10, font:{ size:10 } } }
+        ...OPT_LINE.scales,
+        y:  { ...OPT_LINE.scales.y, position: 'left' },
+        y2: { position: 'right', grid: { display: false }, ticks: { color: '#c62828' } }
       }
     }
   });
-} catch(e){ console.error('groupPieChart', e); }
+} catch(e) { console.error('trendChart', e); }
 
-/* ── 4. TOP20 库存横柱图（可切换日期）── */
+/* ─────────────────────────────────────────────────────
+   2. 库存变化量
+───────────────────────────────────────────────────── */
+try {
+  new Chart(C('chgChart'), {
+    type: 'bar',
+    data: {
+      labels: CHG_LABELS,
+      datasets: [{
+        label: '变化量',
+        data: CHG_VALS,
+        backgroundColor: CHG_VALS.map(v => v >= 0 ? 'rgba(26,35,126,.75)' : 'rgba(198,40,40,.75)'),
+        borderRadius: 4,
+      }]
+    },
+    options: {
+      ...OPT_BAR_V,
+      plugins: {
+        legend: { display: false },
+        tooltip: { callbacks: { label: ctx => (ctx.raw >= 0 ? '+' : '') + fmtNum(ctx.raw) } }
+      }
+    }
+  });
+} catch(e) { console.error('chgChart', e); }
+
+/* ─────────────────────────────────────────────────────
+   3. 产品组占比饼图
+───────────────────────────────────────────────────── */
+try {
+  new Chart(C('groupPieChart'), {
+    type: 'doughnut',
+    data: {
+      labels: GRP_LABELS,
+      datasets: [{ data: GRP_VALS, backgroundColor: PALETTE, borderWidth: 2, borderColor: '#fff', hoverOffset: 6 }]
+    },
+    options: {
+      ...OPT_PIE,
+      plugins: {
+        ...OPT_PIE.plugins,
+        tooltip: { callbacks: { label: ctx => ctx.label + ': ' + fmtNum(ctx.raw) + ' 件' } }
+      },
+      cutout: '55%'
+    }
+  });
+} catch(e) { console.error('groupPieChart', e); }
+
+/* ─────────────────────────────────────────────────────
+   4. 库存TOP20（日期切换）
+───────────────────────────────────────────────────── */
 let top20Chart = null;
-function switchTop20Date(dateStr) {
-  CUR_DATE = dateStr;
-  // 更新按钮状态
+let top20CurDate = LATEST_DATE;
+
+function updateTop20(dateStr) {
+  top20CurDate = dateStr;
   document.querySelectorAll('.date-btn').forEach(b => {
     b.classList.toggle('active', b.dataset.date === dateStr);
   });
-  const d = TOP20_BY_DT[dateStr];
-  if (!d) return;
+  const arr = TOP20_BY_DT[dateStr] || [];
+  const labels = arr.map(x => {
+    const nm = (x.cn_name || x.name || '').trim();
+    return nm.length > 22 ? nm.slice(0,22) + '…' : nm;
+  });
+  const vals = arr.map(x => x.qty || x.remaining || 0);
+  const colors = P_BLUE.slice(0, labels.length).concat(P_BLUE).slice(0, labels.length);
   if (!top20Chart) {
     try {
       top20Chart = new Chart(C('top20Chart'), {
         type: 'bar',
-        data: { labels: d.names, datasets: [{ data: d.vals, backgroundColor: '#42a5f5', borderRadius: 3 }] },
-        options: { ...OPT_BAR_H }
-      });
-    } catch(e) { console.error('top20Chart', e); }
-  } else {
-    top20Chart.data.labels = d.names;
-    top20Chart.data.datasets[0].data = d.vals;
-    top20Chart.update('none');
-  }
-}
-
-/* ── 5. 月度销售柱状图 ── */
-try {
-  new Chart(C('monthlyBillChart'), {
-    type: 'bar',
-    data: {
-      labels: MON_LABELS,
-      datasets: [
-        { label:'销售额(THB)', data: MON_TOTALS, backgroundColor:'rgba(66,165,245,.75)', borderRadius:5, yAxisID:'y' },
-        { label:'开单数',      data: MON_COUNTS, backgroundColor:'rgba(102,187,106,.7)',  borderRadius:5, yAxisID:'y2', type:'bar' }
-      ]
-    },
-    options: {
-      responsive: true, maintainAspectRatio: false,
-      scales: {
-        x:  { grid:{ display:false }, ticks:{ color:'#78909c' } },
-        y:  { position:'left',  grid:{ color:'rgba(255,255,255,0.05)' }, ticks:{ color:'#42a5f5',
-               callback: v => v >= 1e6 ? (v/1e6).toFixed(1)+'M' : v >= 1e3 ? (v/1e3).toFixed(0)+'K' : v }},
-        y2: { position:'right', grid:{ display:false }, ticks:{ color:'#66bb6a' } }
-      },
-      plugins:{ legend:{ display:true, labels:{ color:'#90a4ae', boxWidth:12 } } }
-    }
-  });
-} catch(e){ console.error('monthlyBillChart', e); }
-
-/* ── 6. 业务员业绩柱状图 ── */
-try {
-  const spColors = SP_LABELS.map((_,i) => PALETTE[i % PALETTE.length]);
-  new Chart(C('spBarChart'), {
-    type: 'bar',
-    data: { labels: SP_LABELS, datasets: [{
-      data: SP_AMOUNTS, backgroundColor: spColors, borderRadius: 5,
-    }]},
-    options: {
-      ...OPT_BAR_V,
-      plugins: { legend:{ display:false }, tooltip:{ callbacks:{ label: ctx => 'THB ' + ctx.raw.toLocaleString() }}}
-    }
-  });
-} catch(e){ console.error('spBarChart', e); }
-
-/* ── 7. 店铺类型饼图 ── */
-try {
-  const stLabels = SHOP_TYPE.map(x => x.type);
-  const stVals   = SHOP_TYPE.map(x => x.amount);
-  new Chart(C('shopTypePieChart'), {
-    type: 'doughnut',
-    data: { labels: stLabels, datasets: [{ data: stVals, backgroundColor: PALETTE, borderWidth:1, borderColor:'#12122a' }] },
-    options: {
-      responsive: true, maintainAspectRatio: false,
-      plugins: { legend: { display:true, position:'right', labels:{ color:'#90a4ae', boxWidth:10, font:{ size:10 } } } }
-    }
-  });
-} catch(e){ console.error('shopTypePieChart', e); }
-
-/* ── 8. 产品销售TOP20横柱图（可切换SP）── */
-let catChart = null;
-let catCurSP = '全部';
-
-function updateCatChart(sp) {
-  catCurSP = sp;
-  document.querySelectorAll('.cat-sp-btn').forEach(b => {
-    b.classList.toggle('active', b.dataset.sp === sp);
-  });
-  const arr = (sp === '全部' ? CAT_ALL : (CAT_SP[sp] || []));
-  const labels = arr.map(x => {
-    const nm = (x.name || x.sku || '').trim();
-    return nm.length > 28 ? nm.slice(0,28)+'…' : nm;
-  });
-  const vals   = arr.map(x => x.amount);
-  if (!catChart) {
-    try {
-      catChart = new Chart(C('catBarChart'), {
-        type: 'bar',
-        data: { labels, datasets: [{ data: vals, backgroundColor: PALETTE.slice(0,labels.length), borderRadius:3 }] },
+        data: { labels, datasets: [{ data: vals, backgroundColor: colors, borderRadius: 4 }] },
         options: {
           ...OPT_BAR_H,
           plugins: {
             legend: { display: false },
-            tooltip: { callbacks: { label: ctx => 'THB ' + ctx.raw.toLocaleString() } }
+            tooltip: { callbacks: { label: ctx => fmtNum(ctx.raw) + ' 件' } }
           }
         }
       });
-    } catch(e) { console.error('catBarChart', e); }
+    } catch(e) { console.error('top20Chart', e); }
   } else {
-    catChart.data.labels = labels;
-    catChart.data.datasets[0].data = vals;
-    catChart.data.datasets[0].backgroundColor = PALETTE.slice(0, labels.length);
-    catChart.update('none');
+    top20Chart.data.labels = labels;
+    top20Chart.data.datasets[0].data = vals;
+    top20Chart.data.datasets[0].backgroundColor = colors;
+    top20Chart.update('none');
   }
 }
+updateTop20(LATEST_DATE);
 
-/* ── 9. 销售TOP20（按SP）横柱图 ── */
-let saleTop20Chart = null;
-let saleCurSP = Object.keys(SALE_SP)[0] || '全部';
-function updateSaleChart(sp) {
-  if (sp !== undefined) saleCurSP = sp;
-  document.querySelectorAll('.sale-sp-btn').forEach(b => {
-    b.classList.toggle('active', b.dataset.sp === saleCurSP);
+/* ─────────────────────────────────────────────────────
+   5. 安全库存预警卡片
+───────────────────────────────────────────────────── */
+(function renderAlerts() {
+  const wrap = C('alertsWrap');
+  if (!wrap) return;
+  const zero = ALERTS.filter(a => a.status === 'zero').sort((a,b) => a.remaining - b.remaining);
+  const low  = ALERTS.filter(a => a.status !== 'zero').sort((a,b) => a.remaining - b.remaining);
+  const all  = [...zero, ...low];
+  if (all.length === 0) {
+    wrap.innerHTML = '<p style="color:#2e7d32;font-weight:600;padding:16px">✅ 所有产品库存正常，无预警</p>';
+    return;
+  }
+  // 统计行
+  const statHtml = `
+    <div style="display:flex;gap:16px;flex-wrap:wrap;margin-bottom:14px">
+      <div style="background:#ffebee;border-radius:8px;padding:10px 18px;border:1px solid #ffcdd2">
+        <div style="font-size:20px;font-weight:700;color:#c62828">${zero.length}</div>
+        <div style="font-size:11px;color:#78909c;font-weight:600">零库存产品</div>
+      </div>
+      <div style="background:#fff3e0;border-radius:8px;padding:10px 18px;border:1px solid #ffe0b2">
+        <div style="font-size:20px;font-weight:700;color:#e65100">${low.length}</div>
+        <div style="font-size:11px;color:#78909c;font-weight:600">低库存产品</div>
+      </div>
+    </div>`;
+  const cards = all.map(a => {
+    const isZero = a.status === 'zero';
+    const nm = (a.cn_name || a.name || a.barcode || '').trim();
+    const sku = (a.barcode || '').trim();
+    return `<div class="alert-card${isZero ? '' : ' warn'}">
+      <div class="alert-sku">${sku}</div>
+      <div class="alert-name">${nm || sku}</div>
+      <div class="alert-row">
+        <span class="alert-num">${fmtNum(a.remaining)}</span>
+        <span class="alert-tag ${isZero ? 'zero' : 'low'}">${isZero ? '零库存' : '低库存'}</span>
+      </div>
+      <div class="alert-sub">安全库存: ${fmtNum(a.safety_stock || 10)}</div>
+    </div>`;
+  }).join('');
+  wrap.innerHTML = statHtml + '<div class="alert-grid">' + cards + '</div>';
+})();
+
+/* ─────────────────────────────────────────────────────
+   6. 月度销售折柱混合图
+───────────────────────────────────────────────────── */
+try {
+  new Chart(C('monthlyChart'), {
+    type: 'bar',
+    data: {
+      labels: MON_LABELS,
+      datasets: [
+        {
+          type: 'bar', label: '销售额 (THB)',
+          data: MON_TOTALS,
+          backgroundColor: 'rgba(26,35,126,.75)', borderRadius: 5, yAxisID: 'y',
+        },
+        {
+          type: 'line', label: '开单数',
+          data: MON_COUNTS,
+          borderColor: '#c62828', backgroundColor: 'transparent',
+          tension: .3, borderWidth: 2, pointRadius: 5,
+          pointBackgroundColor: '#c62828', yAxisID: 'y2',
+        }
+      ]
+    },
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      interaction: { mode: 'index', intersect: false },
+      plugins: {
+        legend: { position: 'top', labels: { boxWidth: 12, padding: 14, color: '#455a64' } },
+        tooltip: {
+          callbacks: {
+            label: ctx => ctx.datasetIndex === 0
+              ? fmtThb(ctx.raw)
+              : ctx.raw + ' 张'
+          }
+        }
+      },
+      scales: {
+        x: { grid: { display: false }, ticks: { color: '#78909c' } },
+        y:  { position: 'left',  grid: { color: '#f0f2f8' }, ticks: { color: '#455a64' } },
+        y2: { position: 'right', grid: { display: false }, ticks: { color: '#c62828' } }
+      }
+    }
   });
-  const arr = SALE_SP[saleCurSP] || [];
-  const labels = arr.map(x => x.name || x.sku);
-  const vals   = arr.map(x => x.amount);
-  const colors = arr.map((_,i) => PALETTE[i % PALETTE.length]);
-  if (!saleTop20Chart) {
+} catch(e) { console.error('monthlyChart', e); }
+
+/* ─────────────────────────────────────────────────────
+   7. 业务员业绩对比（横柱 + 统计卡）
+───────────────────────────────────────────────────── */
+(function renderSpCards() {
+  const wrap = C('spCardWrap');
+  if (!wrap) return;
+  const colors = ['sp1','sp2','','',''];
+  const html = SP_LABELS.map((sp,i) => {
+    if (sp === 'Unknown') return '';
+    return `<div class="sp-card ${colors[i]||''}">
+      <div class="sp-name">${sp}</div>
+      <div class="sp-amount">${fmtThb(SP_AMOUNTS[i])}</div>
+      <div class="sp-sub">${SP_COUNTS[i]} 个客户</div>
+    </div>`;
+  }).join('');
+  wrap.innerHTML = html;
+})();
+
+try {
+  const spData = SP_LABELS.map((sp, i) => ({ sp, amt: SP_AMOUNTS[i], cnt: SP_COUNTS[i] }))
+    .filter(d => d.sp && d.sp !== 'Unknown');
+  new Chart(C('spBarChart'), {
+    type: 'bar',
+    data: {
+      labels: spData.map(d => d.sp),
+      datasets: [{
+        data: spData.map(d => d.amt),
+        backgroundColor: ['rgba(26,35,126,.8)', 'rgba(198,40,40,.8)', 'rgba(40,53,147,.8)'],
+        borderRadius: 6,
+      }]
+    },
+    options: {
+      ...OPT_BAR_V,
+      plugins: {
+        legend: { display: false },
+        tooltip: { callbacks: { label: ctx => fmtThb(ctx.raw) } }
+      }
+    }
+  });
+} catch(e) { console.error('spBarChart', e); }
+
+/* ─────────────────────────────────────────────────────
+   8. 产品销售TOP20（按业务员切换）
+───────────────────────────────────────────────────── */
+let saleChart = null;
+let saleCurSP = '全部';
+
+function buildSaleTabBar() {
+  const bar = C('saleTabBar');
+  if (!bar) return;
+  const sps = ['全部', ...Object.keys(SALE_SP).filter(k => k !== '全部')];
+  bar.innerHTML = sps.map(sp =>
+    `<button class="tab-btn${sp === '全部' ? ' active' : ''}" data-sp="${sp}" onclick="updateSaleChart('${sp}')">${sp}</button>`
+  ).join('');
+}
+
+function updateSaleChart(sp) {
+  saleCurSP = sp;
+  document.querySelectorAll('#saleTabBar .tab-btn').forEach(b => {
+    b.classList.toggle('active', b.dataset.sp === sp);
+  });
+  const arr = SALE_SP[sp] || [];
+  const labels = arr.map(x => {
+    const nm = (x.name || x.sku || '').trim();
+    return nm.length > 26 ? nm.slice(0, 26) + '…' : nm;
+  });
+  const vals = arr.map(x => x.amount);
+  const colors = Array.from({length: labels.length}, (_, i) => P_BLUE[i % P_BLUE.length]);
+  if (!saleChart) {
     try {
-      saleTop20Chart = new Chart(C('saleTop20Chart'), {
+      saleChart = new Chart(C('saleTop20Chart'), {
         type: 'bar',
-        data: { labels, datasets: [{ data: vals, backgroundColor: colors, borderRadius:3 }] },
+        data: { labels, datasets: [{ data: vals, backgroundColor: colors, borderRadius: 4 }] },
         options: {
           ...OPT_BAR_H,
-          plugins: { legend:{ display:false }, tooltip:{ callbacks:{ label: ctx => 'THB ' + ctx.raw.toLocaleString() }}}
+          plugins: {
+            legend: { display: false },
+            tooltip: { callbacks: { label: ctx => fmtThb(ctx.raw) } }
+          }
         }
       });
     } catch(e) { console.error('saleTop20Chart', e); }
   } else {
-    saleTop20Chart.data.labels = labels;
-    saleTop20Chart.data.datasets[0].data = vals;
-    saleTop20Chart.data.datasets[0].backgroundColor = colors;
-    saleTop20Chart.update('none');
+    saleChart.data.labels = labels;
+    saleChart.data.datasets[0].data = vals;
+    saleChart.data.datasets[0].backgroundColor = colors;
+    saleChart.update('none');
   }
 }
+buildSaleTabBar();
+const saleInitKey = Object.keys(SALE_SP).includes('全部') ? '全部' : Object.keys(SALE_SP)[0] || '全部';
+updateSaleChart(saleInitKey);
 
-/* ── 10. 客户TOP20（按SP）横柱图 ── */
+/* ─────────────────────────────────────────────────────
+   9. 客户销售TOP20
+───────────────────────────────────────────────────── */
 let custChart = null;
 let custCurSP = '全部';
+
+function buildCustTabBar() {
+  const bar = C('custTabBar');
+  if (!bar) return;
+  const sps = ['全部', ...Object.keys(SP_TOPS)];
+  bar.innerHTML = sps.map(sp =>
+    `<button class="tab-btn${sp === '全部' ? ' active' : ''}" data-sp="${sp}" onclick="updateCustChart('${sp}')">${sp}</button>`
+  ).join('');
+}
+
 function updateCustChart(sp) {
-  if (sp !== undefined) custCurSP = sp;
-  document.querySelectorAll('.cust-sp-btn').forEach(b => {
-    b.classList.toggle('active', b.dataset.sp === custCurSP);
+  custCurSP = sp;
+  document.querySelectorAll('#custTabBar .tab-btn').forEach(b => {
+    b.classList.toggle('active', b.dataset.sp === sp);
   });
-  const arr = (custCurSP === '全部' ? CUST20 : (SP_TOPS[custCurSP] || []));
-  const labels = arr.map(x => {
-    let n = x.name || '';
-    return n.length > 22 ? n.slice(0, 22) + '…' : n;
+  const arr = (sp === '全部' ? CUST20 : (SP_TOPS[sp] || []));
+  const labels = arr.slice(0, 15).map(x => {
+    const nm = (x.name || '').trim();
+    return nm.length > 18 ? nm.slice(0, 18) + '…' : nm;
   });
-  const vals   = arr.map(x => x.total_amount);
-  const colors = arr.map((_,i) => PALETTE[i % PALETTE.length]);
+  const vals = arr.slice(0, 15).map(x => x.total_amount);
+  const colors = Array.from({length: labels.length}, (_, i) => P_RED[i % P_RED.length]);
   if (!custChart) {
     try {
       custChart = new Chart(C('custTop20Chart'), {
         type: 'bar',
-        data: { labels, datasets: [{ data: vals, backgroundColor: colors, borderRadius:3 }] },
+        data: { labels, datasets: [{ data: vals, backgroundColor: colors, borderRadius: 4 }] },
         options: {
           ...OPT_BAR_H,
-          plugins: { legend:{ display:false }, tooltip:{ callbacks:{ label: ctx => 'THB ' + ctx.raw.toLocaleString() }}}
+          plugins: {
+            legend: { display: false },
+            tooltip: { callbacks: { label: ctx => fmtThb(ctx.raw) } }
+          }
         }
       });
     } catch(e) { console.error('custTop20Chart', e); }
@@ -623,137 +902,142 @@ function updateCustChart(sp) {
     custChart.data.datasets[0].backgroundColor = colors;
     custChart.update('none');
   }
-}
-
-/* ── 产品明细表 & 搜索 ── */
-let _sortKey = 'remaining', _sortAsc = false;
-function renderProdTable(rows) {
-  const tb = document.getElementById('prodTableBody');
-  if (!tb) return;
-  const sorted = [...rows].sort((a, b) => {
-    let va = a[_sortKey], vb = b[_sortKey];
-    if (typeof va === 'string') va = va.toLowerCase();
-    if (typeof vb === 'string') vb = vb.toLowerCase();
-    return _sortAsc ? (va > vb ? 1 : -1) : (va < vb ? 1 : -1);
-  });
-  tb.innerHTML = sorted.map(r => {
-    let cls = r.remaining <= 0 ? 'badge-zero' : r.remaining <= 10 ? 'badge-low' : 'badge-ok';
-    let lbl = r.remaining <= 0 ? '零库存' : r.remaining <= 10 ? '低库存' : '正常';
+  // 渲染客户表格
+  const tbody = C('custTableBody');
+  if (!tbody) return;
+  tbody.innerHTML = arr.map((c, i) => {
+    const rank = i < 3 ? `<span class="rank-badge r${i+1}">${i+1}</span>` : `<span class="rank-badge">${i+1}</span>`;
+    const nm = (c.name || '').trim();
     return `<tr>
-      <td>${r.no || ''}</td>
-      <td>${r.barcode}</td>
-      <td style="max-width:200px;overflow:hidden;text-overflow:ellipsis">${r.name}</td>
-      <td>${r.group}</td>
-      <td style="text-align:right">${r.stock_qty.toLocaleString()}</td>
-      <td style="text-align:right">${r.reserved.toLocaleString()}</td>
-      <td style="text-align:right;font-weight:600">${r.remaining.toLocaleString()}</td>
-      <td>${r.unit}</td>
-      <td><span class="${cls}">${lbl}</span></td>
+      <td>${rank}</td>
+      <td style="max-width:200px;overflow:hidden;text-overflow:ellipsis">${nm}</td>
+      <td>${c.salesperson || '-'}</td>
+      <td>${c.shop_type || '-'}</td>
+      <td class="num-right" style="font-weight:600;color:#1a237e">${fmtNum(c.total_amount)}</td>
     </tr>`;
   }).join('');
 }
-function initProdTable() {
-  renderProdTable(ALL_PRODS);
-  const inp = document.getElementById('prodSearch');
-  if (inp) inp.addEventListener('input', function() {
-    const q = this.value.toLowerCase();
-    renderProdTable(ALL_PRODS.filter(r =>
-      r.name.toLowerCase().includes(q) || r.barcode.toLowerCase().includes(q) ||
-      r.group.toLowerCase().includes(q)
-    ));
+buildCustTabBar();
+updateCustChart('全部');
+
+/* ─────────────────────────────────────────────────────
+   10. 店铺类型饼图
+───────────────────────────────────────────────────── */
+try {
+  const shopLabels = Object.keys(SHOP_TYPE);
+  const shopVals   = Object.values(SHOP_TYPE);
+  new Chart(C('shopTypePieChart'), {
+    type: 'pie',
+    data: {
+      labels: shopLabels,
+      datasets: [{ data: shopVals, backgroundColor: PALETTE, borderWidth: 2, borderColor: '#fff', hoverOffset: 6 }]
+    },
+    options: {
+      ...OPT_PIE,
+      plugins: {
+        ...OPT_PIE.plugins,
+        tooltip: { callbacks: { label: ctx => ctx.label + ': ' + fmtThb(ctx.raw) } }
+      }
+    }
   });
-  document.querySelectorAll('#prodTable th[data-key]').forEach(th => {
-    th.style.cursor = 'pointer';
-    th.addEventListener('click', () => {
-      const k = th.dataset.key;
-      if (_sortKey === k) _sortAsc = !_sortAsc;
-      else { _sortKey = k; _sortAsc = false; }
-      const inp2 = document.getElementById('prodSearch');
-      const q = inp2 ? inp2.value.toLowerCase() : '';
-      renderProdTable(ALL_PRODS.filter(r =>
-        r.name.toLowerCase().includes(q) || r.barcode.toLowerCase().includes(q) ||
-        r.group.toLowerCase().includes(q)
+} catch(e) { console.error('shopTypePieChart', e); }
+
+/* ─────────────────────────────────────────────────────
+   11. 产品销售TOP20（Section 7，来自 CAT_ALL）
+───────────────────────────────────────────────────── */
+let catChart = null;
+let catCurSP = '全部';
+
+function buildCatTabBar() {
+  const bar = C('catTabBar');
+  if (!bar) return;
+  const sps = ['全部', ...Object.keys(CAT_SP)];
+  bar.innerHTML = sps.map(sp =>
+    `<button class="tab-btn${sp === '全部' ? ' active' : ''}" data-sp="${sp}" onclick="updateCatChart('${sp}')">${sp}</button>`
+  ).join('');
+}
+
+function updateCatChart(sp) {
+  catCurSP = sp;
+  document.querySelectorAll('#catTabBar .tab-btn').forEach(b => {
+    b.classList.toggle('active', b.dataset.sp === sp);
+  });
+  const arr = (sp === '全部' ? CAT_ALL : (CAT_SP[sp] || []));
+  const labels = arr.map(x => {
+    const nm = (x.name || x.sku || '').trim();
+    return nm.length > 26 ? nm.slice(0, 26) + '…' : nm;
+  });
+  const vals = arr.map(x => x.amount);
+  const colors = Array.from({length: labels.length}, (_, i) => PALETTE[i % PALETTE.length]);
+  if (!catChart) {
+    try {
+      catChart = new Chart(C('catBarChart'), {
+        type: 'bar',
+        data: { labels, datasets: [{ data: vals, backgroundColor: colors, borderRadius: 4 }] },
+        options: {
+          ...OPT_BAR_H,
+          plugins: {
+            legend: { display: false },
+            tooltip: { callbacks: { label: ctx => fmtThb(ctx.raw) } }
+          }
+        }
+      });
+    } catch(e) { console.error('catBarChart', e); }
+  } else {
+    catChart.data.labels = labels;
+    catChart.data.datasets[0].data = vals;
+    catChart.data.datasets[0].backgroundColor = colors;
+    catChart.update('none');
+  }
+}
+buildCatTabBar();
+updateCatChart('全部');
+
+/* ─────────────────────────────────────────────────────
+   12. 完整产品明细表
+───────────────────────────────────────────────────── */
+(function renderProdTable() {
+  const tbody = C('prodTableBody');
+  if (!tbody) return;
+  const rows = ALL_PRODS.sort((a,b) => b.remaining - a.remaining);
+  function renderRows(data) {
+    tbody.innerHTML = data.map((p, i) => {
+      const rem = Number(p.remaining);
+      let statusHtml = '';
+      if (rem <= 0)        statusHtml = '<span style="background:#ffebee;color:#c62828;padding:2px 8px;border-radius:20px;font-size:10px;font-weight:600">零库存</span>';
+      else if (rem <= 10)  statusHtml = '<span style="background:#fff3e0;color:#e65100;padding:2px 8px;border-radius:20px;font-size:10px;font-weight:600">低库存</span>';
+      else                 statusHtml = '<span style="background:#e8f5e9;color:#2e7d32;padding:2px 8px;border-radius:20px;font-size:10px;font-weight:600">正常</span>';
+      const nm = (p.cn_name || p.name || '').trim();
+      return `<tr>
+        <td style="color:#90a4ae;font-size:11px">${i+1}</td>
+        <td style="font-size:11px;color:#78909c">${p.barcode || ''}</td>
+        <td style="font-weight:600">${nm || p.barcode}</td>
+        <td style="color:#546e7a;font-size:11px">${p.group || ''}</td>
+        <td class="num-right">${fmtNum(p.stock_qty || 0)}</td>
+        <td class="num-right" style="color:#e65100">${fmtNum(p.reserved || 0)}</td>
+        <td class="num-right" style="font-weight:700;color:#1a237e">${fmtNum(rem)}</td>
+        <td style="color:#90a4ae;font-size:11px">${p.unit || ''}</td>
+        <td>${statusHtml}</td>
+      </tr>`;
+    }).join('');
+  }
+  renderRows(rows);
+  // 搜索
+  const box = C('prodSearch');
+  if (box) {
+    box.addEventListener('input', () => {
+      const q = box.value.toLowerCase().trim();
+      if (!q) { renderRows(rows); return; }
+      renderRows(rows.filter(p =>
+        (p.barcode||'').toLowerCase().includes(q) ||
+        (p.name||'').toLowerCase().includes(q) ||
+        (p.cn_name||'').toLowerCase().includes(q) ||
+        (p.group||'').toLowerCase().includes(q)
       ));
     });
-  });
-}
-
-/* ── 安全预警渲染 ── */
-function renderAlerts() {
-  const el = document.getElementById('alertsWrap');
-  if (!el) return;
-  if (!ALERTS || ALERTS.length === 0) {
-    el.innerHTML = '<p style="color:#546e7a;font-size:13px">✅ 暂无低于安全库存的产品</p>';
-    return;
   }
-  el.innerHTML = ALERTS.slice(0, 50).map(a => `
-    <div class="alert-card">
-      <div class="alert-name">⚠️ ${a.name}</div>
-      <div>
-        <div class="alert-meta">条码: ${a.barcode} | 组别: ${a.group}</div>
-        <div class="alert-meta">当前: <b style="color:#ffa726">${a.current}</b>${a.unit} &nbsp; 安全库存: ${a.safety_stock}${a.unit}</div>
-      </div>
-      <div class="alert-gap">缺口 ${a.gap} ${a.unit}</div>
-    </div>
-  `).join('');
-}
+})();
 
-/* ── 客户TOP20 表格 ── */
-function renderCustTable() {
-  const tb = document.getElementById('custTableBody');
-  if (!tb) return;
-  const arr = custCurSP === '全部' ? CUST20 : (SP_TOPS[custCurSP] || []);
-  tb.innerHTML = arr.map((r, i) => `<tr>
-    <td style="color:#78909c">${i+1}</td>
-    <td style="max-width:180px;overflow:hidden;text-overflow:ellipsis;color:#90caf9">${r.name}</td>
-    <td>${r.salesperson || '-'}</td>
-    <td>${r.shop_type || '-'}</td>
-    <td style="text-align:right;font-weight:600;color:#42a5f5">${(r.total_amount||0).toLocaleString()}</td>
-  </tr>`).join('');
-}
-
-/* ── 初始化所有模块 ── */
-document.addEventListener('DOMContentLoaded', function() {
-  // 库存 TOP20
-  if (CUR_DATE && TOP20_BY_DT[CUR_DATE]) switchTop20Date(CUR_DATE);
-
-  // 产品类别 (SP tabs)
-  const catSPs = ['全部', ...Object.keys(CAT_SP)];
-  const catTabBar = document.getElementById('catTabBar');
-  if (catTabBar) {
-    catTabBar.innerHTML = catSPs.map(sp =>
-      `<button class="tab-btn cat-sp-btn${sp==='全部'?' active':''}" data-sp="${sp}" onclick="updateCatChart('${sp}')">${sp}</button>`
-    ).join('');
-  }
-  updateCatChart('全部');
-
-  // 销售 TOP20 (SP tabs)
-  const saleSPs = Object.keys(SALE_SP);
-  const saleTabBar = document.getElementById('saleTabBar');
-  if (saleTabBar) {
-    saleTabBar.innerHTML = saleSPs.map((sp, i) =>
-      `<button class="tab-btn sale-sp-btn${i===0?' active':''}" data-sp="${sp}" onclick="updateSaleChart('${sp}')">${sp}</button>`
-    ).join('');
-  }
-  if (saleSPs.length > 0) updateSaleChart(saleSPs[0]);
-
-  // 客户 TOP20 (SP tabs)
-  const custSPs = ['全部', ...Object.keys(SP_TOPS)];
-  const custTabBar = document.getElementById('custTabBar');
-  if (custTabBar) {
-    custTabBar.innerHTML = custSPs.map(sp =>
-      `<button class="tab-btn cust-sp-btn${sp==='全部'?' active':''}" data-sp="${sp}" onclick="updateCustChart('${sp}');renderCustTable()">${sp}</button>`
-    ).join('');
-  }
-  updateCustChart('全部');
-  renderCustTable();
-
-  // 产品明细表
-  initProdTable();
-
-  // 安全预警
-  renderAlerts();
-});
 </script>
 </body>
 </html>
