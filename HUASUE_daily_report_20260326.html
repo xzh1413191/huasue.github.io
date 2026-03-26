@@ -209,7 +209,7 @@ footer {
   <div class="hd-right">
     <div class="rpt-title">📊 每日库存与销售分析报告</div>
     <div class="rpt-date">📅 2026年03月26日</div>
-    <div class="rpt-gen">⏱ 生成时间: 2026-03-26 08:50:02</div>
+    <div class="rpt-gen">⏱ 生成时间: 2026-03-26 10:47:19</div>
   </div>
 </header>
 <div class="kpi-wrap">
@@ -332,7 +332,7 @@ footer {
     </table>
   </div>
 </div>
-<footer>HUASUE MOULD PLASTIC CO., LTD &nbsp;|&nbsp; 每日自动生成 &nbsp;|&nbsp; 生成时间: 2026-03-26 08:50:02</footer>
+<footer>HUASUE MOULD PLASTIC CO., LTD &nbsp;|&nbsp; 每日自动生成 &nbsp;|&nbsp; 生成时间: 2026-03-26 10:47:19</footer>
 <script>
 const DATES       = ["2025-03-25", "2026-03-17", "2026-03-18", "2026-03-19", "2026-03-20", "2026-03-21", "2026-03-24"];
 const TREND_TOT   = [31094.0, 36296.0, 34831.0, 34312.0, 32498.0, 32249.0, 31613.0];
@@ -561,7 +561,13 @@ function showCatDrilldown(category) {
   titleEl.textContent = '▸ ' + category + '  产品明细（Top ' + prods.length + '）';
   panel.classList.add('show');
 
-  const labels = prods.map(p => p.name.length > 22 ? p.name.slice(0,22)+'…' : p.name);
+  // 标签格式：HS-xxx + 中文名称
+  const labels = prods.map(p => {
+    const sku = (p.sku || '').trim();
+    const name = (p.name || '').trim();
+    const display = sku + '  ' + name;
+    return display.length > 28 ? display.slice(0,28)+'…' : display;
+  });
   const vals   = prods.map(p => p.amount);
   const colors = prods.map((_, i) => PALETTE[i % PALETTE.length]);
 
@@ -574,7 +580,7 @@ function showCatDrilldown(category) {
           ...OPT_BAR_H,
           plugins: {
             legend: { display: false },
-            tooltip: { callbacks: { label: ctx => 'THB ' + ctx.raw.toLocaleString() + '  |  SKU: ' + prods[ctx.dataIndex].sku } }
+            tooltip: { callbacks: { label: ctx => 'THB ' + ctx.raw.toLocaleString() + '  |  ' + prods[ctx.dataIndex].sku } }
           }
         }
       });
