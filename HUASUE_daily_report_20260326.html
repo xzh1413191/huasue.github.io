@@ -183,7 +183,7 @@
   <div class="header-right">
     <div class="report-title">📊 每日库存分析报告</div>
     <div class="report-date">2026年03月26日 报告日期</div>
-    <div class="gen-time">生成时间: 2026-03-26 08:17:55</div>
+    <div class="gen-time">生成时间: 2026-03-26 08:28:30</div>
   </div>
 </div>
 
@@ -649,7 +649,7 @@
 
 <div class="footer">
   <p>HUASUE (华塑) | 华塑模具塑料有限公司</p>
-  <p>自动生成报告 | Generated: 2026-03-26 08:17:55 | Data Source: D:/codebuddy2/factory1kucun</p>
+  <p>自动生成报告 | Generated: 2026-03-26 08:28:30 | Data Source: D:/codebuddy2/factory1kucun</p>
 </div>
 
 <script>
@@ -1153,7 +1153,8 @@ const top20Chart = new Chart(document.getElementById('top20Chart'), {
   },
   options: {
     indexAxis: 'y',
-    responsive: false,
+    responsive: true,
+    maintainAspectRatio: false,
     scales: {
       x: {
         grid: { color: 'rgba(255,255,255,0.06)' },
@@ -1230,7 +1231,7 @@ new Chart(document.getElementById('groupPieChart'), {
   },
   options: {
     indexAxis: 'y',
-    responsive: false,
+    responsive: true, maintainAspectRatio: false,
     scales: {
       x: { grid: { color: 'rgba(255,255,255,0.06)' }, ticks: { color: '#90a4ae' } },
       y: { grid: { display: false }, ticks: { color: '#cfd8dc', font: { size: 11 } } }
@@ -1267,7 +1268,7 @@ new Chart(document.getElementById('monthlyBillChart'), {
     }]
   },
   options: {
-    responsive: false,
+    responsive: true, maintainAspectRatio: false,
     scales: {
       y: {
         grid: { color: 'rgba(255,255,255,0.06)' },
@@ -1311,7 +1312,7 @@ new Chart(document.getElementById('invoiceCountChart'), {
     }]
   },
   options: {
-    responsive: false,
+    responsive: true, maintainAspectRatio: false,
     scales: {
       y: {
         grid: { color: 'rgba(255,255,255,0.06)' },
@@ -1360,7 +1361,7 @@ const saleTop20Chart = new Chart(document.getElementById('saleTop20Chart'), {
   data: { labels: [], datasets: [{ label: '销售数量', data: [], backgroundColor: [], borderColor: [], borderWidth: 1.5, borderRadius: 4 }] },
   options: {
     indexAxis: 'y',
-    responsive: false,
+    responsive: true, maintainAspectRatio: false,
     scales: {
       x: { grid: { color: 'rgba(255,255,255,0.06)' }, ticks: { color: '#90a4ae' } },
       y: { grid: { display: false }, ticks: { color: '#cfd8dc', font: { size: 11 } } }
@@ -1782,12 +1783,13 @@ function setCatTab(tab) {
   updateCatCharts();
 }
 
-// ── 初始化全部图表 ──
-initSaleSPTabs();    // 销售TOP20 业务员tab
-updateSaleChart();   // 销售TOP20 图表
-initCustTabs();      // 客户TOP20 业务员tab
-updateCustChart();   // 客户TOP20 图表
-updateCatCharts();   // 产品类别图表
+// ── 初始化全部图表（各图表独立 try-catch，防止一个报错影响其他） ──
+try { switchTop20Date(top20CurrentDate); } catch(e) { console.error('top20Chart init error:', e); }
+try { initSaleSPTabs(); } catch(e) { console.error('initSaleSPTabs error:', e); }
+try { updateSaleChart(); } catch(e) { console.error('updateSaleChart error:', e); }
+try { initCustTabs(); } catch(e) { console.error('initCustTabs error:', e); }
+try { updateCustChart(); } catch(e) { console.error('updateCustChart error:', e); }
+try { updateCatCharts(); } catch(e) { console.error('updateCatCharts error:', e); }
 
 
 
