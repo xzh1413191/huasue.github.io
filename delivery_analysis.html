@@ -6,385 +6,249 @@
     <title>发货分析 - HUASUE</title>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
-        :root {
-            --primary: #e63946;
-            --secondary: #1d3557;
-            --bg: #f8f9fa;
-            --card-bg: #ffffff;
-            --text: #333;
-            --text-light: #666;
-        }
-        
         * { margin: 0; padding: 0; box-sizing: border-box; }
-        
-        body {
+        body { 
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-            background: var(--bg);
-            color: var(--text);
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            min-height: 100vh;
             padding: 20px;
         }
-        
         .header {
-            background: linear-gradient(135deg, var(--secondary), #457b9d);
-            color: white;
-            padding: 30px;
-            border-radius: 16px;
+            text-align: center;
+            color: #fff;
             margin-bottom: 30px;
         }
+        .header h1 { font-size: 28px; margin-bottom: 8px; }
+        .header p { color: #888; font-size: 14px; }
         
-        .header h1 { font-size: 28px; margin-bottom: 10px; }
-        .header .subtitle { opacity: 0.9; font-size: 14px; }
-        
-        .stats-grid {
+        .kpi-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            grid-template-columns: repeat(4, 1fr);
+            gap: 15px;
+            margin-bottom: 30px;
+        }
+        .kpi-card {
+            background: rgba(255,255,255,0.1);
+            border-radius: 12px;
+            padding: 20px;
+            text-align: center;
+        }
+        .kpi-value { font-size: 32px; font-weight: bold; color: #4fd1c5; }
+        .kpi-label { font-size: 14px; color: #aaa; margin-top: 5px; }
+        
+        .chart-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
             gap: 20px;
-            margin-bottom: 30px;
-        }
-        
-        .stat-card {
-            background: var(--card-bg);
-            padding: 24px;
-            border-radius: 12px;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
-            text-align: center;
-        }
-        
-        .stat-card .value {
-            font-size: 36px;
-            font-weight: bold;
-            color: var(--primary);
-        }
-        
-        .stat-card .label {
-            color: var(--text-light);
-            font-size: 14px;
-            margin-top: 8px;
-        }
-        
-        .charts-grid {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 24px;
-            margin-bottom: 30px;
-        }
-        
-        .chart-card {
-            background: var(--card-bg);
-            padding: 24px;
-            border-radius: 12px;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
-        }
-        
-        .chart-card.full-width {
-            grid-column: span 2;
-        }
-        
-        .chart-card h3 {
-            font-size: 18px;
             margin-bottom: 20px;
-            color: var(--secondary);
         }
-        
-        .chart-container {
-            position: relative;
-            height: 300px;
+        .chart-card {
+            background: rgba(255,255,255,0.05);
+            border-radius: 12px;
+            padding: 20px;
         }
+        .chart-card h3 { color: #fff; font-size: 16px; margin-bottom: 15px; }
+        .chart-container { height: 250px; }
         
-        .chart-container.tall {
-            height: 400px;
+        .table-card {
+            background: rgba(255,255,255,0.05);
+            border-radius: 12px;
+            padding: 20px;
         }
+        .table-card h3 { color: #fff; font-size: 16px; margin-bottom: 15px; }
         
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            font-size: 14px;
-        }
+        table { width: 100%; border-collapse: collapse; }
+        th, td { padding: 12px; text-align: left; border-bottom: 1px solid rgba(255,255,255,0.1); }
+        th { color: #888; font-weight: 500; font-size: 13px; }
+        td { color: #fff; font-size: 14px; }
+        tr:hover { background: rgba(255,255,255,0.05); }
         
-        th, td {
-            padding: 12px;
-            text-align: left;
-            border-bottom: 1px solid #eee;
-        }
-        
-        th {
-            background: var(--secondary);
-            color: white;
-            font-weight: 500;
-        }
-        
-        tr:hover { background: #f5f5f5; }
-        
-        .rank-badge {
-            display: inline-block;
-            width: 24px;
-            height: 24px;
-            background: var(--primary);
-            color: white;
-            border-radius: 50%;
-            text-align: center;
-            line-height: 24px;
-            font-size: 12px;
-            margin-right: 8px;
-        }
-        
-        .rank-badge.gold { background: #ffd700; }
-        .rank-badge.silver { background: #c0c0c0; }
-        .rank-badge.bronze { background: #cd7f32; }
+        .box-small { color: #f6ad55 !important; }
+        .box-large { color: #fc8181 !important; }
         
         @media (max-width: 768px) {
-            .charts-grid { grid-template-columns: 1fr; }
-            .chart-card.full-width { grid-column: span 1; }
-        }
-        
-        .footer {
-            text-align: center;
-            padding: 20px;
-            color: var(--text-light);
-            font-size: 12px;
+            .kpi-grid { grid-template-columns: repeat(2, 1fr); }
+            .chart-row { grid-template-columns: 1fr; }
         }
     </style>
 </head>
 <body>
     <div class="header">
-        <h1>🚚 发货分析报表</h1>
-        <div class="subtitle">HUASUE MOULD PLASTIC CO., LTD | 华塑模具有限公司</div>
+        <h1>🚚 发货分析</h1>
+        <p>数据更新: 2026-03-30 22:31</p>
     </div>
     
-    <!-- 关键指标 -->
-    <div class="stats-grid">
-        <div class="stat-card">
-            <div class="value" id="totalRecords">-</div>
-            <div class="label">总发货记录</div>
+    <div class="kpi-grid">
+        <div class="kpi-card">
+            <div class="kpi-value">69</div>
+            <div class="kpi-label">总发货次数</div>
         </div>
-        <div class="stat-card">
-            <div class="value" id="totalBoxes">-</div>
-            <div class="label">总发货箱数</div>
+        <div class="kpi-card">
+            <div class="kpi-value">3,284</div>
+            <div class="kpi-label">总箱数</div>
         </div>
-        <div class="stat-card">
-            <div class="value" id="totalPlates">-</div>
-            <div class="label">活跃车牌数</div>
+        <div class="kpi-card">
+            <div class="kpi-value">7</div>
+            <div class="kpi-label">参与车辆</div>
         </div>
-        <div class="stat-card">
-            <div class="value" id="totalCustomers">-</div>
-            <div class="label">发货客户数</div>
+        <div class="kpi-card">
+            <div class="kpi-value">22</div>
+            <div class="kpi-label">目的地数</div>
         </div>
     </div>
     
-    <!-- 图表区域 -->
-    <div class="charts-grid">
-        <!-- 1. 每日发货趋势 -->
-        <div class="chart-card full-width">
-            <h3>📈 每日发货量趋势</h3>
-            <div class="chart-container">
-                <canvas id="dailyTrendChart"></canvas>
-            </div>
-        </div>
-        
-        <!-- 2. 车牌效率分析 -->
+    <div class="chart-row">
         <div class="chart-card">
-            <h3>🚛 车牌送货效率排名</h3>
+            <h3>📅 每日发货趋势</h3>
             <div class="chart-container">
-                <canvas id="plateEfficiencyChart"></canvas>
+                <canvas id="dailyChart"></canvas>
             </div>
         </div>
-        
-        <!-- 3. 目的地分布 -->
+        <div class="chart-card">
+            <h3>🚛 车牌效率排名</h3>
+            <div class="chart-container">
+                <canvas id="vehicleChart"></canvas>
+            </div>
+        </div>
+    </div>
+    
+    <div class="chart-row">
         <div class="chart-card">
             <h3>📍 目的地分布</h3>
             <div class="chart-container">
-                <canvas id="destinationChart"></canvas>
+                <canvas id="destChart"></canvas>
             </div>
         </div>
-        
-        <!-- 4. 客户发货排行 -->
-        <div class="chart-card full-width">
-            <h3>🏆 客户发货量TOP20</h3>
-            <div class="chart-container tall">
-                <canvas id="customerRankChart"></canvas>
-            </div>
-        </div>
-        
-        <!-- 5. 运输方式分析 -->
         <div class="chart-card">
-            <h3>🏭 托运 vs 直送</h3>
+            <h3>📦 发货次数TOP10</h3>
             <div class="chart-container">
-                <canvas id="deliveryTypeChart"></canvas>
-            </div>
-        </div>
-        
-        <!-- 6. 时效分析 -->
-        <div class="chart-card">
-            <h3>⏱️ 送货时效分布</h3>
-            <div class="chart-container">
-                <canvas id="timeEfficiencyChart"></canvas>
+                <canvas id="top10Chart"></canvas>
             </div>
         </div>
     </div>
     
-    <div class="footer">
-        数据更新时间: <span id="updateTime"></span>
+    <div class="table-card">
+        <h3>📋 送货记录明细</h3>
+        <table>
+            <thead>
+                <tr>
+                    <th>日期</th>
+                    <th>送货单号</th>
+                    <th>箱数</th>
+                    <th>车牌</th>
+                    <th>目的地</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr><td>2026-03-23</td><td>SO0001638</td><td class='box-small'>23</td><td>3428</td><td>-</td></tr><tr><td>2026-03-23</td><td>SO0001639</td><td class='box-small'>10</td><td>3428</td><td>-</td></tr><tr><td>2026-03-23</td><td>SO0001590</td><td class='box-large'>70</td><td>3428</td><td>-</td></tr><tr><td>2026-03-23</td><td>SO0001589</td><td class='box-large'>80</td><td>3428</td><td>-</td></tr><tr><td>2026-03-23</td><td>SO0001643</td><td class='box-small'>5</td><td>2791</td><td>-</td></tr><tr><td>2026-03-23</td><td>SO0001647</td><td class='box-small'>10</td><td>2791</td><td>-</td></tr><tr><td>2026-03-23</td><td>SO0001640</td><td class='box-large'>100</td><td>2791</td><td>-</td></tr><tr><td>2026-03-23</td><td>SO0001625</td><td class='box-small'>10</td><td>2791</td><td>-</td></tr><tr><td>2026-03-23</td><td>SO0001656</td><td class='box-small'>5</td><td>3450</td><td>-</td></tr><tr><td>2026-03-23</td><td>SO0001637</td><td class='box-small'>33</td><td>3450</td><td>-</td></tr><tr><td>2026-03-23</td><td>SO0001652</td><td class='box-small'>3</td><td>3450</td><td>-</td></tr><tr><td>2026-03-24</td><td>SO0001623</td><td class='box-large'>77</td><td>3428</td><td>-</td></tr><tr><td>2026-03-24</td><td>SO0001657</td><td class='box-small'>34</td><td>3428</td><td>-</td></tr><tr><td>2026-03-24</td><td>SO0001651</td><td class='box-small'>25</td><td>3428</td><td>-</td></tr><tr><td>2026-03-24</td><td>SO0001624</td><td class='box-large'>130</td><td>3428</td><td>-</td></tr><tr><td>2026-03-24</td><td>SO0001667</td><td class='box-large'>200</td><td>3428</td><td>-</td></tr><tr><td>2026-03-24</td><td>SO0001641</td><td class='box-large'>100</td><td>2791</td><td>-</td></tr><tr><td>2026-03-24</td><td>SO0001645</td><td class='box-small'>50</td><td>2791</td><td>-</td></tr><tr><td>2026-03-24</td><td>SO0001633</td><td class='box-small'>8</td><td>2791</td><td>-</td></tr><tr><td>2026-03-24</td><td>SO0001654</td><td class='box-small'>7</td><td>2791</td><td>-</td></tr><tr><td>2026-03-24</td><td>SO0001655</td><td class='box-large'>100</td><td>2791</td><td>-</td></tr><tr><td>2026-03-24</td><td>SO0001634</td><td class='box-small'>30</td><td>1625</td><td>-</td></tr><tr><td>2026-03-25</td><td>SO0001620</td><td class='box-large'>193</td><td>2781</td><td>春武里</td></tr><tr><td>2026-03-25</td><td>SO0001627</td><td class='box-large'>200</td><td>3428</td><td>佛统府</td></tr><tr><td>2026-03-25</td><td>SO0001627</td><td class='box-large'>75</td><td>3428</td><td>佛统府</td></tr><tr><td>2026-03-25</td><td>SO0001628</td><td class='box-small'>11</td><td>3428</td><td>曼谷</td></tr><tr><td>2026-03-25</td><td>SO0001672</td><td class='box-small'>17</td><td>3428</td><td>曼谷</td></tr><tr><td>2026-03-25</td><td>SO0001662</td><td class='box-small'>25</td><td>2781</td><td>春蓬（托运站）</td></tr><tr><td>2026-03-25</td><td>SO0001673</td><td class='box-small'>4</td><td>2781</td><td>南邦（托运站）</td></tr><tr><td>2026-03-25</td><td>SO0001669</td><td class='box-small'>10</td><td>2781</td><td>彭世洛（托运站）</td></tr><tr><td>2026-03-25</td><td>SO0001671</td><td class='box-small'>7</td><td>2781</td><td>坤颂（托运站）</td></tr><tr><td>2026-03-25</td><td>SO0001676</td><td class='box-small'>3</td><td>2781</td><td>宋卡（托运站）</td></tr><tr><td>2026-03-25</td><td>SO0001658</td><td class='box-small'>6</td><td>2781</td><td>普吉（托运站）</td></tr><tr><td>2026-03-25</td><td>SO0001686</td><td class='box-large'>111</td><td>自送</td><td>自送</td></tr><tr><td>2026-03-26</td><td>SO0001685</td><td class='box-small'>12</td><td>3428</td><td>巴吞他尼</td></tr><tr><td>2026-03-26</td><td>SO0001665</td><td class='box-small'>12</td><td>3428</td><td>巴吞他尼</td></tr><tr><td>2026-03-26</td><td>SO0001661</td><td class='box-small'>37</td><td>3428</td><td>巴吞他尼</td></tr><tr><td>2026-03-26</td><td>SO0001649</td><td class='box-small'>17</td><td>3428</td><td>巴吞他尼</td></tr><tr><td>2026-03-26</td><td>SO0001663</td><td class='box-small'>16</td><td>3428</td><td>夜功府</td></tr><tr><td>2026-03-26</td><td>SO0001648</td><td class='box-small'>11</td><td>3428</td><td>曼谷</td></tr><tr><td>2026-03-26</td><td>SO0001664</td><td class='box-large'>52</td><td>3428</td><td>暖武里</td></tr><tr><td>2026-03-26</td><td>SO0001690</td><td class='box-large'>210</td><td>2791</td><td>曼谷</td></tr><tr><td>2026-03-26</td><td>SO0001690</td><td class='box-small'>30</td><td>2791</td><td>曼谷</td></tr><tr><td>2026-03-26</td><td>SO0001674</td><td class='box-large'>53</td><td>2791</td><td>曼谷</td></tr><tr><td>2026-03-26</td><td>SO0001683</td><td class='box-large'>100</td><td>2791</td><td>乌隆他尼（托运站）</td></tr><tr><td>2026-03-26</td><td>SO0001687</td><td class='box-small'>10</td><td>2791</td><td>彭世洛府（托运站）</td></tr><tr><td>2026-03-26</td><td>SO0001696</td><td class='box-small'>1</td><td>自取</td><td>宗林</td></tr><tr><td>2026-03-27</td><td>SO0001659</td><td class='box-large'>130</td><td>3428</td><td>春武里</td></tr><tr><td>2026-03-27</td><td>SO0001688</td><td class='box-small'>20</td><td>3428</td><td>那空沙旺府（托运站）</td></tr><tr><td>2026-03-27</td><td>SO0001682</td><td class='box-large'>140</td><td>2791</td><td>春武里</td></tr><tr><td>2026-03-27</td><td>SO0001689</td><td class='box-small'>36</td><td>2791</td><td>那空沙旺府（托运站）</td></tr><tr><td>2026-03-27</td><td>SO0001705</td><td class='box-large'>65</td><td>自送</td><td>自送</td></tr><tr><td>2026-03-28</td><td>SO0001703</td><td class='box-large'>200</td><td>3428</td><td>曼谷</td></tr><tr><td>2026-03-28</td><td>SO0001704</td><td class='box-small'>5</td><td>3428</td><td>曼谷</td></tr><tr><td>2026-03-28</td><td>SO0001706</td><td class='box-small'>7</td><td>2791</td><td>春武里（托运站）</td></tr><tr><td>2026-03-28</td><td>SO0001700</td><td class='box-small'>10</td><td>2791</td><td>呵叻府（托运站）</td></tr><tr><td>2026-03-28</td><td>SO0001694</td><td class='box-small'>13</td><td>2791</td><td>彭世洛府（托运站）</td></tr><tr><td>2026-03-28</td><td>SO0001695</td><td class='box-small'>12</td><td>2791</td><td>素叻他尼（托运站）</td></tr><tr><td>2026-03-28</td><td>SO0001697</td><td class='box-small'>10</td><td>2791</td><td>彭世洛府（托运站）</td></tr><tr><td>2026-03-28</td><td>SO0001701</td><td class='box-small'>10</td><td>2791</td><td>那空沙旺府（托运站）</td></tr><tr><td>2026-03-28</td><td>SO0001692</td><td class='box-small'>36</td><td>2791</td><td>程逸府（托运站）</td></tr><tr><td>2026-03-28</td><td>SO0001680</td><td class='box-small'>12</td><td>1625</td><td>佛统府</td></tr><tr><td>2026-03-28</td><td>SO0001681</td><td class='box-large'>85</td><td>3428</td><td>巴吞他尼</td></tr><tr><td>2026-03-28</td><td>SO0001702</td><td class='box-small'>8</td><td>3428</td><td>巴吞他尼</td></tr><tr><td>2026-03-28</td><td>SO0001699</td><td class='box-small'>17</td><td>3428</td><td>巴吞他尼</td></tr><tr><td>2026-03-28</td><td>SO0001707</td><td class='box-small'>20</td><td>3428</td><td>巴吞他尼</td></tr><tr><td>2026-03-28</td><td>SO0001691</td><td class='box-small'>10</td><td>3428</td><td>尖竹汶（托运站）</td></tr><tr><td>2026-03-28</td><td>SO0001679</td><td class='box-large'>100</td><td>2791</td><td>曼谷</td></tr><tr><td>2026-03-28</td><td>nan</td><td class='box-small'>5</td><td>自送</td><td>自送</td></tr>
+            </tbody>
+        </table>
     </div>
     
     <script>
-        // 示例数据 - 实际使用时替换为真实数据
-        const deliveryData = {
-            daily: {
-                labels: ['03-24', '03-25', '03-26', '03-27', '03-28', '03-29', '03-30'],
-                boxes: [120, 145, 132, 98, 156, 142, 168]
-            },
-            plates: [
-                { name: 'กทพ. 8888', trips: 28, boxes: 456 },
-                { name: 'กทพ. 5555', trips: 24, boxes: 389 },
-                { name: 'บร. 1234', trips: 21, boxes: 312 },
-                { name: 'กทพ. 7777', trips: 18, boxes: 267 },
-                { name: 'สร. 9999', trips: 15, boxes: 198 }
-            ],
-            destinations: [
-                { name: '春武里府', count: 245 },
-                { name: '佛统府', count: 189 },
-                { name: '曼谷', count: 156 },
-                { name: '北揽府', count: 98 },
-                { name: '其他', count: 67 }
-            ],
-            customers: [
-                { name: '客户 A', boxes: 234 },
-                { name: '客户 B', boxes: 189 },
-                { name: '客户 C', boxes: 156 },
-                { name: '客户 D', boxes: 134 },
-                { name: '客户 E', boxes: 112 }
-            ],
-            deliveryType: [
-                { name: '直送', value: 65 },
-                { name: '托运', value: 35 }
-            ],
-            timeEfficiency: [
-                { name: '≤2小时', value: 45 },
-                { name: '2-4小时', value: 32 },
-                { name: '4-6小时', value: 15 },
-                { name: '>6小时', value: 8 }
-            ]
-        };
+        const dailyData = [{"日期":"2026-03-23","发货次数":11,"总箱数":349},{"日期":"2026-03-24","发货次数":11,"总箱数":761},{"日期":"2026-03-25","发货次数":12,"总箱数":662},{"日期":"2026-03-26","发货次数":13,"总箱数":561},{"日期":"2026-03-27","发货次数":5,"总箱数":391},{"日期":"2026-03-28","发货次数":17,"总箱数":560}];
+        const vehicleData = [{"车牌":"3428","发货次数":29,"总箱数":1604},{"车牌":"2791","发货次数":24,"总箱数":1167},{"车牌":"2781","发货次数":7,"总箱数":248},{"车牌":"自送","发货次数":3,"总箱数":181},{"车牌":"1625","发货次数":2,"总箱数":42},{"车牌":"3450","发货次数":3,"总箱数":41},{"车牌":"自取","发货次数":1,"总箱数":1}];
+        const destData = [{"目的地":"曼谷","发货次数":9,"总箱数":637},{"目的地":"春武里","发货次数":3,"总箱数":463},{"目的地":"佛统府","发货次数":3,"总箱数":287},{"目的地":"巴吞他尼","发货次数":8,"总箱数":208},{"目的地":"自送","发货次数":3,"总箱数":181},{"目的地":"乌隆他尼（托运站）","发货次数":1,"总箱数":100},{"目的地":"那空沙旺府（托运站）","发货次数":3,"总箱数":66},{"目的地":"暖武里","发货次数":1,"总箱数":52},{"目的地":"程逸府（托运站）","发货次数":1,"总箱数":36},{"目的地":"彭世洛府（托运站）","发货次数":3,"总箱数":33},{"目的地":"春蓬（托运站）","发货次数":1,"总箱数":25},{"目的地":"夜功府","发货次数":1,"总箱数":16},{"目的地":"素叻他尼（托运站）","发货次数":1,"总箱数":12},{"目的地":"呵叻府（托运站）","发货次数":1,"总箱数":10},{"目的地":"尖竹汶（托运站）","发货次数":1,"总箱数":10},{"目的地":"彭世洛（托运站）","发货次数":1,"总箱数":10},{"目的地":"春武里（托运站）","发货次数":1,"总箱数":7},{"目的地":"坤颂（托运站）","发货次数":1,"总箱数":7},{"目的地":"普吉（托运站）","发货次数":1,"总箱数":6},{"目的地":"南邦（托运站）","发货次数":1,"总箱数":4},{"目的地":"宋卡（托运站）","发货次数":1,"总箱数":3},{"目的地":"宗林","发货次数":1,"总箱数":1}];
         
-        // 更新统计卡片
-        document.getElementById('totalRecords').textContent = '156';
-        document.getElementById('totalBoxes').textContent = '1,234';
-        document.getElementById('totalPlates').textContent = '8';
-        document.getElementById('totalCustomers').textContent = '45';
-        document.getElementById('updateTime').textContent = new Date().toLocaleString('zh-CN');
-        
-        // 1. 每日发货趋势图
-        new Chart(document.getElementById('dailyTrendChart'), {
+        // 每日发货趋势
+        new Chart(document.getElementById('dailyChart'), {
             type: 'line',
             data: {
-                labels: deliveryData.daily.labels,
+                labels: dailyData.map(d => d['日期']),
                 datasets: [{
-                    label: '发货箱数',
-                    data: deliveryData.daily.boxes,
-                    borderColor: '#e63946',
-                    backgroundColor: 'rgba(230, 57, 70, 0.1)',
+                    label: '发货次数',
+                    data: dailyData.map(d => d['发货次数']),
+                    borderColor: '#4fd1c5',
+                    backgroundColor: 'rgba(79, 209, 197, 0.1)',
                     fill: true,
                     tension: 0.4
+                }, {
+                    label: '总箱数',
+                    data: dailyData.map(d => d['总箱数']),
+                    borderColor: '#f6ad55',
+                    backgroundColor: 'rgba(246, 173, 85, 0.1)',
+                    fill: true,
+                    tension: 0.4,
+                    yAxisID: 'y1'
                 }]
             },
             options: {
                 responsive: true,
                 maintainAspectRatio: false,
-                plugins: {
-                    legend: { display: false }
-                },
+                plugins: { legend: { labels: { color: '#aaa' } } },
                 scales: {
-                    y: { beginAtZero: true }
+                    x: { ticks: { color: '#888' }, grid: { color: 'rgba(255,255,255,0.1)' } },
+                    y: { ticks: { color: '#888' }, grid: { color: 'rgba(255,255,255,0.1)' } },
+                    y1: { position: 'right', ticks: { color: '#f6ad55' }, grid: { drawOnChartArea: false } }
                 }
             }
         });
         
-        // 2. 车牌效率图
-        new Chart(document.getElementById('plateEfficiencyChart'), {
+        // 车牌效率排名
+        new Chart(document.getElementById('vehicleChart'), {
             type: 'bar',
             data: {
-                labels: deliveryData.plates.map(p => p.name),
+                labels: vehicleData.map(d => d['车牌']),
                 datasets: [{
-                    label: '送货箱数',
-                    data: deliveryData.plates.map(p => p.boxes),
-                    backgroundColor: ['#e63946', '#457b9d', '#1d3557', '#a8dadc', '#f4a261']
+                    label: '总箱数',
+                    data: vehicleData.map(d => d['总箱数']),
+                    backgroundColor: ['#4fd1c5', '#f6ad55', '#fc8181', '#68d391', '#9f7aea'],
+                    borderRadius: 6
                 }]
             },
             options: {
                 responsive: true,
                 maintainAspectRatio: false,
-                indexAxis: 'y'
+                indexAxis: 'y',
+                plugins: { legend: { display: false } },
+                scales: {
+                    x: { ticks: { color: '#888' }, grid: { color: 'rgba(255,255,255,0.1)' } },
+                    y: { ticks: { color: '#fff' } }
+                }
             }
         });
         
-        // 3. 目的地分布图
-        new Chart(document.getElementById('destinationChart'), {
+        // 目的地分布
+        const destColors = ['#4fd1c5', '#f6ad55', '#fc8181', '#68d391', '#9f7aea', '#63b3ed', '#ed64a6', '#48bb78'];
+        new Chart(document.getElementById('destChart'), {
             type: 'doughnut',
             data: {
-                labels: deliveryData.destinations.map(d => d.name),
+                labels: destData.slice(0, 8).map(d => d['目的地'] || '未知'),
                 datasets: [{
-                    data: deliveryData.destinations.map(d => d.count),
-                    backgroundColor: ['#e63946', '#457b9d', '#1d3557', '#a8dadc', '#f4a261']
-                }]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false
-            }
-        });
-        
-        // 4. 客户排行图
-        new Chart(document.getElementById('customerRankChart'), {
-            type: 'bar',
-            data: {
-                labels: deliveryData.customers.map(c => c.name),
-                datasets: [{
-                    label: '发货箱数',
-                    data: deliveryData.customers.map(c => c.boxes),
-                    backgroundColor: '#e63946'
+                    data: destData.slice(0, 8).map(d => d['总箱数']),
+                    backgroundColor: destColors,
+                    borderWidth: 0
                 }]
             },
             options: {
                 responsive: true,
                 maintainAspectRatio: false,
                 plugins: {
-                    legend: { display: false }
+                    legend: { position: 'right', labels: { color: '#aaa', boxWidth: 12 } }
                 }
             }
         });
         
-        // 5. 运输方式图
-        new Chart(document.getElementById('deliveryTypeChart'), {
-            type: 'pie',
-            data: {
-                labels: deliveryData.deliveryType.map(d => d.name),
-                datasets: [{
-                    data: deliveryData.deliveryType.map(d => d.value),
-                    backgroundColor: ['#e63946', '#457b9d']
-                }]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false
-            }
-        });
-        
-        // 6. 时效分布图
-        new Chart(document.getElementById('timeEfficiencyChart'), {
+        // TOP10发货
+        const top10 = dailyData.slice(-10);
+        new Chart(document.getElementById('top10Chart'), {
             type: 'bar',
             data: {
-                labels: deliveryData.timeEfficiency.map(t => t.name),
+                labels: top10.map(d => d['日期'].slice(5)),
                 datasets: [{
-                    label: '占比 %',
-                    data: deliveryData.timeEfficiency.map(t => t.value),
-                    backgroundColor: ['#2a9d8f', '#457b9d', '#e9c46a', '#e76f51']
+                    label: '发货次数',
+                    data: top10.map(d => d['发货次数']),
+                    backgroundColor: '#4fd1c5',
+                    borderRadius: 6
                 }]
             },
             options: {
                 responsive: true,
                 maintainAspectRatio: false,
-                plugins: {
-                    legend: { display: false }
+                plugins: { legend: { display: false } },
+                scales: {
+                    x: { ticks: { color: '#888' }, grid: { display: false } },
+                    y: { ticks: { color: '#888' }, grid: { color: 'rgba(255,255,255,0.1)' } }
                 }
             }
         });
