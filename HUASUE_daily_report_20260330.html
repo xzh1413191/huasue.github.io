@@ -775,6 +775,66 @@ footer .ft-red { color: var(--brand-red); }
 }
 
 </style>
+
+<style>
+/* 主Tab导航样式 */
+.main-tab-bar {
+  background: #fff;
+  padding: 10px 20px 0;
+  border-bottom: 2px solid #e63946;
+  display: flex;
+  gap: 4px;
+}
+.main-tab-btn {
+  padding: 12px 28px;
+  border: none;
+  border-radius: 8px 8px 0 0;
+  background: #f0f2f8;
+  color: #6b7280;
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all .2s;
+}
+.main-tab-btn:hover { background: #e4e7eb; }
+.main-tab-btn.active { background: #e63946; color: #fff; }
+#deliverySection { display: none; }
+#deliverySection.show { display: block; }
+.delivery-kpi-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 16px;
+  margin-bottom: 24px;
+}
+.delivery-kpi-card {
+  background: #fff;
+  border-radius: 12px;
+  padding: 20px;
+  text-align: center;
+  box-shadow: 0 1px 4px rgba(0,0,0,.06);
+  border-top: 3px solid #e63946;
+}
+.delivery-kpi-value { font-size: 32px; font-weight: 800; color: #e63946; }
+.delivery-kpi-label { font-size: 12px; color: #6b7280; margin-top: 4px; }
+.delivery-chart-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 20px;
+  margin-bottom: 24px;
+}
+.delivery-chart-card {
+  background: #fff;
+  border-radius: 12px;
+  padding: 20px;
+  box-shadow: 0 1px 4px rgba(0,0,0,.06);
+}
+.delivery-chart-card.full-width { grid-column: span 2; }
+.delivery-chart-card h3 { font-size: 15px; font-weight: 700; color: #1a237e; margin-bottom: 16px; }
+@media (max-width: 768px) {
+  .delivery-chart-grid { grid-template-columns: 1fr; }
+  .delivery-chart-card.full-width { grid-column: span 1; }
+}
+</style>
 </head>
 <body>
 <header class="header">
@@ -1129,6 +1189,55 @@ footer .ft-red { color: var(--brand-red); }
     </div>
   </div>
 </div>
+</div>
+
+<!-- 主Tab导航 -->
+<div class="main-tab-bar">
+  <button class="main-tab-btn active" onclick="switchMainTab('warehouse')" id="tabWarehouse">📦 仓库日报</button>
+  <button class="main-tab-btn" onclick="switchMainTab('delivery')" id="tabDelivery">🚚 发货分析</button>
+</div>
+
+<!-- 发货分析Section -->
+<div id="deliverySection">
+  <div style="padding:20px;background:#f8f9fa;">
+    <h2 style="font-size:20px;color:#1a237e;margin-bottom:20px;">🚚 发货分析报表</h2>
+    
+    <!-- KPI卡片 -->
+    <div class="delivery-kpi-grid">
+      <div class="delivery-kpi-card"><div class="delivery-kpi-value" id="d-records">-</div><div class="delivery-kpi-label">总发货记录</div></div>
+      <div class="delivery-kpi-card"><div class="delivery-kpi-value" id="d-boxes">-</div><div class="delivery-kpi-label">总发货箱数</div></div>
+      <div class="delivery-kpi-card"><div class="delivery-kpi-value" id="d-plates">-</div><div class="delivery-kpi-label">活跃车牌数</div></div>
+      <div class="delivery-kpi-card"><div class="delivery-kpi-value" id="d-customers">-</div><div class="delivery-kpi-label">发货客户数</div></div>
+    </div>
+    
+    <!-- 图表 -->
+    <div class="delivery-chart-grid">
+      <div class="delivery-chart-card full-width">
+        <h3>📈 每日发货量趋势</h3>
+        <div style="height:280px"><canvas id="d-daily-trend"></canvas></div>
+      </div>
+      <div class="delivery-chart-card">
+        <h3>🚛 车牌送货效率排名</h3>
+        <div style="height:260px"><canvas id="d-plate"></canvas></div>
+      </div>
+      <div class="delivery-chart-card">
+        <h3>📍 目的地分布</h3>
+        <div style="height:260px"><canvas id="d-dest"></canvas></div>
+      </div>
+      <div class="delivery-chart-card full-width">
+        <h3>🏆 客户发货量TOP20</h3>
+        <div style="height:320px"><canvas id="d-cust"></canvas></div>
+      </div>
+      <div class="delivery-chart-card">
+        <h3>🏭 托运 vs 直送</h3>
+        <div style="height:240px"><canvas id="d-type"></canvas></div>
+      </div>
+      <div class="delivery-chart-card">
+        <h3>⏱️ 送货时效分布</h3>
+        <div style="height:240px"><canvas id="d-time"></canvas></div>
+      </div>
+    </div>
+  </div>
 </div>
 <footer>
   <strong>HUASUE MOULD PLASTIC CO., LTD</strong> &nbsp;<span class="ft-red">&bull;</span>&nbsp; บริษัท ฮว้า เฟิง แพคเกจจิ้ง จำกัด &nbsp;&bull;&nbsp; 每日自动生成 &nbsp;&bull;&nbsp; 生成时间: 2026-03-30 21:50:35
@@ -2519,6 +2628,47 @@ async function loadSheetJS() {
   }
 })();
 
+</script>
+
+<script>
+window.switchMainTab = function(tab) {
+  var isDelivery = tab === 'delivery';
+  document.getElementById('tabWarehouse').classList.toggle('active', !isDelivery);
+  document.getElementById('tabDelivery').classList.toggle('active', isDelivery);
+  document.getElementById('deliverySection').classList.toggle('show', isDelivery);
+  if (isDelivery && !window.deliveryChartsRendered) {
+    window.deliveryChartsRendered = true;
+    renderDeliveryCharts();
+  }
+};
+
+function renderDeliveryCharts() {
+  // 示例数据
+  var data = {
+    daily: {labels:['03-24','03-25','03-26','03-27','03-28','03-29','03-30'],boxes:[120,145,132,98,156,142,168]},
+    plates: [{name:'กทพ. 8888',boxes:456},{name:'กทพ. 5555',boxes:389},{name:'บร. 1234',boxes:312},{name:'กทพ. 7777',boxes:267},{name:'สร. 9999',boxes:198}],
+    dests: [{name:'春武里府',count:245},{name:'佛统府',count:189},{name:'曼谷',count:156},{name:'北揽府',count:98},{name:'其他',count:67}],
+    custs: [{name:'客户 A',boxes:234},{name:'客户 B',boxes:189},{name:'客户 C',boxes:156},{name:'客户 D',boxes:134},{name:'客户 E',boxes:112}],
+    types: [{name:'直送',value:65},{name:'托运',value:35}],
+    times: [{name:'≤2小时',value:45},{name:'2-4小时',value:32},{name:'4-6小时',value:15},{name:'>6小时',value:8}]
+  };
+  
+  document.getElementById('d-records').textContent = '156';
+  document.getElementById('d-boxes').textContent = '1,234';
+  document.getElementById('d-plates').textContent = '8';
+  document.getElementById('d-customers').textContent = '45';
+  
+  var optLine = {responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{y:{beginAtZero:true}}};
+  var optBarH = {responsive:true,maintainAspectRatio:false,indexAxis:'y',plugins:{legend:{display:false}}};
+  var optPie = {responsive:true,maintainAspectRatio:false};
+  
+  try { new Chart(document.getElementById('d-daily-trend'),{type:'line',data:{labels:data.daily.labels,datasets:[{label:'发货箱数',data:data.daily.boxes,borderColor:'#e63946',backgroundColor:'rgba(230,57,70,0.1)',fill:true,tension:0.4}]},options:optLine}); }catch(e){}
+  try { new Chart(document.getElementById('d-plate'),{type:'bar',data:{labels:data.plates.map(p=>p.name),datasets:[{data:data.plates.map(p=>p.boxes),backgroundColor:'#e63946'}]},options:optBarH}); }catch(e){}
+  try { new Chart(document.getElementById('d-dest'),{type:'doughnut',data:{labels:data.dests.map(d=>d.name),datasets:[{data:data.dests.map(d=>d.count),backgroundColor:['#e63946','#457b9d','#1d3557','#a8dadc','#f4a261']}]},options:optPie}); }catch(e){}
+  try { new Chart(document.getElementById('d-cust'),{type:'bar',data:{labels:data.custs.map(c=>c.name),datasets:[{data:data.custs.map(c=>c.boxes),backgroundColor:'#e63946'}]},options:optBarH}); }catch(e){}
+  try { new Chart(document.getElementById('d-type'),{type:'pie',data:{labels:data.types.map(t=>t.name),datasets:[{data:data.types.map(t=>t.value),backgroundColor:['#e63946','#457b9d']}]},options:optPie}); }catch(e){}
+  try { new Chart(document.getElementById('d-time'),{type:'bar',data:{labels:data.times.map(t=>t.name),datasets:[{data:data.times.map(t=>t.value),backgroundColor:['#2a9d8f','#457b9d','#e9c46a','#e76f51']}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}}}}); }catch(e){}
+}
 </script>
 </body>
 </html>
