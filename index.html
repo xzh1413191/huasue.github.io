@@ -3,79 +3,29 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>HUASUE 华塑 库存管理系统</title>
+<title>HUASUE Daily Report</title>
+<meta http-equiv="refresh" content="2;url=./HUASUE_daily_report_20260405.html">
 <style>
 *{margin:0;padding:0;box-sizing:border-box;}
-body{
-  font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
-  background:linear-gradient(135deg,#1a1a2e 0%,#16213e 50%,#0f3460 100%);
-  min-height:100vh;color:white;
-}
-.header{padding:32px 20px 16px;text-align:center;}
-.logo{font-size:3rem;margin-bottom:8px;}
-h1{font-size:1.8rem;letter-spacing:3px;margin-bottom:4px;}
-h2{font-size:.9rem;color:rgba(255,255,255,.5);font-weight:400;}
-.cards{max-width:900px;margin:24px auto;display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:20px;padding:0 20px;}
-.card{
-  background:rgba(255,255,255,.07);
-  border-radius:16px;padding:28px 24px;
-  border:1px solid rgba(255,255,255,.1);
-  backdrop-filter:blur(10px);
-  text-decoration:none;color:white;
-  transition:transform .2s,box-shadow .2s;
-}
-.card:hover{transform:translateY(-4px);box-shadow:0 12px 40px rgba(0,0,0,.3);}
-.icon{font-size:2.4rem;margin-bottom:12px;}
-.card h3{font-size:1.1rem;margin-bottom:6px;}
-.card p{font-size:.82rem;color:rgba(255,255,255,.5);}
-.card.today{border-color:rgba(231,76,60,.5);}
-.card.today:hover{box-shadow:0 8px 30px rgba(231,76,60,.3);}
-.card.trend{border-color:rgba(52,152,219,.5);}
-.card.trend:hover{box-shadow:0 8px 30px rgba(52,152,219,.3);}
-.card.delivery{border-color:rgba(39,174,96,.5);}
-.card.delivery:hover{box-shadow:0 8px 30px rgba(39,174,96,.3);}
-.badge{
-  display:inline-block;padding:3px 10px;border-radius:20px;
-  font-size:.72rem;margin-top:10px;font-weight:600;
-}
-.badge-today{background:rgba(231,76,60,.25);color:#ff7675;}
-.badge-trend{background:rgba(52,152,219,.25);color:#74b9ff;}
-.badge-delivery{background:rgba(39,174,96,.25);color:#55efc4;}
-footer{text-align:center;padding:30px;color:rgba(255,255,255,.25);font-size:.78rem;}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:linear-gradient(135deg,#1a1a2e 0%,#16213e 50%,#0f3460 100%);min-height:100vh;display:flex;align-items:center;justify-content:center;color:white;}
+.card{text-align:center;padding:48px 40px;background:rgba(255,255,255,0.05);border-radius:20px;border:1px solid rgba(255,255,255,0.1);backdrop-filter:blur(10px);max-width:420px;width:90%;}
+h1{font-size:22px;font-weight:700;margin-bottom:8px;letter-spacing:2px;}
+h2{font-size:14px;color:rgba(255,255,255,0.6);margin-bottom:32px;font-weight:400;}
+.date{background:rgba(231,76,60,0.2);border:1px solid rgba(231,76,60,0.4);border-radius:8px;padding:10px 20px;margin-bottom:24px;font-size:16px;color:#ff6b6b;}
+.btn{display:inline-block;background:linear-gradient(135deg,#e74c3c,#c0392b);color:white;padding:14px 36px;border-radius:50px;text-decoration:none;font-size:16px;font-weight:600;box-shadow:0 4px 20px rgba(231,76,60,0.4);}
+.hint{margin-top:20px;font-size:12px;color:rgba(255,255,255,0.4);}
+@keyframes spin{to{transform:rotate(360deg);}}
+.sp{width:16px;height:16px;border:2px solid rgba(255,255,255,0.2);border-top-color:white;border-radius:50%;animation:spin 0.8s linear infinite;display:inline-block;margin-right:6px;vertical-align:middle;}
 </style>
 </head>
 <body>
-<div class="header">
-  <div class="logo">🏭</div>
-  <h1>HUASUE 华塑</h1>
-  <h2>การจัดการคลังสินค้า &amp; ระบบสต็อก &nbsp;|&nbsp; Stock &amp; Warehouse Management</h2>
+<div class="card">
+  <div style="font-size:48px;margin-bottom:16px">&#127981;</div>
+  <h1>HUASUE</h1>
+  <h2>Daily Warehouse Report &#20179;&#24211;&#26085;&#25253;</h2>
+  <div class="date">&#128197; Latest: 2026-04-05</div>
+  <a href="./HUASUE_daily_report_20260405.html" class="btn">&#128202; View Report</a>
+  <p class="hint"><span class="sp"></span>Redirecting automatically...</p>
 </div>
-<div class="cards">
-  <a href="./HUASUE_daily_report_20260404.html" class="card today">
-    <div class="icon">📦</div>
-    <h3>每日库存报告</h3>
-    <p>รายงานสต็อกประจำวัน</p>
-    <p>Daily Stock Report</p>
-    <span class="badge badge-today">最新 Daily</span>
-  </a>
-  <a href="./stock_4day_trend.html" class="card trend">
-    <div class="icon">📈</div>
-    <h3>4日库存趋势分析</h3>
-    <p>การวิเคราะห์แนวโน้ม 4 วัน</p>
-    <p>4-Day Stock Trend</p>
-    <span class="badge badge-trend">Apr 1-4</span>
-  </a>
-  <a href="./delivery_analysis.html" class="card delivery">
-    <div class="icon">🚚</div>
-    <h3>发货分析</h3>
-    <p>การวิเคราะห์การจัดส่งสินค้า</p>
-    <p>Delivery Analysis</p>
-    <span class="badge badge-delivery">送货记录</span>
-  </a>
-</div>
-<footer>
-  HUASUE 华塑 库存管理系统 &nbsp;|&nbsp; ระบบจัดการสต็อก<br>
-  Updated: 2026-04-04
-</footer>
 </body>
 </html>
