@@ -1,0 +1,748 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>HUASUE 半个月生产计划 / แผนการผลิต 15 วัน</title>
+<script src="chartjs.min.js"></script>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'Microsoft YaHei', Arial, sans-serif; background: #f5f7fa; color: #1a1a2e; }
+  
+  .header {
+    background: linear-gradient(135deg, #c0392b 0%, #922b21 100%);
+    color: white; padding: 24px 32px;
+    display: flex; align-items: center; justify-content: space-between;
+  }
+  .header h1 { font-size: 26px; font-weight: 700; }
+  .header .subtitle { font-size: 13px; opacity: 0.9; margin-top: 4px; }
+  .badge { background: rgba(255,255,255,0.2); padding: 8px 18px; border-radius: 20px; font-size: 14px; }
+  
+  .summary-bar {
+    background: white; padding: 20px 32px;
+    display: flex; gap: 40px; flex-wrap: wrap;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.06); border-bottom: 1px solid #e8e8e8;
+  }
+  .kpi { display: flex; flex-direction: column; }
+  .kpi-val { font-size: 32px; font-weight: 700; }
+  .kpi-val.red { color: #e74c3c; }
+  .kpi-val.blue { color: #3498db; }
+  .kpi-val.green { color: #27ae60; }
+  .kpi-val.gray { color: #7f8c8d; }
+  .kpi-label { font-size: 12px; color: #888; margin-top: 4px; }
+  
+  .note-bar {
+    background: #e8f4f8; border-left: 4px solid #3498db;
+    padding: 12px 32px; font-size: 13px; color: #2c3e50;
+  }
+  
+  .main { padding: 24px 32px; }
+  
+  .section-title {
+    font-size: 18px; font-weight: 700; color: #1a1a2e;
+    margin: 28px 0 16px; padding-left: 14px;
+    border-left: 5px solid #c0392b;
+    display: flex; align-items: center; gap: 10px;
+  }
+  
+  .chart-container {
+    background: white; border-radius: 12px;
+    box-shadow: 0 2px 16px rgba(0,0,0,0.08);
+    padding: 24px; margin-bottom: 20px;
+  }
+  .chart-row { display: flex; gap: 20px; flex-wrap: wrap; }
+  .chart-box { flex: 1; min-width: 400px; }
+  
+  .plan-card {
+    background: white; border-radius: 12px;
+    box-shadow: 0 2px 16px rgba(0,0,0,0.08);
+    padding: 24px; margin-bottom: 16px;
+  }
+  .week-title {
+    font-size: 16px; font-weight: 700; color: #2c3e50;
+    margin-bottom: 16px; padding-bottom: 12px;
+    border-bottom: 2px solid #e8e8e8;
+    display: flex; align-items: center; gap: 10px;
+  }
+  .week-icon { 
+    width: 28px; height: 28px; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 13px; font-weight: 700; color: white;
+    flex-shrink: 0;
+  }
+  .icon-red { background: #e74c3c; }
+  .icon-blue { background: #3498db; }
+  .icon-orange { background: #e67e22; }
+  .icon-green { background: #27ae60; }
+  .icon-gray { background: #95a5a6; }
+  
+  .prod-item {
+    display: flex; align-items: center; gap: 14px;
+    padding: 14px 0; border-bottom: 1px solid #f5f5f5;
+  }
+  .prod-item:last-child { border-bottom: none; }
+  .prod-rank {
+    width: 24px; height: 24px; border-radius: 50%;
+    background: #e8e8e8; color: #666;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 12px; font-weight: 700; flex-shrink: 0;
+  }
+  .prod-rank.r1 { background: #e74c3c; color: white; }
+  .prod-rank.r2 { background: #3498db; color: white; }
+  .prod-rank.r3 { background: #e67e22; color: white; }
+  .prod-rank.r4 { background: #27ae60; color: white; }
+  .prod-info { flex: 1; }
+  .prod-name { font-size: 14px; font-weight: 600; color: #1a1a2e; }
+  .prod-sku { font-size: 12px; color: #888; margin-top: 2px; }
+  .prod-stats { display: flex; gap: 16px; font-size: 12px; color: #666; margin-top: 4px; flex-wrap: wrap; }
+  .color-badge {
+    display: inline-block; padding: 2px 8px; border-radius: 10px;
+    font-size: 11px; font-weight: 600; margin-left: 6px;
+  }
+  .color-black { background: #2c3e50; color: white; }
+  .color-clear { background: #85c1e9; color: #1a5276; }
+  .prod-qty { text-align: right; min-width: 90px; }
+  .qty-num { font-size: 22px; font-weight: 700; color: #c0392b; }
+  .qty-unit { font-size: 11px; color: #888; }
+  
+  .summary-table {
+    width: 100%; background: white; border-radius: 12px;
+    box-shadow: 0 2px 16px rgba(0,0,0,0.08);
+    border-collapse: collapse; font-size: 13px;
+    margin-top: 20px;
+  }
+  .summary-table th {
+    background: #2c3e50; color: white;
+    padding: 12px 14px; text-align: center;
+    font-weight: 600;
+  }
+  .summary-table th:first-child { border-radius: 12px 0 0 0; }
+  .summary-table th:last-child { border-radius: 0 12px 0 0; }
+  .summary-table td {
+    padding: 10px 14px; text-align: center;
+    border-bottom: 1px solid #f0f0f0;
+  }
+  .summary-table tr:last-child td { border-bottom: none; }
+  .summary-table tr:hover { background: #f8f9fa; }
+  .summary-table td.left { text-align: left; }
+  
+  .urgent-tag { 
+    display: inline-block; background: #fde8e8; color: #c0392b;
+    padding: 3px 12px; border-radius: 12px; font-size: 12px; font-weight: 600;
+  }
+  .blue-tag { 
+    display: inline-block; background: #e8f4fc; color: #3498db;
+    padding: 3px 12px; border-radius: 12px; font-size: 12px; font-weight: 600;
+  }
+  .num-red { color: #e74c3c; font-weight: 700; }
+  .num-blue { color: #3498db; font-weight: 700; }
+  .num-orange { color: #e67e22; font-weight: 600; }
+  
+  .footer {
+    background: #2c3e50; color: white;
+    padding: 16px 32px; margin-top: 40px;
+    text-align: center; font-size: 12px; opacity: 0.85;
+  }
+  
+  @media print {
+    body { background: white; }
+    .main { padding: 10px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div>
+    <h1>🏭 HUASUE 半个月生产计划 / แผนการผลิต 15 วัน</h1>
+    <div class="subtitle">数据日期：2026年4月22日 | สินค้าคงคลัง ณ วันที่ 22 เมษายน 2569</div>
+  </div>
+  <div class="badge">📅 制定日期：2026-04-23 | วันที่จัดทำ: 23 เมษายน 2569</div>
+</div>
+
+<div class="summary-bar">
+  <div class="kpi">
+    <span class="kpi-val red">3</span>
+    <span class="kpi-label">🔴 紧急（≤3天）</span>
+  </div>
+  <div class="kpi">
+    <span class="kpi-val blue">5</span>
+    <span class="kpi-label">🔵 本周排产（4-7天）</span>
+  </div>
+  <div class="kpi">
+    <span class="kpi-val orange">7</span>
+    <span class="kpi-label">🟠 半月内排产（8-15天）</span>
+  </div>
+  <div class="kpi">
+    <span class="kpi-val green">16</span>
+    <span class="kpi-label">✅ 库存充足（15天+）</span>
+  </div>
+  <div class="kpi">
+    <span class="kpi-val gray">20.5</span>
+    <span class="kpi-label">箱 黑色日均消耗</span>
+  </div>
+  <div class="kpi">
+    <span class="kpi-val blue">230.5</span>
+    <span class="kpi-label">箱 透明日均消耗</span>
+  </div>
+</div>
+
+<div class="note-bar">
+  📊 <strong>生产计划说明：</strong>基于2026年4月1日-4月22日共13个时间点的库存数据计算日均消耗量，制定15天生产计划。<br>
+  安全库存目标：15天消耗量 + 20%缓冲。黑色和透明产品分开计划，方便配色生产安排。
+</div>
+
+<div class="main">
+
+<div class="section-title">📊 日均消耗量可视化 / กราฟแสดงอัตราการใช้วัตถุดิบรายวัน</div>
+
+<div class="chart-row">
+  <div class="chart-box">
+    <div class="chart-container">
+      <h3 style="margin-bottom:16px;color:#2c3e50;">TOP 15 日均消耗量（按颜色）<br><span style="font-size:12px;color:#888;">อัตราการใช้วัตถุดิบรายวัน 15 อันดับแรก (แยกตามสี)</span></h3>
+      <canvas id="consumptionChart" height="350"></canvas>
+    </div>
+  </div>
+</div>
+
+<div class="chart-row">
+  <div class="chart-box">
+    <div class="chart-container">
+      <h3 style="margin-bottom:16px;color:#2c3e50;">黑色 vs 透明 日均消耗对比<br><span style="font-size:12px;color:#888;">เปรียบเทียบการใช้วัตถุดิบรายวัน สีดำ vs สีใส</span></h3>
+      <canvas id="colorPieChart" height="280"></canvas>
+    </div>
+  </div>
+  <div class="chart-box">
+    <div class="chart-container">
+      <h3 style="margin-bottom:16px;color:#2c3e50;">各产品系列消耗占比<br><span style="font-size:12px;color:#888;">สัดส่วนการใช้วัตถุดิบตามซีรีส์</span></h3>
+      <canvas id="seriesPieChart" height="280"></canvas>
+    </div>
+  </div>
+</div>
+
+<!-- 紧急排产 -->
+<div class="section-title">🔴 紧急排产 / ต้องผลิตทันที（剩余 ≤ 3天）</div>
+<div class="plan-card">
+  <div class="week-title">
+    <div class="week-icon icon-red">!</div>
+    今明两天内必须开机生产
+  </div>
+
+  <div class="prod-item">
+    <div class="prod-rank r1">1</div>
+    <div class="prod-info">
+      <div class="prod-name">圆碗700ml(800) <span class="color-badge color-clear">透明</span></div>
+      <div class="prod-sku">HS-K003 | กล่องข้าวกลม 700 ML.</div>
+      <div class="prod-stats">
+        <span>📦 库存：<strong>14箱</strong></span>
+        <span>📉 日消耗：<strong class="num-red">21.5箱/天</strong></span>
+        <span>⏱ 剩余：<strong class="num-red">0.7天</strong></span>
+        <span>🎨 需生产 <strong class="num-red">308箱</strong></span>
+      </div>
+    </div>
+    <div class="prod-qty">
+      <div class="qty-num">308</div>
+      <div class="qty-unit">箱（15天）</div>
+    </div>
+  </div>
+
+  <div class="prod-item">
+    <div class="prod-rank r1">2</div>
+    <div class="prod-info">
+      <div class="prod-name">2000透明圆形大盆 <span class="color-badge color-clear">透明</span></div>
+      <div class="prod-sku">HS-A010 | กล่องกลม ZS-2000 ml</div>
+      <div class="prod-stats">
+        <span>📦 库存：<strong>3箱</strong></span>
+        <span>📉 日消耗：<strong class="num-red">2.0箱/天</strong></span>
+        <span>⏱ 剩余：<strong class="num-red">1.5天</strong></span>
+        <span>🎨 需生产 <strong class="num-red">27箱</strong></span>
+      </div>
+    </div>
+    <div class="prod-qty">
+      <div class="qty-num">27</div>
+      <div class="qty-unit">箱（15天）</div>
+    </div>
+  </div>
+
+  <div class="prod-item">
+    <div class="prod-rank r2">3</div>
+    <div class="prod-info">
+      <div class="prod-name">圆碗950ml(1250) <span class="color-badge color-clear">透明</span></div>
+      <div class="prod-sku">HS-K005 | กล่องข้าวกลม 950 ML.</div>
+      <div class="prod-stats">
+        <span>📦 库存：<strong>58箱</strong></span>
+        <span>📉 日消耗：<strong class="num-red">22.0箱/天</strong></span>
+        <span>⏱ 剩余：<strong class="num-red">2.6天</strong></span>
+        <span>🎨 需生产 <strong class="num-red">272箱</strong></span>
+      </div>
+    </div>
+    <div class="prod-qty">
+      <div class="qty-num">272</div>
+      <div class="qty-unit">箱（15天）</div>
+    </div>
+  </div>
+</div>
+
+<!-- 本周排产（4-7天） -->
+<div class="section-title">🔵 本周排产 / ผลิตภายในสัปดาห์นี้（剩余 4-7天）</div>
+<div class="plan-card">
+  <div class="week-title">
+    <div class="week-icon icon-blue">4-7</div>
+    4月24日-4月27日安排生产
+  </div>
+
+  <div class="prod-item">
+    <div class="prod-rank r3">4</div>
+    <div class="prod-info">
+      <div class="prod-name">650透明圆形餐盒 <span class="color-badge color-clear">透明</span></div>
+      <div class="prod-sku">HS-A004 | กล่องกลม ZS-650 ml</div>
+      <div class="prod-stats">
+        <span>📦 库存：<strong>118箱</strong></span>
+        <span>📉 日消耗：<strong class="num-blue">20.0箱/天</strong></span>
+        <span>⏱ 剩余：<strong class="num-blue">5.9天</strong></span>
+        <span>🎨 需生产 <strong>182箱</strong></span>
+      </div>
+    </div>
+    <div class="prod-qty">
+      <div class="qty-num" style="color:#3498db">182</div>
+      <div class="qty-unit">箱（15天）</div>
+    </div>
+  </div>
+
+  <div class="prod-item">
+    <div class="prod-rank r3">5</div>
+    <div class="prod-info">
+      <div class="prod-name">16透防盗桶 <span class="color-badge color-clear">透明</span></div>
+      <div class="prod-sku">HS-B018 | ฝาล๊อก 300</div>
+      <div class="prod-stats">
+        <span>📦 库存：<strong>50箱</strong></span>
+        <span>📉 日消耗：<strong class="num-blue">8.5箱/天</strong></span>
+        <span>⏱ 剩余：<strong class="num-blue">5.9天</strong></span>
+        <span>🎨 需生产 <strong>77箱</strong></span>
+      </div>
+    </div>
+    <div class="prod-qty">
+      <div class="qty-num" style="color:#3498db">77</div>
+      <div class="qty-unit">箱（15天）</div>
+    </div>
+  </div>
+
+  <div class="prod-item">
+    <div class="prod-rank r3">6</div>
+    <div class="prod-info">
+      <div class="prod-name">方盒650ml <span class="color-badge color-clear">透明</span></div>
+      <div class="prod-sku">HS-K014 | กล่องข้าวเหลี่ยม 650 ML.</div>
+      <div class="prod-stats">
+        <span>📦 库存：<strong>340箱</strong></span>
+        <span>📉 日消耗：<strong class="num-blue">49.0箱/天</strong></span>
+        <span>⏱ 剩余：<strong class="num-blue">6.9天</strong></span>
+        <span>🎨 需生产 <strong>395箱</strong></span>
+      </div>
+    </div>
+    <div class="prod-qty">
+      <div class="qty-num" style="color:#3498db">395</div>
+      <div class="qty-unit">箱（15天）</div>
+    </div>
+  </div>
+
+  <div class="prod-item">
+    <div class="prod-rank r4">7</div>
+    <div class="prod-info">
+      <div class="prod-name">12透防盗桶 <span class="color-badge color-clear">透明</span></div>
+      <div class="prod-sku">HS-B017 | ฝาล๊อก 300</div>
+      <div class="prod-stats">
+        <span>📦 库存：<strong>69箱</strong></span>
+        <span>📉 日消耗：<strong class="num-blue">10.0箱/天</strong></span>
+        <span>⏱ 剩余：<strong class="num-blue">6.9天</strong></span>
+        <span>🎨 需生产 <strong>81箱</strong></span>
+      </div>
+    </div>
+    <div class="prod-qty">
+      <div class="qty-num" style="color:#3498db">81</div>
+      <div class="qty-unit">箱（15天）</div>
+    </div>
+  </div>
+
+  <div class="prod-item">
+    <div class="prod-rank r4">8</div>
+    <div class="prod-info">
+      <div class="prod-name">1000透明圆形餐盒 <span class="color-badge color-clear">透明</span></div>
+      <div class="prod-sku">HS-A006 | กล่องกลม ZS-1000 ml</div>
+      <div class="prod-stats">
+        <span>📦 库存：<strong>43箱</strong></span>
+        <span>📉 日消耗：<strong class="num-blue">5.0箱/天</strong></span>
+        <span>⏱ 剩余：<strong class="num-blue">8.6天</strong></span>
+        <span>🎨 需生产 <strong>32箱</strong></span>
+      </div>
+    </div>
+    <div class="prod-qty">
+      <div class="qty-num" style="color:#3498db">32</div>
+      <div class="qty-unit">箱（15天）</div>
+    </div>
+  </div>
+</div>
+
+<!-- 半月内排产（8-15天） -->
+<div class="section-title">🟠 半月内排产 / ผลิตภายใน 15 วัน（剩余 8-15天）</div>
+<div class="plan-card">
+  <div class="week-title">
+    <div class="week-icon icon-orange">8-15</div>
+    4月28日-5月7日安排生产
+  </div>
+
+  <div class="prod-item">
+    <div class="prod-rank">9</div>
+    <div class="prod-info">
+      <div class="prod-name">1280白圆碗防盗 <span class="color-badge color-clear">透明</span></div>
+      <div class="prod-sku">HS-B012 | กล่องกลมฝาล๊อกรุ่น 1280</div>
+      <div class="prod-stats">
+        <span>📦 库存：<strong>117箱</strong></span>
+        <span>📉 日消耗：<strong>12.0箱/天</strong></span>
+        <span>⏱ 剩余：<strong>9.8天</strong></span>
+        <span>🎨 需生产 <strong>63箱</strong></span>
+      </div>
+    </div>
+    <div class="prod-qty">
+      <div class="qty-num" style="color:#e67e22">63</div>
+      <div class="qty-unit">箱（15天）</div>
+    </div>
+  </div>
+
+  <div class="prod-item">
+    <div class="prod-rank">10</div>
+    <div class="prod-info">
+      <div class="prod-name">方盒500ml <span class="color-badge color-clear">透明</span></div>
+      <div class="prod-sku">HS-K013 | กล่องข้าวเหลี่ยม 500 ML.</div>
+      <div class="prod-stats">
+        <span>📦 库存：<strong>100箱</strong></span>
+        <span>📉 日消耗：<strong>8.0箱/天</strong></span>
+        <span>⏱ 剩余：<strong>12.5天</strong></span>
+        <span>🎨 需生产 <strong>20箱</strong></span>
+      </div>
+    </div>
+    <div class="prod-qty">
+      <div class="qty-num" style="color:#e67e22">20</div>
+      <div class="qty-unit">箱（15天）</div>
+    </div>
+  </div>
+
+  <div class="prod-item">
+    <div class="prod-rank">11</div>
+    <div class="prod-info">
+      <div class="prod-name">圆PET蛋糕高脚托盘(大) <span class="color-badge color-clear">透明</span></div>
+      <div class="prod-sku">HS-C003 | ขนาดใหญ่</div>
+      <div class="prod-stats">
+        <span>📦 库存：<strong>22箱</strong></span>
+        <span>📉 日消耗：<strong>1.0箱/天</strong></span>
+        <span>⏱ 剩余：<strong>22.0天</strong></span>
+        <span>🎨 需生产 <strong>0箱</strong></span>
+      </div>
+    </div>
+    <div class="prod-qty">
+      <div class="qty-num" style="color:#27ae60">0</div>
+      <div class="qty-unit">箱（充足）</div>
+    </div>
+  </div>
+
+  <div class="prod-item">
+    <div class="prod-rank">12</div>
+    <div class="prod-info">
+      <div class="prod-name">1500白圆碗防盗 <span class="color-badge color-clear">透明</span></div>
+      <div class="prod-sku">HS-B013 | กล่องกลมฝาล๊อกรุ่น 1500</div>
+      <div class="prod-stats">
+        <span>📦 库存：<strong>158箱</strong></span>
+        <span>📉 日消耗：<strong>6.0箱/天</strong></span>
+        <span>⏱ 剩余：<strong>26.3天</strong></span>
+        <span>🎨 需生产 <strong>0箱</strong></span>
+      </div>
+    </div>
+    <div class="prod-qty">
+      <div class="qty-num" style="color:#27ae60">0</div>
+      <div class="qty-unit">箱（充足）</div>
+    </div>
+  </div>
+
+  <div class="prod-item">
+    <div class="prod-rank">13</div>
+    <div class="prod-info">
+      <div class="prod-name">50连体酱料杯 <span class="color-badge color-clear">透明</span></div>
+      <div class="prod-sku">HS-A026 | ถ้วยน้ำจิ้ม P2 1000</div>
+      <div class="prod-stats">
+        <span>📦 库存：<strong>91箱</strong></span>
+        <span>📉 日消耗：<strong>5.0箱/天</strong></span>
+        <span>⏱ 剩余：<strong>18.2天</strong></span>
+        <span>🎨 需生产 <strong>0箱</strong></span>
+      </div>
+    </div>
+    <div class="prod-qty">
+      <div class="qty-num" style="color:#27ae60">0</div>
+      <div class="qty-unit">箱（充足）</div>
+    </div>
+  </div>
+
+  <div class="prod-item">
+    <div class="prod-rank">14</div>
+    <div class="prod-info">
+      <div class="prod-name">1750透明圆形深碗 <span class="color-badge color-clear">透明</span></div>
+      <div class="prod-sku">HS-A009 | กล่องกลม ZS-1750 ml</div>
+      <div class="prod-stats">
+        <span>📦 库存：<strong>103箱</strong></span>
+        <span>📉 日消耗：<strong>5.0箱/天</strong></span>
+        <span>⏱ 剩余：<strong>20.6天</strong></span>
+        <span>🎨 需生产 <strong>0箱</strong></span>
+      </div>
+    </div>
+    <div class="prod-qty">
+      <div class="qty-num" style="color:#27ae60">0</div>
+      <div class="qty-unit">箱（充足）</div>
+    </div>
+  </div>
+
+  <div class="prod-item">
+    <div class="prod-rank">15</div>
+    <div class="prod-info">
+      <div class="prod-name">珠边斜条纹圆型碗(大) <span class="color-badge color-clear">透明</span></div>
+      <div class="prod-sku">HS-C031 | ชามกลม PET JCA746</div>
+      <div class="prod-stats">
+        <span>📦 库存：<strong>45箱</strong></span>
+        <span>📉 日消耗：<strong>2.0箱/天</strong></span>
+        <span>⏱ 剩余：<strong>22.5天</strong></span>
+        <span>🎨 需生产 <strong>0箱</strong></span>
+      </div>
+    </div>
+    <div class="prod-qty">
+      <div class="qty-num" style="color:#27ae60">0</div>
+      <div class="qty-unit">箱（充足）</div>
+    </div>
+  </div>
+</div>
+
+<!-- 汇总表 -->
+<div class="section-title">📋 半个月生产计划汇总表 / ตารางสรุปแผนการผลิต 15 วัน</div>
+<table class="summary-table">
+  <thead>
+    <tr>
+      <th>#</th>
+      <th>SKU</th>
+      <th>产品名称 / ชื่อสินค้า</th>
+      <th>颜色<br>สี</th>
+      <th>当前库存<br>(箱)</th>
+      <th>日消耗<br>(箱/天)</th>
+      <th>剩余天数</th>
+      <th>15天消耗量</th>
+      <th>需生产<br>(箱)</th>
+      <th>优先级</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr style="background:#fde8e8">
+      <td>1</td><td>HS-K003</td><td class="left">圆碗700ml(800)</td><td><span class="color-badge color-clear">透明</span></td>
+      <td>14</td><td class="num-red">21.5</td><td class="num-red">0.7</td><td>323</td><td class="num-red">308</td>
+      <td><span class="urgent-tag">🔴 紧急</span></td>
+    </tr>
+    <tr style="background:#fde8e8">
+      <td>2</td><td>HS-A010</td><td class="left">2000透明圆形大盆</td><td><span class="color-badge color-clear">透明</span></td>
+      <td>3</td><td class="num-red">2.0</td><td class="num-red">1.5</td><td>30</td><td class="num-red">27</td>
+      <td><span class="urgent-tag">🔴 紧急</span></td>
+    </tr>
+    <tr style="background:#fde8e8">
+      <td>3</td><td>HS-K005</td><td class="left">圆碗950ml(1250)</td><td><span class="color-badge color-clear">透明</span></td>
+      <td>58</td><td class="num-red">22.0</td><td class="num-red">2.6</td><td>330</td><td class="num-red">272</td>
+      <td><span class="urgent-tag">🔴 紧急</span></td>
+    </tr>
+    <tr style="background:#e8f4fc">
+      <td>4</td><td>HS-A004</td><td class="left">650透明圆形餐盒</td><td><span class="color-badge color-clear">透明</span></td>
+      <td>118</td><td class="num-blue">20.0</td><td class="num-blue">5.9</td><td>300</td><td class="num-blue">182</td>
+      <td><span class="blue-tag">🔵 本周</span></td>
+    </tr>
+    <tr style="background:#e8f4fc">
+      <td>5</td><td>HS-B018</td><td class="left">16透防盗桶</td><td><span class="color-badge color-clear">透明</span></td>
+      <td>50</td><td class="num-blue">8.5</td><td class="num-blue">5.9</td><td>128</td><td class="num-blue">77</td>
+      <td><span class="blue-tag">🔵 本周</span></td>
+    </tr>
+    <tr style="background:#e8f4fc">
+      <td>6</td><td>HS-K014</td><td class="left">方盒650ml</td><td><span class="color-badge color-clear">透明</span></td>
+      <td>340</td><td class="num-blue">49.0</td><td class="num-blue">6.9</td><td>735</td><td class="num-blue">395</td>
+      <td><span class="blue-tag">🔵 本周</span></td>
+    </tr>
+    <tr style="background:#e8f4fc">
+      <td>7</td><td>HS-B017</td><td class="left">12透防盗桶</td><td><span class="color-badge color-clear">透明</span></td>
+      <td>69</td><td class="num-blue">10.0</td><td class="num-blue">6.9</td><td>150</td><td class="num-blue">81</td>
+      <td><span class="blue-tag">🔵 本周</span></td>
+    </tr>
+    <tr style="background:#e8f4fc">
+      <td>8</td><td>HS-A006</td><td class="left">1000透明圆形餐盒</td><td><span class="color-badge color-clear">透明</span></td>
+      <td>43</td><td class="num-blue">5.0</td><td class="num-blue">8.6</td><td>75</td><td class="num-blue">32</td>
+      <td><span class="blue-tag">🔵 本周</span></td>
+    </tr>
+    <tr style="background:#fef0e7">
+      <td>9</td><td>HS-B012</td><td class="left">1280白圆碗防盗</td><td><span class="color-badge color-clear">透明</span></td>
+      <td>117</td><td>12.0</td><td>9.8</td><td>180</td><td>63</td>
+      <td><span class="urgent-tag" style="background:#fef0e7;color:#e67e22">🟠 半月</span></td>
+    </tr>
+    <tr style="background:#fef0e7">
+      <td>10</td><td>HS-K013</td><td class="left">方盒500ml</td><td><span class="color-badge color-clear">透明</span></td>
+      <td>100</td><td>8.0</td><td>12.5</td><td>120</td><td>20</td>
+      <td><span class="urgent-tag" style="background:#fef0e7;color:#e67e22">🟠 半月</span></td>
+    </tr>
+    <tr style="background:#eafaf1">
+      <td>11</td><td>HS-K004</td><td class="left">圆碗800ml(1000)</td><td><span class="color-badge color-clear">透明</span></td>
+      <td>405</td><td>8.0</td><td>50.6</td><td>120</td><td>0</td>
+      <td><span class="urgent-tag" style="background:#eafaf1;color:#27ae60">✅ 充足</span></td>
+    </tr>
+    <tr style="background:#eafaf1">
+      <td>12</td><td>HS-K002</td><td class="left">圆碗400ml(450)</td><td><span class="color-badge color-clear">透明</span></td>
+      <td>255</td><td>7.5</td><td>34.0</td><td>113</td><td>0</td>
+      <td><span class="urgent-tag" style="background:#eafaf1;color:#27ae60">✅ 充足</span></td>
+    </tr>
+    <tr style="background:#eafaf1">
+      <td>13</td><td>HS-K009</td><td class="left">方盒400ml(500)</td><td><span class="color-badge color-clear">透明</span></td>
+      <td>328</td><td>7.5</td><td>43.7</td><td>113</td><td>0</td>
+      <td><span class="urgent-tag" style="background:#eafaf1;color:#27ae60">✅ 充足</span></td>
+    </tr>
+    <tr style="background:#eafaf1">
+      <td>14</td><td>HS-B013</td><td class="left">1500白圆碗防盗</td><td><span class="color-badge color-clear">透明</span></td>
+      <td>158</td><td>6.0</td><td>26.3</td><td>90</td><td>0</td>
+      <td><span class="urgent-tag" style="background:#eafaf1;color:#27ae60">✅ 充足</span></td>
+    </tr>
+    <tr style="background:#eafaf1">
+      <td>15</td><td>HS-A008</td><td class="left">1500透明圆形深碗</td><td><span class="color-badge color-clear">透明</span></td>
+      <td>341</td><td>5.0</td><td>68.2</td><td>75</td><td>0</td>
+      <td><span class="urgent-tag" style="background:#eafaf1;color:#27ae60">✅ 充足</span></td>
+    </tr>
+  </tbody>
+</table>
+
+<div style="margin-top:20px;padding:16px 20px;background:white;border-radius:12px;font-size:13px;color:#666;box-shadow:0 2px 8px rgba(0,0,0,0.05)">
+  <strong>📌 说明 / หมายเหตุ：</strong><br>
+  1. 日均消耗量基于2026年4月1日-4月22日共13个时间点库存数据计算<br>
+  2. 安全库存目标 = 15天消耗量 + 20%缓冲库存<br>
+  3. 需生产量 = (日消耗 × 15天 + 缓冲) - 当前库存（若为负则显示0）<br>
+  4. 黑色产品（HS-A028-A031系列）当前消耗量较低，已纳入库存充足范围
+</div>
+
+</div>
+
+<div class="footer">
+  HUASUE 华塑工厂 | 半个月生产计划 แผนการผลิต 15 วัน | 生成时间：2026-04-23 | 数据来源：每日库存报告 4/1-4/22
+</div>
+
+<script>
+// TOP 15 日均消耗量柱状图
+const consumptionCtx = document.getElementById('consumptionChart').getContext('2d');
+new Chart(consumptionCtx, {
+  type: 'bar',
+  data: {
+    labels: [
+      '方盒650ml(K14)', '圆碗950ml(K05)', '圆碗700ml(K03)', '650透明圆盒(A04)',
+      '防盗1280(B12)', '防盗12透(B17)', '防盗16透(B18)', '方盒500(K13)',
+      '圆碗800ml(K04)', '防盗1500(B13)', '1000透明圆盒(A06)', '连体酱料杯(A26)',
+      '1750透明深碗(A09)', '1500透明深碗(A08)', '圆碗280ml(K01)'
+    ],
+    datasets: [{
+      label: '日均消耗量 (箱/天)',
+      data: [49, 22, 21.5, 20, 12, 10, 8.5, 8, 8, 6, 5, 5, 5, 5, 5],
+      backgroundColor: [
+        '#e74c3c', '#e74c3c', '#e74c3c',  // 紧急 - 红色
+        '#3498db', '#3498db',              // 本周 - 蓝色
+        '#e67e22', '#e67e22',              // 本周 - 橙色
+        '#95a5a6', '#95a5a6', '#95a5a6',  // 半月 - 灰色
+        '#27ae60', '#27ae60', '#27ae60', '#27ae60', '#27ae60'  // 充足 - 绿色
+      ],
+      borderRadius: 6,
+      borderSkipped: false
+    }]
+  },
+  options: {
+    responsive: true,
+    maintainAspectRatio: false,
+    plugins: {
+      legend: { display: false },
+      tooltip: {
+        callbacks: {
+          label: function(context) {
+            return '日消耗: ' + context.raw + ' 箱/天';
+          }
+        }
+      }
+    },
+    scales: {
+      y: {
+        beginAtZero: true,
+        title: { display: true, text: '箱/天' }
+      }
+    }
+  }
+});
+
+// 黑色vs透明饼图
+const colorCtx = document.getElementById('colorPieChart').getContext('2d');
+new Chart(colorCtx, {
+  type: 'doughnut',
+  data: {
+    labels: ['黑色产品', '透明产品'],
+    datasets: [{
+      data: [20.5, 230.5],
+      backgroundColor: ['#2c3e50', '#85c1e9'],
+      borderWidth: 3,
+      borderColor: '#fff'
+    }]
+  },
+  options: {
+    responsive: true,
+    maintainAspectRatio: false,
+    plugins: {
+      legend: {
+        position: 'bottom',
+        labels: { padding: 20, font: { size: 14 } }
+      },
+      tooltip: {
+        callbacks: {
+          label: function(context) {
+            const total = context.dataset.data.reduce((a, b) => a + b, 0);
+            const pct = ((context.raw / total) * 100).toFixed(1);
+            return context.label + ': ' + context.raw + ' 箱/天 (' + pct + '%)';
+          }
+        }
+      }
+    }
+  }
+});
+
+// 系列消耗饼图
+const seriesCtx = document.getElementById('seriesPieChart').getContext('2d');
+new Chart(seriesCtx, {
+  type: 'doughnut',
+  data: {
+    labels: ['K系列(通货)', 'A系列(透明)', 'B系列(防盗)', 'C系列(蛋糕)', '其他'],
+    datasets: [{
+      data: [120, 85, 36.5, 5, 4.5],
+      backgroundColor: ['#c0392b', '#3498db', '#e67e22', '#9b59b6', '#95a5a6'],
+      borderWidth: 3,
+      borderColor: '#fff'
+    }]
+  },
+  options: {
+    responsive: true,
+    maintainAspectRatio: false,
+    plugins: {
+      legend: {
+        position: 'bottom',
+        labels: { padding: 20, font: { size: 14 } }
+      },
+      tooltip: {
+        callbacks: {
+          label: function(context) {
+            const total = context.dataset.data.reduce((a, b) => a + b, 0);
+            const pct = ((context.raw / total) * 100).toFixed(1);
+            return context.label + ': ' + context.raw + ' 箱/天 (' + pct + '%)';
+          }
+        }
+      }
+    }
+  }
+});
+</script>
+
+</body>
+</html>
